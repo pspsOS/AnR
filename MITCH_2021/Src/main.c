@@ -25,12 +25,16 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* User-defined libraries */
+
 #include "acquisition.h"
 #include "controlLogic.h"
 #include "monitoring.h"
 #include "processing.h"
 #include "storage.h"
 #include "transmission.h"
+
+/* C-libraries */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -44,6 +48,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
+#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

@@ -25,6 +25,20 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* User Defined libraries */
+
+#include "acquisition.h"
+#include "controlLogic.h"
+#include "monitoring.h"
+#include "processing.h"
+#include "storage.h"
+#include "transmission.h"
+
+/* Imported C-libraries */
+
+#include <stdbool.h>
+#include <stdint.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,9 +76,9 @@ osStaticThreadDef_t ProcessingControlBlock;
 osThreadId ControlLogicHandle;
 uint32_t ControlLogicBuffer[ 128 ];
 osStaticThreadDef_t ControlLogicControlBlock;
-osThreadId MontoringHandle;
-uint32_t MontoringBuffer[ 128 ];
-osStaticThreadDef_t MontoringControlBlock;
+osThreadId MonitoringHandle;
+uint32_t MonitoringBuffer[ 128 ];
+osStaticThreadDef_t MonitoringControlBlock;
 osThreadId StorageHandle;
 uint32_t StorageBuffer[ 128 ];
 osStaticThreadDef_t StorageControlBlock;
@@ -174,9 +188,9 @@ int main(void)
   osThreadStaticDef(ControlLogic, startControlLogic, osPriorityNormal, 0, 128, ControlLogicBuffer, &ControlLogicControlBlock);
   ControlLogicHandle = osThreadCreate(osThread(ControlLogic), (void*) hotBoot);
 
-  /* definition and creation of Montoring */
-  osThreadStaticDef(Montoring, startMonitoring, osPriorityLow, 0, 128, MontoringBuffer, &MontoringControlBlock);
-  MontoringHandle = osThreadCreate(osThread(Montoring), (void*) hotBoot);
+  /* definition and creation of Monitoring */
+  osThreadStaticDef(Monitoring, startMonitoring, osPriorityLow, 0, 128, MonitoringBuffer, &MonitoringControlBlock);
+  MonitoringHandle = osThreadCreate(osThread(Monitoring), (void*) hotBoot);
 
   /* definition and creation of Storage */
   osThreadStaticDef(Storage, setupStorage, osPriorityHigh, 0, 128, StorageBuffer, &StorageControlBlock);

@@ -25,8 +25,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-/* User-defined libraries */
-
 #include "acquisition.h"
 #include "controlLogic.h"
 #include "monitoring.h"
@@ -34,11 +32,8 @@
 #include "storage.h"
 #include "transmission.h"
 
-/* C-libraries */
-
 #include <stdbool.h>
 #include <stdint.h>
-
 
 /* USER CODE END Includes */
 

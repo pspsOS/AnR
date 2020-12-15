@@ -33,6 +33,7 @@
 #include "processing.h"
 #include "storage.h"
 #include "transmission.h"
+#include "common.h"
 
 /* C-libraries */
 

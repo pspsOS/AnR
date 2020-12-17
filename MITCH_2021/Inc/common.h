@@ -24,14 +24,16 @@ typedef struct daqStatusData {
 /* 		(d) Enable DAQ Scaling, default = 0
  * 		(G) GPS setup and nominal, default = 0
  * 		(B) Barometric Altimeter (BMP) setup and nominal, default = 0
- * 		(I) Inertial Measurement Unit (IMU) nominal, default = 0
+ * 		(I) Inertial Measurement Unit (IMU) setup and nominal, default = 0
  * 		(A) Analog Linear Accelerometer (ALA) nominal, default = 0
  */
 } daqStatusData_t;
 
 typedef struct gpsData {
 	uint32_t timeStamp;
-	float lla[3]; // Lat, Lon, Alt
+	float lat;
+	float lon;
+	float alt;
 	float speed;
 	float angle;
 	uint8_t gpsStatus; // = FQQQnnnn
@@ -50,21 +52,25 @@ typedef struct bmpData {
 
 typedef struct imuData {
 	uint32_t timeStamp;
-	float data[10];
-/* 0,1,2 = Acc X,Y,Z
- * 3,4,5 = Gyr X,Y,Z
- * 6,7,8 = Mag X,Y,Z
- *    10 = ALA Z
- */
+	float accX;
+	float accY;
+	float accZ;
+	float gyrX;
+	float gyrY;
+	float gyrZ;
+	float magX;
+	float magY;
+	float magZ;
+	float alaZ;
 
 } imuData_t;
 
-typedef struct monitoring {
+typedef struct monitorData {
 	uint32_t timeStamp;
 	uint8_t voltage;
 	uint8_t monitorStatus;
 
-} monitoring_t;
+} monitorData_t;
 
 typedef struct processedData {
 	uint32_t timeStamp;

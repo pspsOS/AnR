@@ -15,6 +15,8 @@
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 
 
+/* Common Functions */
+uint32_t getTimeStamp(void);
 
 /* Typedef structs */
 
@@ -31,6 +33,7 @@ typedef struct daqStatusData {
 
 typedef struct gpsData {
 	uint32_t timeStamp;
+	char NMEA[80];
 	float lat;
 	float lon;
 	float alt;

@@ -8,6 +8,10 @@
 #ifndef INC_ACQUISITION_H_
 #define INC_ACQUISITION_H_
 
+#include "common.h"
 
+
+
+gpsData_t *getGpsData();
 
 #endif /* INC_ACQUISITION_H_ */

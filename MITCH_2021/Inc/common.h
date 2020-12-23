@@ -15,10 +15,17 @@
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 
 
+/* User-defined Constants*/
+#define True 1
+#define False 0
+
 /* Common Functions */
+byte pspStrCmp(char *str, byte start, char *compare, byte length);
 uint32_t getTimeStamp(void);
 
-/* Typedef structs */
+/* Typedef structs and types */
+
+typedef unsigned char byte;
 
 typedef struct daqStatusData {
 	uint32_t timeStamp;
@@ -34,13 +41,16 @@ typedef struct daqStatusData {
 typedef struct gpsData {
 	uint32_t timeStamp;
 	char NMEA[80];
+	byte fix;
+	byte quality;
+	byte numSats;
 	float lat;
 	float lon;
 	float alt;
 	float speed;
 	float angle;
-	uint8_t gpsStatus; // = FQQQnnnn
-/*		(F) Fix
+/*	uint8_t gpsStatus; // = FQQQnnnn
+		(F) Fix
  * 	  (QQQ) Quality
  * 	 (nnnn) Number of Satellites
  */

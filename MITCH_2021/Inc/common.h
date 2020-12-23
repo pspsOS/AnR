@@ -16,11 +16,13 @@
 
 
 /* User-defined Constants*/
-#define True 1
-#define False 0
 
-/* Common Functions */
-byte pspStrCmp(char *str, byte start, char *compare, byte length);
+#define TRUE 1
+#define FALSE 0
+#define MAX_NMEA 80
+
+/* Common Function Prototypes */
+
 uint32_t getTimeStamp(void);
 
 /* Typedef structs and types */
@@ -40,7 +42,7 @@ typedef struct daqStatusData {
 
 typedef struct gpsData {
 	uint32_t timeStamp;
-	char NMEA[80];
+	char NMEA[MAX_NMEA];
 	byte fix;
 	byte quality;
 	byte numSats;

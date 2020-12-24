@@ -8,6 +8,8 @@
 #ifndef INC_CONTROLLOGIC_H_
 #define INC_CONTROLLOGIC_H_
 
+#include "common.h"
+
 /* function prototypes */
 
 void modeLogic();

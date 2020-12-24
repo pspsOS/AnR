@@ -8,6 +8,8 @@
 #ifndef INC_MONITORING_H_
 #define INC_MONITORING_H_
 
+#include "common.h"
+
 /* function prototypes */
 
 void checkBatteryVoltage();

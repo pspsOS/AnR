@@ -29,6 +29,9 @@ uint32_t getTimeStamp(void);
 
 typedef unsigned char byte;
 
+// TODO: Refine bool definition
+typedef unsigned char bool;
+
 typedef struct daqStatusData {
 	uint32_t timeStamp;
 	uint8_t daqStatus; // = d000GBIA

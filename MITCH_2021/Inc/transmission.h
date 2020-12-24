@@ -8,6 +8,8 @@
 #ifndef INC_TRANSMISSION_H_
 #define INC_TRANSMISSION_H_
 
+#include "common.h"
+
 /* Function Prototypes */
 void getData();
 void transmitData();

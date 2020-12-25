@@ -18,11 +18,16 @@ bool alaSetup();
 
 // Loop
 gpsData_t getGpsData();
+bmpData_t getbmpData();
 
 gpsData_t gpsRead();
 bmpData_t bmpRead();
 imuData_t imuRead();
 
 void checkStatus();
+
+
+// Private
+void _findNmeaAddr(int addr);
 
 #endif /* INC_ACQUISITION_H_ */

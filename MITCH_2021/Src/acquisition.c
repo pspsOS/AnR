@@ -141,14 +141,17 @@ void checkStatus() {
 }
 
 
-/* TODO: Document _findNmeaAddr
- *  Finds the start and end addresses of a given field
- *  within the comma separated string gpsNmea.
- *  Stores start address in _nmeaAddrStart
- *  Stores end address in _nmeaAddrEnd
+/**
+ * @brief NMEA Address Identification
+ * Finds the start and end addresses of a given field within the comma separated string gpsNmea.
+ *   Stores start address in _nmeaAddrStart
+ *   Stores end address in _nmeaAddrEnd
  *
- *  Author: Jeff Kaji
- *  Date: 12/25/2020
+ * @param addr: Address to locate
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/25/2020
  */
 void _findNmeaAddr(int addr) {
     for(int i = 0; i < 80; i++) {

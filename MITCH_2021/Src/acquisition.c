@@ -140,10 +140,28 @@ void checkStatus() {
 
 }
 
+/**
+ * @brief Split NMEA String
+ * Takes raw NMEA string and replaces ',' with '\n', splitting each substring
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/26/2020
+ */
+void _splitNmea() {
+	for(int i = 0; i < 80; i++) {
+		if(gpsNmea[i] == ',')
+			gpsNmea[i] = '\n';
+		if(gpsNmea[i] == 0)
+			return;
+	}
+}
 
 /**
  * @brief NMEA Address Identification
- * Finds the start and end addresses of a given field within the comma separated string gpsNmea.
+ * Finds the start and end addresses of a given field within split string gpsNmea.
  *   Stores start address in _nmeaAddrStart
  *   Stores end address in _nmeaAddrEnd
  *
@@ -157,7 +175,7 @@ void _findNmeaAddr(int addr) {
     for(int i = 0; i < 80; i++) {
 
     	// Find instance of ','
-        if(gpsNMEA[i] == ',') {
+        if(gpsNmea[i] == '\n') {
             addr -= 1;
 
             // Set end address
@@ -171,7 +189,7 @@ void _findNmeaAddr(int addr) {
         }
 
         // Handle end of string condition
-        if(gpsNMEA[i] == 0) {
+        if(gpsNmea[i] == 0) {
             _nmeaAddrEnd = i;
             return;
         }

@@ -9,7 +9,7 @@
 
 
 uint32_t getTimeStamp(void) {
-#ifndef COMMONSTM_H_
+#ifndef __MAIN_H
 	return 0;
 #else
 	return HAL_GetTick();

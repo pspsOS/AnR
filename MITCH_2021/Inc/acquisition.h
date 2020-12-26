@@ -20,9 +20,9 @@ bool alaSetup();
 gpsData_t getGpsData();
 bmpData_t getbmpData();
 
-gpsData_t gpsRead();
-bmpData_t bmpRead();
-imuData_t imuRead();
+void gpsRead();
+void bmpRead();
+void imuRead();
 
 void checkStatus();
 

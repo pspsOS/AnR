@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include "acquisition.h"
+#include "common.h"
 
 gpsData_t g_gpsData;
 
@@ -40,12 +41,12 @@ byte _nmeaAddrEnd;
  * Date: 12/23/2020
  */
 bool gpsSetup() {
-
+	return 0;
 }
 
 
 bool bmpSetup() {
-
+	return 0;
 }
 
 
@@ -56,7 +57,7 @@ bool bmpSetup() {
  * Date: 12/23/2020
  */
 bool imuSetup() {
-
+	return 0;
 }
 
 
@@ -67,7 +68,7 @@ bool imuSetup() {
  * Date: 12/23/2020
  */
 bool alaSetup() {
-
+	return 0;
 }
 
 // Loop
@@ -80,10 +81,11 @@ bool alaSetup() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-gpsData_t gpsRead() {
+void gpsRead() {
 
 // Parse each GPS packet type
 	//	Type = GPGGA
+	/*
 	if (!(strncmp(gpsNmea[0], "$GPGGA,", 7))) {
 
 	}
@@ -96,13 +98,14 @@ gpsData_t gpsRead() {
 	//	Catch Bad Read
 	else {
 		gpsNominal = FALSE;
-		return NULL;
+
 	}
-
+	*/
 	g_gpsData.timeStamp = getTimeStamp();
-	strncpy(gpsData.Nmea, gpsNmea, strlen(gpsNmea));
 
-	return;
+	strncpy(g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
+
+//	return;
 }
 
 
@@ -119,12 +122,12 @@ gpsData_t gpsRead() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-bmpData_t bmpRead() {
+void bmpRead() {
 
 }
 
 
-imuData_t imuRead() {
+void imuRead() {
 
 }
 

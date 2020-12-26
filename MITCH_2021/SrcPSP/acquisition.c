@@ -5,9 +5,11 @@
  *      Author: vishv
  */
 
+#include "../IncPSP/acquisition.h"
+
 #include <string.h>
-#include "acquisition.h"
-#include "common.h"
+
+#include "../IncPSP/common.h"
 
 gpsData_t g_gpsData;
 

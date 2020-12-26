@@ -5,11 +5,14 @@
  *      Author: Jeff
  */
 
-#include "common.h"
+#include "../IncPSP/common.h"
 
 
-// TODO: Implement getTimeStamp()
 uint32_t getTimeStamp(void) {
+#ifndef COMMONSTM_H_
+	return 0;
+#else
 	return HAL_GetTick();
+#endif
 }
 

@@ -5,7 +5,7 @@
  *      Author: vishv
  */
 
-#include "transmission.h"
+#include "../IncPSP/transmission.h"
 
 /* TODO: Implement getData
  * This function gets the transmission data from the control logic task

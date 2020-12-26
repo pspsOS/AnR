@@ -21,9 +21,11 @@
 #define FALSE 0
 #define MAX_NMEA 80
 
+
 /* Common Function Prototypes */
 
 uint32_t getTimeStamp(void);
+
 
 /* Typedef structs and types */
 

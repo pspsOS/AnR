@@ -5,7 +5,7 @@
  *      Author: vishv
  */
 
-#include "controlLogic.h"
+#include "../IncPSP/controlLogic.h"
 
 
 /* TODO: Implement modeLogic

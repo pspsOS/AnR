@@ -27,18 +27,16 @@
 
 /* User-defined libraries */
 
-#include "acquisition.h"
-#include "controlLogic.h"
-#include "monitoring.h"
-#include "processing.h"
-#include "storage.h"
-#include "transmission.h"
-#include "common.h"
-
-/* C-libraries */
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "../IncPSP/acquisition.h"
+#include "../IncPSP/common.h"
+#include "../IncPSP/controlLogic.h"
+#include "../IncPSP/monitoring.h"
+#include "../IncPSP/processing.h"
+#include "../IncPSP/storage.h"
+#include "../IncPSP/transmission.h"
 
 /* USER CODE END Includes */
 

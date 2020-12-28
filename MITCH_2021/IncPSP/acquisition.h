@@ -28,6 +28,15 @@ void checkStatus();
 
 
 // Private
+void _splitNmea();
 void _findNmeaAddr(int addr);
+
+// Test functions
+void __setNmea(char *nmea);
+void __printNmea();
+
+float __getFloat(int addr);
+
+void __debug();
 
 #endif /* INC_ACQUISITION_H_ */

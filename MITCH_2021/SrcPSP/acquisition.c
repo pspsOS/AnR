@@ -5,11 +5,11 @@
  *      Author: vishv
  */
 
-#include "../IncPSP/acquisition.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-#include "../IncPSP/common.h"
+#include "../IncPSP/acquisition.h"
 
 gpsData_t g_gpsData;
 
@@ -85,16 +85,43 @@ bool alaSetup() {
  */
 void gpsRead() {
 
+	printf("Reading:");
+
 // Parse each GPS packet type
 	//	Type = GPGGA
-	/*
-	if (!(strncmp(gpsNmea[0], "$GPGGA,", 7))) {
+	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
+		printf("GGA");
 
+		// Get Latitude
+		_findNmeaAddr(2);
+		//g_gpsData.lat = (int)(10000*atof(&gpsNmea[_nmeaAddrStart]));
+		g_gpsData.lat = atof(&gpsNmea[_nmeaAddrStart]);
+		if (gpsNmea[_nmeaAddrEnd + 1] == 'N');
+		else if (gpsNmea[_nmeaAddrEnd + 1] == 'S')
+			g_gpsData.lat *= -1;
+		else {
+			gpsNominal = FALSE;
+			return;
+		}
+
+		// Get Longitude
+		_findNmeaAddr(4);
+		g_gpsData.lon = atof(&gpsNmea[_nmeaAddrStart]);
+		if (gpsNmea[_nmeaAddrEnd + 1] == 'E');
+		else if (gpsNmea[_nmeaAddrEnd + 1] == 'W')
+			g_gpsData.lon *= -1;
+		else {
+			gpsNominal = FALSE;
+			return;
+		}
+
+		printf("\n%.4f\n",g_gpsData.lat);
 	}
 
 	//	Type = GPRMC
-	else if (!(strncmp(gpsNmea[0], "$GPRMC,", 7))) {
-
+	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
+		//puts("RMC");
+		printf("RMC");
 	}
 
 	//	Catch Bad Read
@@ -102,7 +129,7 @@ void gpsRead() {
 		gpsNominal = FALSE;
 
 	}
-	*/
+
 	g_gpsData.timeStamp = getTimeStamp();
 
 	strncpy(g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
@@ -158,8 +185,8 @@ void checkStatus() {
 void _splitNmea() {
 	for(int i = 0; i < 80; i++) {
 		if(gpsNmea[i] == ',')
-			gpsNmea[i] = '\n';
-		if(gpsNmea[i] == 0)
+			gpsNmea[i] = 0;
+		else if(gpsNmea[i] == 0)
 			return;
 	}
 }
@@ -180,13 +207,13 @@ void _findNmeaAddr(int addr) {
     for(int i = 0; i < 80; i++) {
 
     	// Find instance of ','
-        if(gpsNmea[i] == '\n') {
+        if(gpsNmea[i] == 0) {
             addr -= 1;
 
             // Set end address
             if(addr == -1) {
                 _nmeaAddrEnd = i;
-                return;
+                break;
             }
 
             // Set start address
@@ -194,10 +221,64 @@ void _findNmeaAddr(int addr) {
         }
 
         // Handle end of string condition
-        if(gpsNmea[i] == 0) {
+        /*if(gpsNmea[i] == 0) {
             _nmeaAddrEnd = i;
-            return;
-        }
+            break;
+        }*/
     }
+    /*
+    printf("Start:%d\n", _nmeaAddrStart);
+    printf("End:  %d\n", _nmeaAddrEnd);
+    */
 }
 
+// Test Functions
+
+/**
+ * @brief Set Local NMEA String
+ * Sets the local string gpsNmea[80] to the input string.
+ * As of now, is only intended for use in the testbed.
+ *
+ * @param nmea: New value for local string
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/26/2020
+ */
+void __setNmea(char *nmea) {
+	strncpy(gpsNmea, nmea, strlen(nmea));
+}
+
+/**
+ * @brief Print NMEA string
+ * Prints NMEA string to console. Used for debugging.
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/26/2020
+ */
+void __printNmea() {
+	printf("\n%s", gpsNmea);
+}
+
+/**
+ * @brief Get float from NMEA
+ * Returns a specific float from GPS string. Used for debugging.
+ * @param addr: Address within the NMEA string
+ * @return None
+ *
+ * @author Jeff Kaji
+ * @date 12/27/2020
+ */
+float __getFloat(int addr) {
+	_findNmeaAddr(addr);
+	printf("Start: %d\n", _nmeaAddrStart);
+	printf("End:   %d\n", _nmeaAddrEnd);
+	printf("%s\n", &gpsNmea[_nmeaAddrStart]);
+	return atof(&gpsNmea[_nmeaAddrStart]);
+}
+void __debug() {
+	printf("%s",&gpsNmea[_nmeaAddrEnd + 1]);
+}

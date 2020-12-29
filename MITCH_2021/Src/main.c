@@ -736,10 +736,12 @@ void startControlLogic(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
+	setup_M();
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  loop_M();
+	  osDelay(1);
   }
   /* USER CODE END startMonitoring */
 }

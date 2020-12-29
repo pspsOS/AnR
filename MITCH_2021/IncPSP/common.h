@@ -9,6 +9,8 @@
 #define COMMON_H_
 
 #include <stdint.h>
+#include <stdbool.h>
+
 /* User-defined Macros */
 
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
@@ -17,9 +19,9 @@
 
 /* User-defined Constants*/
 
-#define TRUE 1
-#define FALSE 0
-#define MAX_NMEA 80
+#define MAX_NMEA (80)
+
+/* User typedef */
 
 typedef uint8_t ui8;
 typedef uint16_t ui16;
@@ -32,11 +34,6 @@ ui32 getTimeStamp(void);
 void retryTakeDelay(int length);
 
 /* Typedef structs and types */
-
-
-
-// TODO: Refine bool definition
-typedef unsigned char bool;
 
 typedef struct daqStatusData {
 	ui32 timeStamp;
@@ -57,7 +54,6 @@ typedef struct daqStatusData {
 } daqStatusData_t;
 
 
-
 typedef struct gpsData {
 	ui32 timeStamp;
 	char NMEA[MAX_NMEA];
@@ -68,12 +64,14 @@ typedef struct gpsData {
 	bool lock;
 } gpsData_t;
 
+
 typedef struct bmpData {
 	ui32 timeStamp;
 	float pressure;
 	float temperature;
 
 } bmpData_t;
+
 
 typedef struct imuData {
 	ui32 timeStamp;
@@ -90,6 +88,7 @@ typedef struct imuData {
 
 } imuData_t;
 
+
 typedef struct monitorData {
 	ui32 timeStamp;
 	ui8 voltage;
@@ -97,12 +96,13 @@ typedef struct monitorData {
 
 } monitorData_t;
 
+
 typedef struct processedData {
 	ui32 timeStamp;
 
 } processedData_t;
 
-
+/* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
 

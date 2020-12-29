@@ -5,13 +5,18 @@
  *      Author: vishv
  */
 
+#include "../IncPSP/acquisition.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../IncPSP/acquisition.h"
 
-gpsData_t g_gpsData;
+/* Global variable declarations */
+
+gpsData_t g_gpsData = {0};
+daqStatusData_t g_daqStatusData = {0};
+
+/* Local variable declarations */
 
 char gpsNmea[MAX_NMEA];
 ui8 daqScaling;

@@ -29,6 +29,9 @@
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
+#define ALTITUDE_LIST_SIZE (20)
+#define ALA_LIST_SIZE (40)
+
 // Nominal mode flow
 #define PRELAUNCH (1)
 #define LAUNCH (2)
@@ -62,13 +65,6 @@ typedef struct daqStatusData {
 	bool alaNominal;
 	bool hasUpdate;
 	bool lock;
-/*	ui8 daqStatus; // = d000GBIA
-/* 		(d) Enable DAQ Scaling, default = 0
- * 		(G) GPS setup and nominal, default = 0
- * 		(B) Barometric Altimeter (BMP) setup and nominal, default = 0
- * 		(I) Inertial Measurement Unit (IMU) setup and nominal, default = 0
- * 		(A) Analog Linear Accelerometer (ALA) nominal, default = 0
- */
 } daqStatusData_t;
 
 
@@ -148,6 +144,24 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
+typedef struct altitudeNode {
+	float altitude;
+	bool lock;
+	altitudeNode *nextNode;
+} altitudeNode_t;
+
+typedef struct alaNode {
+	float gForce;
+	bool lock;
+	alaNode *nextNode;
+} alaNode_t;
+
+
+typedef struct staticOrientationNode {
+	bool lock;
+	staticOrientationNode *nextNode;
+} staticOrientationNode_t;
+
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
@@ -159,5 +173,9 @@ extern volatile transmissionData_t g_transmissionData;
 
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
+
+extern altitudeNode_t *g_headAltitudeNode;
+extern alaNode_t *g_headALANode;
+extern staticOrientationNode_t *g_headStaticOrientationNode;
 
 #endif /* COMMON_H_ */

@@ -69,7 +69,8 @@ typedef struct bmpData {
 	ui32 timeStamp;
 	float pressure;
 	float temperature;
-
+	bool hasUpdate;
+	bool lock;
 } bmpData_t;
 
 
@@ -85,6 +86,8 @@ typedef struct imuData {
 	float magY;
 	float magZ;
 	float alaZ;
+	bool hasUpdate;
+	bool lock;
 
 } imuData_t;
 

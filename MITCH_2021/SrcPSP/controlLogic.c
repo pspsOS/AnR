@@ -6,6 +6,7 @@
  */
 
 #include "../IncPSP/controlLogic.h"
+#include <stdio.h>
 
 
 /* TODO: Implement modeLogic
@@ -17,7 +18,8 @@
  */
 
 void modeLogic() {
-
+	printf("I'm here\n");
+	return;
 }
 
 
@@ -122,7 +124,7 @@ bool determineMode() {
  */
 
 bool checkPrelaunchTrans() {
-
+ return 0;
 }
 
 
@@ -135,7 +137,7 @@ bool checkPrelaunchTrans() {
  */
 
 bool checkLaunchTrans() {
-
+	return 0;
 }
 
 
@@ -148,7 +150,7 @@ bool checkLaunchTrans() {
  */
 
 bool checkAscentTrans() {
-
+	return 0;
 }
 
 
@@ -161,7 +163,7 @@ bool checkAscentTrans() {
  */
 
 bool checkDescentDrogueTrans() {
-
+	return 0;
 }
 
 
@@ -174,7 +176,7 @@ bool checkDescentDrogueTrans() {
  */
 
 bool checkDescentMainTrans() {
-
+	return 0;
 }
 
 
@@ -187,5 +189,5 @@ bool checkDescentMainTrans() {
  */
 
 bool checkProgramEnd() {
-
+	return 0;
 }

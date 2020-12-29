@@ -7,6 +7,9 @@
 
 #include "../IncPSP/transmission.h"
 
+/*Local Variable declaration */
+char transmissionString[MAX_TRANSMISSION_SIZE] = 0;
+
 /**
  * @brief Getting transmission data task
  *  TODO: Implement getData_T
@@ -20,25 +23,38 @@
  */
 void getData_T(){
 	// Wait for unlock
-	while(g_Data.lock) {
+	while(g_transmissionData.lock) {
 			retryTakeDelay(0);
 		}
 
 	// Lock
-	g_Data.lock = true;
+	g_transmissionData.lock = true;
 
-	if(g_Data.hasUpdate) {
+	if(g_transmissionData.hasUpdate) {
 
 		// Update local variables
 
 
 		// Reset Update
-		g_Data.hasUpdate = false;
+		g_transmissionData.hasUpdate = false;
 	}
 	// Unlock
-	g_Data.lock = false;
+	g_transmissionData.lock = false;
 }
+/**
+ * @brief Compressing Data Task
+ *  TODO: Implement compressData_T
+ * This function compresses the data that will be transmitted
+ *
+ * @param none
+ * @retval none
+ *
+ * @author Ryan Horvath
+ * @date 12/29/20
+ */
+void compressData_T(){
 
+}
 /**
  * @brief Transmitting data task
  * TODO: Implement transmitData_T

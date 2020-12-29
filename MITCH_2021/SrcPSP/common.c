@@ -7,6 +7,8 @@
 
 #include "../IncPSP/common.h"
 
+
+
 /**
  * @brief Get system timestamp
  * Gets the system timestamp. Returns 0 when run from testbed.
@@ -18,11 +20,11 @@
  * @date 12/24/2020
  */
 ui32 getTimeStamp(void) {
-#ifndef __MAIN_H
-	return 0;
-#else
-	return HAL_GetTick();
-#endif
+	#ifndef NDEBUG
+		return 0;
+	#else
+		return HAL_GetTick();
+	#endif
 }
 
 /**
@@ -36,7 +38,7 @@ ui32 getTimeStamp(void) {
  * @date 12/28/2020
  */
 void retryTakeDelay(int length) {
-#ifndef __MAIN_H
+#ifndef NDEBUG
 	// Do Nothing
 #else
 	// TODO: Implement retryTakeDelay

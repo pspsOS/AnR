@@ -139,8 +139,9 @@ void gpsRead_A() {
 	else {
 		gpsNominal = false;
 
-	}
 
+	}
+	assert(gpsNominal);
 	g_gpsData.timeStamp = getTimeStamp();
 
 	strncpy(g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));

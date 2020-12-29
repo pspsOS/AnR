@@ -6,7 +6,11 @@
  */
 
 #include "../IncPSP/controlLogic.h"
-#include <stdio.h>
+
+/* extern definitions */
+
+extern volatile ui8 currentNominalMode = 0;
+extern volatile ui8 currentContingency = 0;
 
 
 /**

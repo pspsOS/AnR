@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /* User-defined Macros */
 
@@ -23,6 +24,18 @@
 /* User-defined Constants*/
 
 #define MAX_NMEA (80)
+
+//#define NDEBUG
+
+// Nominal mode flow
+#define PRELAUNCH (1)
+#define LAUNCH (2)
+#define ASCENT (3)
+#define DESCENT_DROGUE (4)
+#define DESCENT_MAIN (5)
+#define TOUCHDOWN (6)
+#define PROGRAM_END (7)
+
 
 /* User typedef */
 
@@ -117,6 +130,7 @@ typedef struct monitoringData {
 
 } monitoringData_t;
 
+
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
@@ -124,5 +138,8 @@ extern volatile gpsData_t g_gpsData;
 extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
 extern volatile monitoringData_t g_monitoringData;
+
+extern volatile ui8 currentNominalMode;
+extern volatile ui8 currentContingency;
 
 #endif /* COMMON_H_ */

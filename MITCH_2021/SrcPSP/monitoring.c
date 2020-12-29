@@ -9,7 +9,6 @@
 
 /* Global variable declarations */
 
-extern volatile monitoringData_t g_monitoringData = {0};
 
 /* Local variable declarations */
 
@@ -130,6 +129,7 @@ void sendUpdate_M() {
 		retryTakeDelay(0);
 	}
 	g_monitoringData.lock = true;
+	g_monitoringData.timeStamp = getTimeStamp();
 	g_monitoringData.batteryVoltage;
 	for (ui8 i = 0; i < 4; i++) {
 		g_monitoringData.continuity[i] = continuity[i];

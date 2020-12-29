@@ -9,8 +9,7 @@
 
 /* extern definitions */
 
-extern volatile ui8 g_currentNominalMode = 0;
-extern volatile ui8 g_currentContingency = 0;
+
 
 
 /**
@@ -218,6 +217,7 @@ bool checkPrelaunchTrans_C() {
  */
 
 bool checkLaunchTrans_C() {
+
 	return 0;
 }
 

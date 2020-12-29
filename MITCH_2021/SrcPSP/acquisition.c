@@ -10,10 +10,6 @@
 /* Global variable declarations */
 
 
-extern volatile daqStatusData_t g_daqStatusData = {0};
-extern volatile gpsData_t g_gpsData = {0};
-extern volatile bmpData_t g_bmpData = {0};
-extern volatile imuData_t g_imuData = {0};
 /* Local variable declarations */
 
 char gpsNmea[MAX_NMEA];

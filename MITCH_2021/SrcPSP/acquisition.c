@@ -58,7 +58,7 @@ void setup() {
 	hasUpdate = 0;
 
 	// Initialize interface structs
-	dSD.lock = FALSE;
+	g_daqStatusData.lock = FALSE;
 	sendUpdate();
 }
 
@@ -182,17 +182,18 @@ void checkStatus() {
 
 
 void sendUpdate() {
-	while(dSD.lock)
+	while(g_daqStatusData.lock) {
 		retryTakeDelay(0);
-	dSD.lock = TRUE;
-	dSD.timeStamp = getTimeStamp();
-	dSD.daqScaling = daqScaling;
-	dSD.gpsNominal = gpsNominal;
-	dSD.bmpNominal = bmpNominal;
-	dSD.imuNominal = imuNominal;
-	dSD.alaNominal = alaNominal;
-	dSD.hasUpdate = TRUE;
-	dSD.lock = FALSE;
+	}
+	g_daqStatusData.lock = TRUE;
+	g_daqStatusData.timeStamp = getTimeStamp();
+	g_daqStatusData.daqScaling = daqScaling;
+	g_daqStatusData.gpsNominal = gpsNominal;
+	g_daqStatusData.bmpNominal = bmpNominal;
+	g_daqStatusData.imuNominal = imuNominal;
+	g_daqStatusData.alaNominal = alaNominal;
+	g_daqStatusData.hasUpdate = TRUE;
+	g_daqStatusData.lock = FALSE;
 }
 
 /**

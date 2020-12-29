@@ -8,10 +8,10 @@
 #ifndef INC_ACQUISITION_H_
 #define INC_ACQUISITION_H_
 
-#include "common.h"
+#include "../IncPSP/common.h"
 
 // Interface Structs
-extern volatile daqStatusData_t dSD;
+
 
 // Setup
 void setup();

@@ -8,6 +8,8 @@
 #ifndef INC_PROCESSING_H_
 #define INC_PROCESSING_H_
 
+#include "../IncPSP/common.h"
+
 /* Function prototypes */
 
 bool getBMPData();

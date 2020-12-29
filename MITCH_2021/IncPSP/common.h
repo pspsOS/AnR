@@ -56,12 +56,16 @@ typedef struct daqStatusData {
  */
 } daqStatusData_t;
 
+
+
 typedef struct gpsData {
 	ui32 timeStamp;
 	char NMEA[MAX_NMEA];
 	ui8 fix;
 	float alt;
 	float speed;
+	bool hasUpdate;
+	bool lock;
 } gpsData_t;
 
 typedef struct bmpData {
@@ -99,5 +103,7 @@ typedef struct processedData {
 } processedData_t;
 
 
+
+extern volatile daqStatusData_t g_daqStatusData;
 
 #endif /* COMMON_H_ */

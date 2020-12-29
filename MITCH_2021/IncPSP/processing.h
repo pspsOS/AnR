@@ -18,4 +18,6 @@ bool getGPSData_P();
 void processData_P();
 void transmitData_P();
 
+bool pointyEndUp_P();
+
 #endif /* INC_PROCESSING_H_ */

@@ -27,6 +27,7 @@
 
 #define MAX_NMEA (80)
 #define MAX_TRANSMISSION_SIZE (100)
+#define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
 // Nominal mode flow
 #define PRELAUNCH (1)

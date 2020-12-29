@@ -8,7 +8,7 @@
 #ifndef INC_ACQUISITION_H_
 #define INC_ACQUISITION_H_
 
-#include "../IncPSP/common.h"
+#include "common.h"
 
 // Interface Structs
 
@@ -16,18 +16,18 @@
 // Setup
 void setup();
 
-bool gpsSetup();
-bool bmpSetup();
-bool imuSetup();
-bool alaSetup();
+bool gpsSetup_A();
+bool bmpSetup_A();
+bool imuSetup_A();
+bool alaSetup_A();
 
 // Loop
-void gpsRead();
-void bmpRead();
-void imuRead();
+void gpsRead_A();
+void bmpRead_A();
+void imuRead_A();
 
-void checkStatus();
-void sendUpdate();
+void checkStatus_A();
+void sendUpdate_A();
 
 
 // Private

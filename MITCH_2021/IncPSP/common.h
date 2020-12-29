@@ -69,7 +69,8 @@ typedef struct bmpData {
 	ui32 timeStamp;
 	float pressure;
 	float temperature;
-
+	bool hasUpdate;
+	bool lock;
 } bmpData_t;
 
 
@@ -85,6 +86,8 @@ typedef struct imuData {
 	float magY;
 	float magZ;
 	float alaZ;
+	bool hasUpdate;
+	bool lock;
 
 } imuData_t;
 
@@ -102,8 +105,21 @@ typedef struct processedData {
 
 } processedData_t;
 
+typedef struct monitoringData {
+	float batteryVoltage;
+	bool continuity[3];
+	bool buttonState;
+	bool hasUpdate;
+	bool lock;
+
+} monitoringData_t;
+
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
+extern volatile gpsData_t g_gpsData;
+extern volatile bmpData_t g_bmpData;
+extern volatile imuData_t g_imuData;
+extern volatile monitoringData_t g_monitoringData;
 
 #endif /* COMMON_H_ */

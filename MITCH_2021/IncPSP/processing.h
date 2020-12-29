@@ -12,10 +12,10 @@
 
 /* Function prototypes */
 
-bool getBMPData();
-bool getIMUData();
-bool getGPSData();
-void processData();
-void transmitData();
+bool getBMPData_P();
+bool getIMUData_P();
+bool getGPSData_P();
+void processData_P();
+void transmitData_P();
 
 #endif /* INC_PROCESSING_H_ */

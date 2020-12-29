@@ -26,6 +26,7 @@
 /* User-defined Constants*/
 
 #define MAX_NMEA (80)
+#define MAX_TRANSMISSION_SIZE (100)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -154,7 +155,8 @@ extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
 extern volatile monitoringData_t g_monitoringData;
 extern volatile transmissionData_t g_transmissionData;
-extern volatile ui8 currentNominalMode;
-extern volatile ui8 currentContingency;
+
+extern volatile ui8 g_currentNominalMode;
+extern volatile ui8 g_currentContingency;
 
 #endif /* COMMON_H_ */

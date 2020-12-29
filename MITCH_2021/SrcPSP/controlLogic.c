@@ -9,8 +9,8 @@
 
 /* extern definitions */
 
-extern volatile ui8 currentNominalMode = 0;
-extern volatile ui8 currentContingency = 0;
+extern volatile ui8 g_currentNominalMode = 0;
+extern volatile ui8 g_currentContingency = 0;
 
 
 /**
@@ -27,7 +27,7 @@ extern volatile ui8 currentContingency = 0;
 void modeLogic_C() {
 	// check contingency mode first
 
-	switch (currentNominalMode) {
+	switch (g_currentNominalMode) {
 		case PRELAUNCH:
 			prelaunchLogic_C();
 			break;
@@ -164,7 +164,7 @@ void touchdownLogic_C() {
  */
 
 bool determineMode_C() {
-	switch (currentNominalMode) {
+	switch (g_currentNominalMode) {
 		case PRELAUNCH:
 			checkPrelaunchTrans_C();
 			break;
@@ -200,7 +200,8 @@ bool determineMode_C() {
  */
 
 bool checkPrelaunchTrans_C() {
- return 0;
+
+	return 0;
 }
 
 

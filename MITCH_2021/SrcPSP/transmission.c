@@ -7,22 +7,22 @@
 
 #include "../IncPSP/transmission.h"
 
-/* TODO: Implement getData
+/* TODO: Implement getData_T
  * This function gets the transmission data from the control logic task
  *
  * Author: Ryan Horvath
  * Date: 12/23/20
  */
-void getData(){
+void getData_T(){
 
 }
 
-/* TODO: Implement transmitData
+/* TODO: Implement transmitData_T
  * This function sends the transmitted data to the radio
  *
  * Author: Ryan Horvath
  * Date: 12/23/20
  */
-void transmitData(){
+void transmitData_T(){
 
 }

@@ -11,7 +11,7 @@
 #include "common.h"
 
 /* Function Prototypes */
-void getData();
-void transmitData();
+void getData_T();
+void transmitData_T();
 
 #endif /* INC_TRANSMISSION_H_ */

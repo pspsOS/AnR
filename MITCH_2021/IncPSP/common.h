@@ -15,6 +15,8 @@
 #include <string.h>
 #include <assert.h>
 
+//#define NDEBUG
+
 /* User-defined Macros */
 
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
@@ -24,8 +26,6 @@
 /* User-defined Constants*/
 
 #define MAX_NMEA (80)
-
-//#define NDEBUG
 
 // Nominal mode flow
 #define PRELAUNCH (1)

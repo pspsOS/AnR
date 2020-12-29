@@ -25,8 +25,31 @@ extern volatile ui8 currentContingency = 0;
  */
 
 void modeLogic_C() {
-	printf("I'm here\n");
-	return;
+	// check contingency mode first
+
+	switch (currentNominalMode) {
+		case PRELAUNCH:
+			prelaunchLogic_C();
+			break;
+		case LAUNCH:
+			launchLogic_C();
+			break;
+		case ASCENT:
+			ascentLogic_C();
+			break;
+		case DESCENT_DROGUE:
+			descentDrogueLogic_C();
+			break;
+		case DESCENT_MAIN:
+			descentMainLogic_C();
+			break;
+		case TOUCHDOWN:
+			touchdownLogic_C();
+			break;
+		case PROGRAM_END:
+			// literally nothing atm
+			break;
+	}
 }
 
 
@@ -141,7 +164,26 @@ void touchdownLogic_C() {
  */
 
 bool determineMode_C() {
-
+	switch (currentNominalMode) {
+		case PRELAUNCH:
+			checkPrelaunchTrans_C();
+			break;
+		case LAUNCH:
+			checkLaunchTrans_C();
+			break;
+		case ASCENT:
+			checkAscentTrans_C();
+			break;
+		case DESCENT_DROGUE:
+			checkDescentDrogueTrans_C();
+			break;
+		case DESCENT_MAIN:
+			checkDescentMainTrans_C();
+			break;
+		case TOUCHDOWN:
+			checkProgramEnd();
+			break;
+	}
 }
 
 

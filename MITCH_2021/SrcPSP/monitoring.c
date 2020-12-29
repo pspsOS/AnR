@@ -18,11 +18,15 @@ float batteryVoltage;
 bool continuity[4];
 bool buttonState;
 
-/* TODO: Implement checkBatteryVoltage
- * This function checks the battery voltage and stores it as a global float
+/**
+ * @brief Check new battery voltage
+ * This function checks the battery voltage and stores it as a local float
  *
- * Author: markp
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
  */
 
 void checkBatteryVoltage_M() {
@@ -33,11 +37,15 @@ void checkBatteryVoltage_M() {
 		#endif
 }
 
-/* TODO: Implement checkContinuity
- * This function checks the continuity of all 4 parachute charges and stores as a global bool array
+/**
+ * @brief Check new continuity for each parachute charge
+ * This function checks the continuity of all 4 parachute charges and stores as a local bool array
  *
- * Author: markp
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
  */
 
 void checkContinuity_M() {
@@ -50,11 +58,15 @@ void checkContinuity_M() {
 	}
 }
 
-/* TODO: Implement checkButtonState
- * This function checks the button state and stores it as a global bool
+/**
+ * @brief Check new button state
+ * This function checks the button state and stores it as a local bool
  *
- * Author: markp
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
  */
 
 void checkButtonState_M() {
@@ -65,17 +77,22 @@ void checkButtonState_M() {
 		#endif
 }
 
-/* TODO: Implement checkButtonState
- * This function checks the button state and stores it as a global bool
+/**
+ * @brief send updated monitoring data
+ * Takes local monitoring data and updates global monitoring variables with local data
  *
- * Author: markp
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
  */
 
 void sendUpdate_M() {
 	while(g_monitoringData.lock) {
 		retryTakeDelay(0);
 	}
+	g_monitoringData.lock = true;
 	g_monitoringData.batteryVoltage;
 	for (i = 0; i < 4; i++) {
 		g_monitoringData.continuity[i] = continuity[i];

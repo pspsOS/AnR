@@ -19,7 +19,24 @@
  * @date 12/29/20
  */
 void getData_T(){
+	// Wait for unlock
+	while(g_Data.lock) {
+			retryTakeDelay(0);
+		}
 
+	// Lock
+	g_Data.lock = true;
+
+	if(g_Data.hasUpdate) {
+
+		// Update local variables
+
+
+		// Reset Update
+		g_Data.hasUpdate = false;
+	}
+	// Unlock
+	g_Data.lock = false;
 }
 
 /**

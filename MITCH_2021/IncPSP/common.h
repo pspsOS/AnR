@@ -105,5 +105,8 @@ typedef struct processedData {
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
+extern volatile gpsData_t g_gpsData;
+extern volatile bmpData_t g_bmpData;
+extern volatile imuData_t g_imuData;
 
 #endif /* COMMON_H_ */

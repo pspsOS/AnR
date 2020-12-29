@@ -29,7 +29,7 @@ typedef uint32_t ui32;
 /* Common Function Prototypes */
 
 ui32 getTimeStamp(void);
-
+void retryTakeDelay(int length);
 
 /* Typedef structs and types */
 
@@ -40,7 +40,13 @@ typedef unsigned char bool;
 
 typedef struct daqStatusData {
 	ui32 timeStamp;
-
+	bool daqScaling;
+	bool gpsNominal;
+	bool bmpNominal;
+	bool imuNominal;
+	bool alaNominal;
+	bool hasUpdate;
+	bool lock;
 /*	ui8 daqStatus; // = d000GBIA
 /* 		(d) Enable DAQ Scaling, default = 0
  * 		(G) GPS setup and nominal, default = 0

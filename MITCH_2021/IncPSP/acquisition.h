@@ -10,6 +10,9 @@
 
 #include "common.h"
 
+// Interface Structs
+extern volatile daqStatusData_t dSD;
+
 // Setup
 void setup();
 
@@ -19,9 +22,6 @@ bool imuSetup();
 bool alaSetup();
 
 // Loop
-gpsData_t getGpsData();
-bmpData_t getbmpData();
-
 void gpsRead();
 void bmpRead();
 void imuRead();

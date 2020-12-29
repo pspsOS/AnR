@@ -32,6 +32,16 @@ ui8 _nmeaAddrEnd;
 
 // Setup
 
+/**
+ * @brief Setup Acquisition Task
+ * Initialized local variables and runs setup functions
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/28/2020
+ */
 void setup() {
 
 	// Initialize local variables
@@ -46,6 +56,10 @@ void setup() {
 	fsmCounter1 = 0;
 	fsmState = 0;
 	hasUpdate = 0;
+
+	// Initialize interface structs
+	dSD.lock = FALSE;
+	sendUpdate();
 }
 
 
@@ -164,6 +178,21 @@ void imuRead() {
  */
 void checkStatus() {
 
+}
+
+
+void sendUpdate() {
+	while(dSD.lock)
+		retryTakeDelay(0);
+	dSD.lock = TRUE;
+	dSD.timeStamp = getTimeStamp();
+	dSD.daqScaling = daqScaling;
+	dSD.gpsNominal = gpsNominal;
+	dSD.bmpNominal = bmpNominal;
+	dSD.imuNominal = imuNominal;
+	dSD.alaNominal = alaNominal;
+	dSD.hasUpdate = TRUE;
+	dSD.lock = FALSE;
 }
 
 /**

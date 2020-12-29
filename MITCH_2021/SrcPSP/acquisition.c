@@ -7,10 +7,6 @@
 
 #include "../IncPSP/acquisition.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 /* Global variable declarations */
 
 gpsData_t g_gpsData = {0};

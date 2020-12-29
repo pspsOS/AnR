@@ -10,24 +10,24 @@
 /* Global variable declarations */
 
 // acquisition
-extern volatile daqStatusData_t g_daqStatusData = {0};
-extern volatile gpsData_t g_gpsData = {0};
-extern volatile bmpData_t g_bmpData = {0};
-extern volatile imuData_t g_imuData = {0};
+volatile daqStatusData_t g_daqStatusData = {0};
+volatile gpsData_t g_gpsData = {0};
+volatile bmpData_t g_bmpData = {0};
+volatile imuData_t g_imuData = {0};
 // monitoring
-extern volatile monitoringData_t g_monitoringData = {0};
+volatile monitoringData_t g_monitoringData = {0};
 // transmission
-extern volatile transmissionData_t g_transmissionData = {0};
+volatile transmissionData_t g_transmissionData = {0};
 // modes
-extern volatile ui8 g_currentNominalMode = 0;
-extern volatile ui8 g_currentContingency = 0;
+volatile ui8 g_currentNominalMode = 0;
+volatile ui8 g_currentContingency = 0;
 // pointers
-extern altitudeNode_t *g_headAltitudeNode = NULL;
-extern alaNode_t *g_headALANode = NULL;
-extern staticOrientationNode_t *g_headStaticOrientationNode = NULL;
+altitudeNode_t *g_headAltitudeNode = NULL;
+alaNode_t *g_headALANode = NULL;
+staticOrientationNode_t *g_headStaticOrientationNode = NULL;
 
 
-void *createLinkedList(void listType, ui8 listSize) {
+/*void *createLinkedList(void listType, ui8 listSize) {
 	void *headNode = calloc(sizeof(listType), 1);
 	void *currentPointer = headNode;
 	for (ui8 i = 1; i < listSize; i++) {
@@ -36,7 +36,7 @@ void *createLinkedList(void listType, ui8 listSize) {
 	}
 	currentPointer->nextNode = headNode;
 	return headNode;
-}
+}*/
 
 
 

@@ -8,7 +8,7 @@
 #include "../IncPSP/transmission.h"
 
 /*Local Variable declaration */
-char transmissionString[MAX_TRANSMISSION_SIZE] = 0;
+char transmissionString[MAX_TRANSMISSION_SIZE] = {0};
 
 /**
  * @brief Getting transmission data task

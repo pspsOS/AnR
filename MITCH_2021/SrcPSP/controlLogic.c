@@ -180,7 +180,7 @@ bool determineMode_C() {
 			checkDescentMainTrans_C();
 			break;
 		case TOUCHDOWN:
-			checkProgramEnd();
+			checkProgramEnd_C();
 			break;
 	}
 }

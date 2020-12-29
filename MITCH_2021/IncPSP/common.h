@@ -56,6 +56,11 @@ void retryTakeDelay(int length);
 
 /* Typedef structs and types */
 
+typedef struct altitudeNode altitudeNode_t;
+typedef struct alaNode alaNode_t;
+typedef struct staticOrientationNode staticOrientationNode_t;
+
+
 typedef struct daqStatusData {
 	ui32 timeStamp;
 	bool daqScaling;
@@ -120,6 +125,7 @@ typedef struct processedData {
 } processedData_t;
 
 typedef struct monitoringData {
+	ui32 timeStamp;
 	float batteryVoltage;
 	bool continuity[4];
 	bool buttonState;
@@ -144,22 +150,24 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
+
+
 typedef struct altitudeNode {
 	float altitude;
 	bool lock;
-	altitudeNode *nextNode;
+	altitudeNode_t *nextNode;
 } altitudeNode_t;
 
 typedef struct alaNode {
 	float gForce;
 	bool lock;
-	alaNode *nextNode;
+	alaNode_t *nextNode;
 } alaNode_t;
 
 
 typedef struct staticOrientationNode {
 	bool lock;
-	staticOrientationNode *nextNode;
+	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
 
 /* Extern variable definitions */

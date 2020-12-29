@@ -102,11 +102,19 @@ typedef struct processedData {
 
 } processedData_t;
 
+typedef struct monitoringData {
+	float batteryVoltage;
+	bool continuity[3];
+	bool buttonState;
+
+} monitoringData_t;
+
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
 extern volatile gpsData_t g_gpsData;
 extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
+extern volatile monitoringData_t g_monitoringData;
 
 #endif /* COMMON_H_ */

@@ -8,7 +8,7 @@
 #include "../IncPSP/common.h"
 
 
-uint32_t getTimeStamp(void) {
+ui32 getTimeStamp(void) {
 #ifndef __MAIN_H
 	return 0;
 #else

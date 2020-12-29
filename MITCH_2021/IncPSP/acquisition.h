@@ -11,6 +11,8 @@
 #include "common.h"
 
 // Setup
+void setup();
+
 bool gpsSetup();
 bool bmpSetup();
 bool imuSetup();
@@ -25,6 +27,7 @@ void bmpRead();
 void imuRead();
 
 void checkStatus();
+void sendUpdate();
 
 
 // Private

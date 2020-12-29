@@ -21,22 +21,27 @@
 #define FALSE 0
 #define MAX_NMEA 80
 
+typedef uint8_t ui8;
+typedef uint16_t ui16;
+typedef uint32_t ui32;
+
 
 /* Common Function Prototypes */
 
-uint32_t getTimeStamp(void);
+ui32 getTimeStamp(void);
 
 
 /* Typedef structs and types */
 
-typedef unsigned char byte;
+
 
 // TODO: Refine bool definition
 typedef unsigned char bool;
 
 typedef struct daqStatusData {
-	uint32_t timeStamp;
-	uint8_t daqStatus; // = d000GBIA
+	ui32 timeStamp;
+
+/*	ui8 daqStatus; // = d000GBIA
 /* 		(d) Enable DAQ Scaling, default = 0
  * 		(G) GPS setup and nominal, default = 0
  * 		(B) Barometric Altimeter (BMP) setup and nominal, default = 0
@@ -46,32 +51,22 @@ typedef struct daqStatusData {
 } daqStatusData_t;
 
 typedef struct gpsData {
-	uint32_t timeStamp;
+	ui32 timeStamp;
 	char NMEA[MAX_NMEA];
-	byte fix;
-	byte quality;
-	byte numSats;
-	float lat;
-	float lon;
+	ui8 fix;
 	float alt;
 	float speed;
-	float angle;
-/*	uint8_t gpsStatus; // = FQQQnnnn
-		(F) Fix
- * 	  (QQQ) Quality
- * 	 (nnnn) Number of Satellites
- */
 } gpsData_t;
 
 typedef struct bmpData {
-	uint32_t timeStamp;
+	ui32 timeStamp;
 	float pressure;
 	float temperature;
 
 } bmpData_t;
 
 typedef struct imuData {
-	uint32_t timeStamp;
+	ui32 timeStamp;
 	float accX;
 	float accY;
 	float accZ;
@@ -86,14 +81,14 @@ typedef struct imuData {
 } imuData_t;
 
 typedef struct monitorData {
-	uint32_t timeStamp;
-	uint8_t voltage;
-	uint8_t monitorStatus;
+	ui32 timeStamp;
+	ui8 voltage;
+	ui8 monitorStatus;
 
 } monitorData_t;
 
 typedef struct processedData {
-	uint32_t timeStamp;
+	ui32 timeStamp;
 
 } processedData_t;
 

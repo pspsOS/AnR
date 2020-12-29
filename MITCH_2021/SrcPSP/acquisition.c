@@ -14,22 +14,41 @@
 gpsData_t g_gpsData;
 
 char gpsNmea[MAX_NMEA];
-byte daqScaling;
-byte daqScaler;
-byte gpsNominal;
-byte bmpNominal;
-byte imuNominal;
-byte alaNominal;
-byte sendDaqStatus;
-byte i;
-byte j;
-byte hasUpdate;
+ui8 daqScaling;
+ui8 daqScaler;
+ui8 gpsNominal;
+ui8 bmpNominal;
+ui8 imuNominal;
+ui8 alaNominal;
+ui8 sendDaqStatus;
+ui8 fsmCounter0;
+ui8 fsmCounter1;
+ui8 fsmState;
+ui8 hasUpdate;
 
 // Used for parsing NMEA data
-byte _nmeaAddrStart;
-byte _nmeaAddrEnd;
+ui8 _nmeaAddrStart;
+ui8 _nmeaAddrEnd;
 
 // Setup
+
+void setup() {
+
+	// Initialize local variables
+	daqScaling = FALSE;
+	daqScaler = 10;
+	gpsNominal = FALSE;
+	bmpNominal = FALSE;
+	imuNominal = FALSE;
+	alaNominal = FALSE;
+	sendDaqStatus = FALSE;
+	fsmCounter0 = 0;
+	fsmCounter1 = 0;
+	fsmState = 0;
+	hasUpdate = 0;
+}
+
+
 /* TODO: Implement gpsSetup
  * Established connection with GPS.
  *
@@ -92,32 +111,7 @@ void gpsRead() {
 	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
 		printf("GGA");
 
-		// Get Latitude
-		_findNmeaAddr(2);
-		//g_gpsData.lat = (int)(10000*atof(&gpsNmea[_nmeaAddrStart]));
-		g_gpsData.lat = atof(&gpsNmea[_nmeaAddrStart]);
-		if (gpsNmea[_nmeaAddrEnd + 1] == 'N');
-		else if (gpsNmea[_nmeaAddrEnd + 1] == 'S')
-			g_gpsData.lat *= -1;
-		else {
-			gpsNominal = FALSE;
-			return;
-		}
-
-		// Get Longitude
-		_findNmeaAddr(4);
-		g_gpsData.lon = atof(&gpsNmea[_nmeaAddrStart]);
-		if (gpsNmea[_nmeaAddrEnd + 1] == 'E');
-		else if (gpsNmea[_nmeaAddrEnd + 1] == 'W')
-			g_gpsData.lon *= -1;
-		else {
-			gpsNominal = FALSE;
-			return;
-		}
-
-		printf("\n%.4f\n",g_gpsData.lat);
 	}
-
 	//	Type = GPRMC
 	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
 		//puts("RMC");

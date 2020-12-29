@@ -12,8 +12,11 @@
 
 /* function prototypes */
 
+void setup_M();
+void loop_M();
 void checkBatteryVoltage();
 void checkContinuity();
 void checkButtonState();
+void sendUpdate_M();
 
 #endif /* INC_MONITORING_H_ */

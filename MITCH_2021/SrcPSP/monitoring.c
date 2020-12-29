@@ -19,7 +19,7 @@ bool buttonState;
 
 /**
  * @brief setup
- *
+ * Initialize the monitoring local variables
  *
  * @param None
  * @retval None

@@ -123,13 +123,28 @@ typedef struct processedData {
 
 typedef struct monitoringData {
 	float batteryVoltage;
-	bool continuity[3];
+	bool continuity[4];
 	bool buttonState;
 	bool hasUpdate;
 	bool lock;
 
 } monitoringData_t;
 
+typedef struct transmissionData {
+	float altitude;
+	float accelerationDataX;
+	float accelerationDataY;
+	float accelerationDataZ;
+	float trajectoryDataX;
+	float trajectoryDataY;
+	float trajectoryDataZ;
+	float resolvedOrientationX;
+	float resolvedOrientationY;
+	float resolvedOrientationZ;
+	float rawData;
+	bool lock;
+	bool hasUpdate;
+} transmissionData_t;
 
 /* Extern variable definitions */
 
@@ -138,7 +153,7 @@ extern volatile gpsData_t g_gpsData;
 extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
 extern volatile monitoringData_t g_monitoringData;
-
+extern volatile transmissionData_t g_transmissionData;
 extern volatile ui8 currentNominalMode;
 extern volatile ui8 currentContingency;
 

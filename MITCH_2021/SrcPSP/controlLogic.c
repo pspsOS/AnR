@@ -9,12 +9,15 @@
 #include <stdio.h>
 
 
-/* TODO: Implement modeLogic
- * Encapsulates functions that handle logic for different modes.
+/**
+ * @brief Encapsulates logic functions
  * Will call other logic functions depending on current mode
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 void modeLogic_C() {
@@ -23,13 +26,17 @@ void modeLogic_C() {
 }
 
 
-/* TODO: Implement prelaunchLogic
- * Called by modeLogic() function, and contains logic for prelaunch mode
- * Plays buzzer to indicate system is active
+/**
+ * @brief Contains logic for PRELAUNCH Mode
+ * Called by modeLogic_C() function,
+ * Plays buzzer to indicate system is active,
  * Checks if disarm button is pressed to change global disarm status
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 void prelaunchLogic_C() {
@@ -37,11 +44,15 @@ void prelaunchLogic_C() {
 }
 
 
-/* TODO: Implement launchLogic
- * Called by modeLogic() function, and contains logic for launch mode
+/**
+ * @brief Contains logic for LAUNCH Mode
+ * Called by modeLogic_C() function
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 void launchLogic_C() {
@@ -49,65 +60,80 @@ void launchLogic_C() {
 }
 
 
-/* TODO: Implement ascentLogic
- * Called by modeLogic() function, and contains logic for ascent mode
+/**
+ * @brief Contains logic for ASCENT Mode
+ * Called by modeLogic_C() function
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
-
 
 void ascentLogic_C() {
 
 }
 
 
-/* TODO: Implement descentDrogueLogic
- * Called by modeLogic() function, and contains logic for descent drogue mode
+/**
+ * @brief Contains logic for DESCENTDROGUE Mode
+ * Called by modeLogic_C() function
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
-
 
 void descentDrogueLogic_C() {
 
 }
 
 
-/* TODO: Implement descentMainLogic
- * Called by modeLogic() function, and contains logic for descent main mode
+/**
+ * @brief Contains logic for DESCENTMAIN Mode
+ * Called by modeLogic_C() function
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
-
 
 void descentMainLogic_C() {
 
 }
 
 
-/* TODO: Implement touchdownLogic
- * Called by modeLogic() function, and contains logic for touchdown mode
- * Activates recovery buzzer
+/**
+ * @brief Contains logic for TOUCHDOWN Mode
+ * Called by modeLogic_C() function
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
-
 
 void touchdownLogic_C() {
 
 }
 
 
-/* TODO: Implement Determine Mode
+/**
+ * @brief Changes mode
  * Uses raw and processed data to determine whether or not
  * to change modes
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval None
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool determineMode_C() {
@@ -115,12 +141,16 @@ bool determineMode_C() {
 }
 
 
-/* TODO: Implement checkPrelaunchTrans
- * Determines if conditions have been met to move from prelaunch to launch mode
- * Conditions: Corrent orientation and stillness for certain period of time
+/**
+ * @brief Changes mode from PRELAUNCH to LAUNCH
+ * Determines if conditions have been met to move from PRELAUNCH to LAUNCH mode
+ * Conditions: Correct orientation and stillness for certain period of time
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkPrelaunchTrans_C() {
@@ -128,12 +158,16 @@ bool checkPrelaunchTrans_C() {
 }
 
 
-/* TODO: Implement checkLaunchTrans
- * Determines if conditions have been met to move from launch to ascent mode
- * Conditions: Sustained Z+ Gs and BMP detecting ascent
+/**
+ * @brief Changes mode from LAUNCH to ASCENT
+ * Determines if conditions have been met to move from LAUNCH to ASCENT mode
+ * Conditions: Sustained Z+ G's and BMP detecting ascent
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkLaunchTrans_C() {
@@ -141,12 +175,16 @@ bool checkLaunchTrans_C() {
 }
 
 
-/* TODO: Implement checkAscentTrans
+/**
+ * @brief Changes mode from ASCENT to DESCENTDROGUE
  * Determines if conditions have been met to move from ascent to descent drogue mode
- * Conditions: Detects apogee (loss of alt)
+ * Conditions: Detects apogee (loss of altitude)
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkAscentTrans_C() {
@@ -154,12 +192,16 @@ bool checkAscentTrans_C() {
 }
 
 
-/* TODO: Implement checkDescentDrogueTrans
- * Determines if conditions have been met to move from descent drogue to descent main mode
- * Conditions: Main chute alt reached
+/**
+ * @brief Changes mode from DESCENTDROGUE to DESCENTMAIN
+ * Determines if conditions have been met to move from DESCENTDROGUE to DESCENTMAIN mode
+ * Conditions: Main chute altitude reached
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkDescentDrogueTrans_C() {
@@ -167,12 +209,16 @@ bool checkDescentDrogueTrans_C() {
 }
 
 
-/* TODO: Implement checkPrelaunchTrans
- * Determines if conditions have been met to move from descent main to touchdown mode
+/**
+ * @brief Changes mode from DESCENTMAIN to TOUCHDOWN
+ * Determines if conditions have been met to move from DESCENTMAIN to TOUCHDOWN mode
  * Conditions: Constant altitude and BLTN is still
  *
- * Author: Vishnu Vijay
- * Date: 12/23/20
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkDescentMainTrans_C() {
@@ -186,6 +232,17 @@ bool checkDescentMainTrans_C() {
  *
  * Author: Vishnu Vijay
  * Date: 12/23/20
+ */
+/**
+ * @brief Changes mode from TOUCHDOWN to PROGRAMEND
+ * Determines if conditions have been met to move from TOUCHDOWN to PROGRAMEND mode
+ * Conditions: ???
+ *
+ * @param None
+ * @retval bool
+ *
+ * @author Vishnu Vijay
+ * @date 12/23/20
  */
 
 bool checkProgramEnd_C() {

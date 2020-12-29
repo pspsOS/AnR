@@ -106,6 +106,8 @@ typedef struct monitoringData {
 	float batteryVoltage;
 	bool continuity[3];
 	bool buttonState;
+	bool hasUpdate;
+	bool lock;
 
 } monitoringData_t;
 

@@ -13,10 +13,47 @@ extern volatile monitoringData_t g_monitoringData = {0};
 
 /* Local variable declarations */
 
-ui8 i;
 float batteryVoltage;
 bool continuity[4];
 bool buttonState;
+
+/**
+ * @brief setup
+ *
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
+ */
+
+void setup_M() {
+	//initialize variables
+	batteryVoltage = 7.4;
+	for (ui8 i = 0; i < 4; i++) {
+		continuity[i] = true;
+	}
+	buttonState = false;
+}
+
+/**
+ * @brief Flight Loop
+ * This function runs the flight loops which calls all necessary monitoring flight functions
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 12/29/2020
+ */
+
+void loop_M() {
+	checkBatteryVoltage_M();
+	checkContinuity_M();
+	checkButtonState_M();
+	sendUpdate_M();
+}
 
 /**
  * @brief Check new battery voltage
@@ -49,7 +86,7 @@ void checkBatteryVoltage_M() {
  */
 
 void checkContinuity_M() {
-	for (i = 0; i < 4; i++) {
+	for (ui8 i = 0; i < 4; i++) {
 		#ifndef NDEBUG
 			continuity[i] = true;
 		#else
@@ -94,7 +131,7 @@ void sendUpdate_M() {
 	}
 	g_monitoringData.lock = true;
 	g_monitoringData.batteryVoltage;
-	for (i = 0; i < 4; i++) {
+	for (ui8 i = 0; i < 4; i++) {
 		g_monitoringData.continuity[i] = continuity[i];
 	}
 	g_monitoringData.buttonState = buttonState;

@@ -14,9 +14,9 @@ extern volatile monitoringData_t g_monitoringData = {0};
 /* Local variable declarations */
 
 ui8 i;
-float voltage;
-bool continuity[3];
-bool button;
+float batteryVoltage;
+bool continuity[4];
+bool buttonState;
 
 /* TODO: Implement checkBatteryVoltage
  * This function checks the battery voltage and stores it as a global float
@@ -27,7 +27,7 @@ bool button;
 
 void checkBatteryVoltage_M() {
 	#ifndef NDEBUG
-		g_monitoringData.batteryVoltage = 7.4;
+		batteryVoltage = 7.4;
 		#else
 			// TODO: Implement battery voltage reading from hardware
 		#endif
@@ -43,7 +43,7 @@ void checkBatteryVoltage_M() {
 void checkContinuity_M() {
 	for (i = 0; i < 4; i++) {
 		#ifndef NDEBUG
-			g_monitoringData.continuity[i] = true;
+			continuity[i] = true;
 		#else
 			// TODO: Implement continuity reading from hardware
 		#endif
@@ -59,7 +59,7 @@ void checkContinuity_M() {
 
 void checkButtonState_M() {
 	#ifndef NDEBUG
-		g_monitoringData.buttonState = false;
+		buttonState = false;
 		#else
 			// TODO: Implement button state reading from hardware
 		#endif
@@ -77,8 +77,10 @@ void sendUpdate_M() {
 		retryTakeDelay(0);
 	}
 	g_monitoringData.batteryVoltage;
-	g_monitoringData.continuity[3];
-	g_monitoringData.buttonState;
+	for (i = 0; i < 4; i++) {
+		g_monitoringData.continuity[i] = continuity[i];
+	}
+	g_monitoringData.buttonState = buttonState;
 	g_monitoringData.hasUpdate = true;
 	g_monitoringData.lock = false;
 }

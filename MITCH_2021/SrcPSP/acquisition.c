@@ -47,7 +47,7 @@ ui8 _nmeaAddrEnd;
  * @author Jeff Kaji
  * @date 12/28/2020
  */
-void setup() {
+void setup_A() {
 
 	// Initialize local variables
 	daqScaling = false;
@@ -64,7 +64,7 @@ void setup() {
 
 	// Initialize interface structs
 	g_daqStatusData.lock = false;
-	sendUpdate();
+	sendUpdate_A();
 }
 
 
@@ -80,12 +80,12 @@ void setup() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-bool gpsSetup() {
+bool gpsSetup_A() {
 	return 0;
 }
 
 
-bool bmpSetup() {
+bool bmpSetup_A() {
 	return 0;
 }
 
@@ -96,7 +96,7 @@ bool bmpSetup() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-bool imuSetup() {
+bool imuSetup_A() {
 	return 0;
 }
 
@@ -107,7 +107,7 @@ bool imuSetup() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-bool alaSetup() {
+bool alaSetup_A() {
 	return 0;
 }
 
@@ -121,7 +121,7 @@ bool alaSetup() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-void gpsRead() {
+void gpsRead_A() {
 
 	printf("Reading:");
 
@@ -164,12 +164,12 @@ void gpsRead() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-void bmpRead() {
+void bmpRead_A() {
 
 }
 
 
-void imuRead() {
+void imuRead_A() {
 
 }
 
@@ -181,12 +181,12 @@ void imuRead() {
  * Author: Jeff Kaji
  * Date: 12/23/2020
  */
-void checkStatus() {
+void checkStatus_A() {
 
 }
 
 
-void sendUpdate() {
+void sendUpdate_A() {
 	while(g_daqStatusData.lock) {
 		retryTakeDelay(0);
 	}

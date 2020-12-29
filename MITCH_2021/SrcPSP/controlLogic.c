@@ -17,7 +17,7 @@
  * Date: 12/23/20
  */
 
-void modeLogic() {
+void modeLogic_C() {
 	printf("I'm here\n");
 	return;
 }
@@ -32,7 +32,7 @@ void modeLogic() {
  * Date: 12/23/20
  */
 
-void prelaunchLogic() {
+void prelaunchLogic_C() {
 
 }
 
@@ -44,7 +44,7 @@ void prelaunchLogic() {
  * Date: 12/23/20
  */
 
-void launchLogic() {
+void launchLogic_C() {
 
 }
 
@@ -57,7 +57,7 @@ void launchLogic() {
  */
 
 
-void ascentLogic() {
+void ascentLogic_C() {
 
 }
 
@@ -70,7 +70,7 @@ void ascentLogic() {
  */
 
 
-void descentDrogueLogic() {
+void descentDrogueLogic_C() {
 
 }
 
@@ -83,7 +83,7 @@ void descentDrogueLogic() {
  */
 
 
-void descentMainLogic() {
+void descentMainLogic_C() {
 
 }
 
@@ -97,7 +97,7 @@ void descentMainLogic() {
  */
 
 
-void touchdownLogic() {
+void touchdownLogic_C() {
 
 }
 
@@ -110,7 +110,7 @@ void touchdownLogic() {
  * Date: 12/23/20
  */
 
-bool determineMode() {
+bool determineMode_C() {
 
 }
 
@@ -123,7 +123,7 @@ bool determineMode() {
  * Date: 12/23/20
  */
 
-bool checkPrelaunchTrans() {
+bool checkPrelaunchTrans_C() {
  return 0;
 }
 
@@ -136,7 +136,7 @@ bool checkPrelaunchTrans() {
  * Date: 12/23/20
  */
 
-bool checkLaunchTrans() {
+bool checkLaunchTrans_C() {
 	return 0;
 }
 
@@ -149,7 +149,7 @@ bool checkLaunchTrans() {
  * Date: 12/23/20
  */
 
-bool checkAscentTrans() {
+bool checkAscentTrans_C() {
 	return 0;
 }
 
@@ -162,7 +162,7 @@ bool checkAscentTrans() {
  * Date: 12/23/20
  */
 
-bool checkDescentDrogueTrans() {
+bool checkDescentDrogueTrans_C() {
 	return 0;
 }
 
@@ -175,7 +175,7 @@ bool checkDescentDrogueTrans() {
  * Date: 12/23/20
  */
 
-bool checkDescentMainTrans() {
+bool checkDescentMainTrans_C() {
 	return 0;
 }
 
@@ -188,6 +188,6 @@ bool checkDescentMainTrans() {
  * Date: 12/23/20
  */
 
-bool checkProgramEnd() {
+bool checkProgramEnd_C() {
 	return 0;
 }

@@ -13,7 +13,7 @@
  * Date: 12/29/20
  */
 
-bool getBMPData() {
+bool getBMPData_P() {
 
 }
 
@@ -24,7 +24,7 @@ bool getBMPData() {
  * Date: 12/29/20
  */
 
-bool getIMUData() {
+bool getIMUData_P() {
 
 }
 
@@ -35,7 +35,7 @@ bool getIMUData() {
  * Date: 12/29/20
  */
 
-bool getGPSData() {
+bool getGPSData_P() {
 
 }
 
@@ -46,7 +46,7 @@ bool getGPSData() {
  * Date: 12/29/20
  */
 
-void processData() {
+void processData_P() {
 
 }
 
@@ -57,6 +57,6 @@ void processData() {
  * Date: 12/29/20
  */
 
-void transmitData() {
+void transmitData_P() {
 
 }

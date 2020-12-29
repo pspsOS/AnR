@@ -8,7 +8,7 @@
 #ifndef INC_ACQUISITION_H_
 #define INC_ACQUISITION_H_
 
-#include "../IncPSP/common.h"
+#include "common.h"
 
 // Interface Structs
 

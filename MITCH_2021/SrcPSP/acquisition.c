@@ -14,7 +14,7 @@
 /* Global variable declarations */
 
 gpsData_t g_gpsData = {0};
-daqStatusData_t g_daqStatusData = {0};
+extern volatile daqStatusData_t g_daqStatusData = {0};
 
 /* Local variable declarations */
 
@@ -50,20 +50,20 @@ ui8 _nmeaAddrEnd;
 void setup() {
 
 	// Initialize local variables
-	daqScaling = FALSE;
+	daqScaling = false;
 	daqScaler = 10;
-	gpsNominal = FALSE;
-	bmpNominal = FALSE;
-	imuNominal = FALSE;
-	alaNominal = FALSE;
-	sendDaqStatus = FALSE;
+	gpsNominal = false;
+	bmpNominal = false;
+	imuNominal = false;
+	alaNominal = false;
+	sendDaqStatus = false;
 	fsmCounter0 = 0;
 	fsmCounter1 = 0;
 	fsmState = 0;
 	hasUpdate = 0;
 
 	// Initialize interface structs
-	g_daqStatusData.lock = FALSE;
+	g_daqStatusData.lock = false;
 	sendUpdate();
 }
 
@@ -139,7 +139,7 @@ void gpsRead() {
 
 	//	Catch Bad Read
 	else {
-		gpsNominal = FALSE;
+		gpsNominal = false;
 
 	}
 
@@ -190,15 +190,15 @@ void sendUpdate() {
 	while(g_daqStatusData.lock) {
 		retryTakeDelay(0);
 	}
-	g_daqStatusData.lock = TRUE;
+	g_daqStatusData.lock = true;
 	g_daqStatusData.timeStamp = getTimeStamp();
 	g_daqStatusData.daqScaling = daqScaling;
 	g_daqStatusData.gpsNominal = gpsNominal;
 	g_daqStatusData.bmpNominal = bmpNominal;
 	g_daqStatusData.imuNominal = imuNominal;
 	g_daqStatusData.alaNominal = alaNominal;
-	g_daqStatusData.hasUpdate = TRUE;
-	g_daqStatusData.lock = FALSE;
+	g_daqStatusData.hasUpdate = true;
+	g_daqStatusData.lock = false;
 }
 
 /**

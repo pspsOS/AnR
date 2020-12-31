@@ -29,6 +29,9 @@
 #endif
 
 #define print(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stdout, fmt); } while (0)
+
+#define prints(fmt, ...) \
             do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
 
 

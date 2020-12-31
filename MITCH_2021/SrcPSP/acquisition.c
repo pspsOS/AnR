@@ -56,9 +56,18 @@ void setup_A() {
 	fsmState = 0;
 	hasUpdate = 0;
 
+
+	// Setup sensors
+	gpsSetup_A();
+	bmpSetup_A();
+	imuSetup_A();
+	alaSetup_A();
+
 	// Initialize interface structs
 	g_daqStatusData.lock = false;
 	sendUpdate_A();
+
+
 }
 
 
@@ -149,7 +158,7 @@ void alaSetup_A() {
  */
 void gpsRead_A() {
 
-	print("Reading:");
+	print("Reading:",);
 
 // Parse each GPS packet type
 	//	Type = GPGGA

@@ -62,47 +62,79 @@ void setup_A() {
 }
 
 
-/* TODO: Implement gpsSetup
- * Established connection with GPS.
+/**
+ * @brief Setup GPS Sensor
+ * Establishes connection with GPS
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
- */
-/* TODO: Implement bmpSetup
- * Established connection with Barometric Pressure Sensor.
+ * @param None
+ * @retval None
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @author Jeff Kaji
+ * @date 12/31/2020
  */
-bool gpsSetup_A() {
-	return 0;
+void gpsSetup_A() {
+	#ifndef NDEBUG
+		gpsNominal = true;
+	#else
+		// TODO: Implement gpsSetup
+	#endif
 }
 
 
-bool bmpSetup_A() {
-	return 0;
+/**
+ * @brief Setup BMP Sensor
+ * Establishes connection with BMP
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/31/2020
+ */
+void bmpSetup_A() {
+	#ifndef NDEBUG
+		bmpNominal = true;
+	#else
+		// TODO: Implement bmpSetup
+	#endif
 }
 
 
-/* TODO: Implement imuSetup
- * Established connection with IMU.
+/**
+ * @brief Setup IMU Sensor
+ * Establishes connection with IMU
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/31/2020
  */
-bool imuSetup_A() {
-	return 0;
+void imuSetup_A() {
+	#ifndef NDEBUG
+		imuNominal = true;
+	#else
+		// TODO: Implement imuSetup
+	#endif
 }
 
 
-/* TODO: Implement alaSetup
- * Established connection with Analog Linear Accelerometer.
+/**
+ * @brief Setup ALA Sensor
+ * Establishes connection with ALA
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/31/2020
  */
-bool alaSetup_A() {
-	return 0;
+void alaSetup_A() {
+	#ifndef NDEBUG
+		alaNominal = true;
+	#else
+		// TODO: Implement alaSetup
+	#endif
 }
 
 // Loop
@@ -117,18 +149,18 @@ bool alaSetup_A() {
  */
 void gpsRead_A() {
 
-	printf("Reading:");
+	print("Reading:");
 
 // Parse each GPS packet type
 	//	Type = GPGGA
 	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
-		printf("GGA");
+		print("GGA");
 
 	}
 	//	Type = GPRMC
 	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
 		//puts("RMC");
-		printf("RMC");
+		print("RMC");
 	}
 
 	//	Catch Bad Read
@@ -251,8 +283,8 @@ void _findNmeaAddr(int addr) {
         }*/
     }
     /*
-    printf("Start:%d\n", _nmeaAddrStart);
-    printf("End:  %d\n", _nmeaAddrEnd);
+    print("Start:%d\n", _nmeaAddrStart);
+    print("End:  %d\n", _nmeaAddrEnd);
     */
 }
 
@@ -284,7 +316,7 @@ void __setNmea(char *nmea) {
  * @date 12/26/2020
  */
 void __printNmea() {
-	printf("\n%s", gpsNmea);
+	print("\n%s", gpsNmea);
 }
 
 /**
@@ -298,11 +330,11 @@ void __printNmea() {
  */
 float __getFloat(int addr) {
 	_findNmeaAddr(addr);
-	printf("Start: %d\n", _nmeaAddrStart);
-	printf("End:   %d\n", _nmeaAddrEnd);
-	printf("%s\n", &gpsNmea[_nmeaAddrStart]);
+	print("Start: %d\n", _nmeaAddrStart);
+	print("End:   %d\n", _nmeaAddrEnd);
+	print("%s\n", &gpsNmea[_nmeaAddrStart]);
 	return atof(&gpsNmea[_nmeaAddrStart]);
 }
 void __debug() {
-	printf("%s",&gpsNmea[_nmeaAddrEnd + 1]);
+	print("%s",&gpsNmea[_nmeaAddrEnd + 1]);
 }

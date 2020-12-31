@@ -16,10 +16,10 @@
 // Setup
 void setup();
 
-bool gpsSetup_A();
-bool bmpSetup_A();
-bool imuSetup_A();
-bool alaSetup_A();
+void gpsSetup_A();
+void bmpSetup_A();
+void imuSetup_A();
+void alaSetup_A();
 
 // Loop
 void gpsRead_A();

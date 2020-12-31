@@ -22,6 +22,15 @@
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 
+#ifndef NDEBUG
+#define ENABLE_PRINT 1
+#else
+#define ENABLE_PRINT 0
+#endif
+
+#define print(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
+
 
 /* User-defined Constants*/
 

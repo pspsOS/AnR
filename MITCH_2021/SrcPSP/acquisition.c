@@ -198,7 +198,7 @@ void sendUpdate_A() {
 
 /**
  * @brief Split NMEA String
- * Takes raw NMEA string and replaces ',' with '\n', splitting each substring
+ * Takes raw NMEA string and replaces ',' with 0, splitting each substring
  *
  * @param None
  * @retval None

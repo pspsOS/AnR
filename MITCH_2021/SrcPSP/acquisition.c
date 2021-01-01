@@ -283,7 +283,7 @@ void gpsRead_A() {
 
 	g_gpsData.timeStamp = getTimeStamp();
 
-	strncpy(g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
+	strncpy((char*)g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
 
 //	return;
 }
@@ -435,7 +435,7 @@ void __setNmea(char *nmea) {
  * @date 12/26/2020
  */
 void __printNmea() {
-	print("\n%s", gpsNmea);
+	prints("\n%s", gpsNmea);
 }
 
 /**
@@ -449,11 +449,11 @@ void __printNmea() {
  */
 float __getFloat(int addr) {
 	_findNmeaAddr(addr);
-	print("Start: %d\n", _nmeaAddrStart);
-	print("End:   %d\n", _nmeaAddrEnd);
-	print("%s\n", &gpsNmea[_nmeaAddrStart]);
+	prints("Start: %d\n", _nmeaAddrStart);
+	prints("End:   %d\n", _nmeaAddrEnd);
+	prints("%s\n", &gpsNmea[_nmeaAddrStart]);
 	return atof(&gpsNmea[_nmeaAddrStart]);
 }
 void __debug() {
-	print("%s",&gpsNmea[_nmeaAddrEnd + 1]);
+	prints("%s",&gpsNmea[_nmeaAddrEnd + 1]);
 }

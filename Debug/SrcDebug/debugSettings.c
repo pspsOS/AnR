@@ -7,6 +7,11 @@
 
 #include <debugSettings.h>
 
+// General Settings
+bool notifyWhenReadDisabled = true;
+
+
+// Sensor Settings
 bool simulateGps = true;
 char gpsFileName[] = "TestData/gpsTestData.txt";
 

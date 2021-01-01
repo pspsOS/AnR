@@ -12,10 +12,12 @@
 
 // Interface Structs
 
+// Parent Functions
+void setup();
+void loop_A();
+
 
 // Setup
-void setup();
-
 void gpsSetup_A();
 void bmpSetup_A();
 void imuSetup_A();

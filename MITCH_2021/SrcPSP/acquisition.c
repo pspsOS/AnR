@@ -12,6 +12,11 @@
 #include <debugSettings.h>
 #endif
 
+// Acquisition Finite States
+#define ACQUIRE_IMU_BMP_GPS (0)
+#define ACQUIRE_IMU_BMP (1)
+#define ACQUIRE_IMU (2)
+
 /* Global variable declarations */
 
 
@@ -25,8 +30,8 @@ ui8 bmpNominal;
 ui8 imuNominal;
 ui8 alaNominal;
 ui8 sendDaqStatus;
-ui8 fsmCounter0;
-ui8 fsmCounter1;
+ui8 gpsCounter;
+ui8 bmpCounter;
 ui8 fsmState;
 ui8 hasUpdate;
 
@@ -43,7 +48,7 @@ ui8 _nmeaAddrEnd;
 #endif
 
 
-// Setup
+
 
 /** setup_A()
  * @brief Setup Acquisition Task
@@ -65,9 +70,9 @@ void setup_A() {
 	imuNominal = false;
 	alaNominal = false;
 	sendDaqStatus = false;
-	fsmCounter0 = 0;
-	fsmCounter1 = 0;
-	fsmState = 0;
+	gpsCounter = 0;
+	bmpCounter = 0;
+	fsmState = ACQUIRE_IMU_BMP_GPS;
 	hasUpdate = 0;
 
 
@@ -82,8 +87,30 @@ void setup_A() {
 	sendUpdate_A();
 }
 
+void loop_A() {
+	switch(fsmState) {
+	case ACQUIRE_IMU_BMP_GPS:
+		gpsRead_A();
+	case ACQUIRE_IMU_BMP:
+		bmpRead_A();
+	case ACQUIRE_IMU:
+		imuRead_A();
+	}
+
+/*	if(daqScaling) {
+		switch(fsmState) {
+		case
+		}
+
+	} else {
+		gpsRead_A();
+		bmpRead_A();
+		imuRead_A();
+	}*/
+}
 
 
+// Setup
 /** gpsSetup_A()
  * @brief Setup GPS Sensor
  * Establishes connection with GPS
@@ -97,7 +124,8 @@ void setup_A() {
 void gpsSetup_A() {
 	#ifndef NDEBUG
 		if(!simulateGps) {
-			print("GPS simulation disabled\n");
+			if(notifyWhenReadDisabled)
+				print("GPS simulation disabled\n");
 			gpsNominal = false;
 			return;
 		}
@@ -208,11 +236,17 @@ void alaSetup_A() {
 
 
 
-/*
- * Read data from GPS.
+
+
+/** gpsRead_A()
+ * @brief GPS Read
+ * Read data from GPS
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/23/2020
  */
 void gpsRead_A() {
 
@@ -256,23 +290,32 @@ void gpsRead_A() {
 
 
 
-/* TODO: Implement bmpRead
+/** bmpRead_A();
+ * @brief BMP Read
  * Read data from BMP
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
- */
-/* TODO: Implement imuRead
- * Read data from IMU and ALA
+ * @param None
+ * @retval None
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @author Jeff Kaji
+ * @date 12/23/2020
  */
 void bmpRead_A() {
 
 }
 
 
+
+/** imuRead_A()
+ * @brief IMU Read
+ * Read data from IMU
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/23/2020
+ */
 void imuRead_A() {
 
 }

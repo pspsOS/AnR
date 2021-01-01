@@ -10,6 +10,10 @@
 
 #include "common.h"
 
+// General Settings
+extern bool notifyWhenReadDisabled;
+
+// Sensor Settings
 extern bool simulateGps;
 extern char gpsFileName[];
 
@@ -17,6 +21,6 @@ extern bool simulateBmp;
 extern char bmpFileName[];
 
 extern bool simulateImu;
-extern char imuFileName;
+extern char imuFileName[];
 
 #endif /* DEBUGSETTINGS_H_ */

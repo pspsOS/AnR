@@ -7,6 +7,11 @@
 
 #include "../IncPSP/acquisition.h"
 
+#ifndef NDEBUG
+#include <unistd.h>
+#include <debugSettings.h>
+#endif
+
 /* Global variable declarations */
 
 
@@ -29,9 +34,18 @@ ui8 hasUpdate;
 ui8 _nmeaAddrStart;
 ui8 _nmeaAddrEnd;
 
+// File load buffer
+#ifndef NDEBUG
+	FILE *_gpsFile;
+	FILE *_bmpFile;
+	FILE *_imuFile;
+	char _buff[255];
+#endif
+
+
 // Setup
 
-/**
+/** setup_A()
  * @brief Setup Acquisition Task
  * Initialized local variables and runs setup functions
  *
@@ -66,12 +80,11 @@ void setup_A() {
 	// Initialize interface structs
 	g_daqStatusData.lock = false;
 	sendUpdate_A();
-
-
 }
 
 
-/**
+
+/** gpsSetup_A()
  * @brief Setup GPS Sensor
  * Establishes connection with GPS
  *
@@ -83,14 +96,29 @@ void setup_A() {
  */
 void gpsSetup_A() {
 	#ifndef NDEBUG
-		gpsNominal = true;
+		if(!simulateGps) {
+			print("GPS simulation disabled\n");
+			gpsNominal = false;
+			return;
+		}
+		if( access(gpsFileName, F_OK ) == 0 ) {
+			prints("GPS File: \"%s\"\n", gpsFileName);
+			gpsNominal = true;
+			_gpsFile = fopen(gpsFileName, "r");
+
+		} else {
+			printe("GPS File: \"%s\" NOT FOUND\n", gpsFileName);
+			gpsNominal = false;
+		}
+
 	#else
 		// TODO: Implement gpsSetup
 	#endif
 }
 
 
-/**
+
+/** bmpSetup_A()
  * @brief Setup BMP Sensor
  * Establishes connection with BMP
  *
@@ -102,14 +130,29 @@ void gpsSetup_A() {
  */
 void bmpSetup_A() {
 	#ifndef NDEBUG
-		bmpNominal = true;
+		if(!simulateBmp) {
+			print("BMP simulation disabled\n");
+			bmpNominal = false;
+			return;
+		}
+		if( access(bmpFileName, F_OK ) == 0 ) {
+			prints("BMP File: \"%s\"\n", bmpFileName);
+			bmpNominal = true;
+			_bmpFile = fopen(bmpFileName, "r");
+
+		} else {
+			printe("BMP File: \"%s\" NOT FOUND\n", bmpFileName);
+			bmpNominal = false;
+		}
+
 	#else
 		// TODO: Implement bmpSetup
 	#endif
 }
 
 
-/**
+
+/** imuSetup_A()
  * @brief Setup IMU Sensor
  * Establishes connection with IMU
  *
@@ -121,14 +164,29 @@ void bmpSetup_A() {
  */
 void imuSetup_A() {
 	#ifndef NDEBUG
-		imuNominal = true;
+		if(!simulateImu) {
+			print("IMU simulation disabled\n");
+			imuNominal = false;
+			return;
+		}
+		if( access(imuFileName, F_OK ) == 0 ) {
+			prints("IMU File: \"%s\"\n", imuFileName);
+			imuNominal = true;
+			_imuFile = fopen(imuFileName, "r");
+
+		} else {
+			printe("IMU File: \"%s\" NOT FOUND\n", imuFileName);
+			imuNominal = false;
+		}
+
 	#else
 		// TODO: Implement imuSetup
 	#endif
 }
 
 
-/**
+
+/** alaSetup_A()
  * @brief Setup ALA Sensor
  * Establishes connection with ALA
  *
@@ -150,7 +208,7 @@ void alaSetup_A() {
 
 
 
-/* TODO: Implement gpsRead
+/*
  * Read data from GPS.
  *
  * Author: Jeff Kaji
@@ -158,18 +216,28 @@ void alaSetup_A() {
  */
 void gpsRead_A() {
 
+	#ifndef NDEBUG
+		if(!simulateGps) {
+			prints("%s\n", "GPS read aborted.");
+			return;
+		}
+		fscanf(_gpsFile, "%s", gpsNmea);
+	#else
+		TODO: Implement gpsRead w/ hardware
+	#endif
+
 	print("Reading:",);
 
 // Parse each GPS packet type
 	//	Type = GPGGA
 	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
-		print("GGA");
+		print("GGA\n");
 
 	}
 	//	Type = GPRMC
 	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
 		//puts("RMC");
-		print("RMC");
+		print("RMC\n");
 	}
 
 	//	Catch Bad Read
@@ -178,7 +246,7 @@ void gpsRead_A() {
 
 
 	}
-	assert(gpsNominal);
+
 	g_gpsData.timeStamp = getTimeStamp();
 
 	strncpy(g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
@@ -221,7 +289,16 @@ void checkStatus_A() {
 
 }
 
-
+/**
+ * @brief Send Update
+ * Updates the daqStatusData interface struct.
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jeff Kaji
+ * @date 12/31/2020
+ */
 void sendUpdate_A() {
 	while(g_daqStatusData.lock) {
 		retryTakeDelay(0);
@@ -284,17 +361,7 @@ void _findNmeaAddr(int addr) {
             // Set start address
             _nmeaAddrStart = i+1;
         }
-
-        // Handle end of string condition
-        /*if(gpsNmea[i] == 0) {
-            _nmeaAddrEnd = i;
-            break;
-        }*/
     }
-    /*
-    print("Start:%d\n", _nmeaAddrStart);
-    print("End:  %d\n", _nmeaAddrEnd);
-    */
 }
 
 // Test Functions

@@ -33,6 +33,8 @@
 
 #define prints(fmt, ...) \
             do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
+#define printe(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
 
 /* User-defined Constants*/

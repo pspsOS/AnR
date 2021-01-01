@@ -137,6 +137,7 @@ void gpsSetup_A() {
 		} else {
 			printe("GPS File: \"%s\" NOT FOUND\n", gpsFileName);
 			gpsNominal = false;
+			if(assertFileNames) assert(!assertFileNames);
 		}
 
 	#else
@@ -171,6 +172,7 @@ void bmpSetup_A() {
 		} else {
 			printe("BMP File: \"%s\" NOT FOUND\n", bmpFileName);
 			bmpNominal = false;
+			if(assertFileNames) assert(!assertFileNames);
 		}
 
 	#else
@@ -205,6 +207,7 @@ void imuSetup_A() {
 		} else {
 			printe("IMU File: \"%s\" NOT FOUND\n", imuFileName);
 			imuNominal = false;
+			if(assertFileNames) assert(!assertFileNames);
 		}
 
 	#else

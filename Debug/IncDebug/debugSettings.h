@@ -12,6 +12,7 @@
 
 // General Settings
 extern bool notifyWhenReadDisabled;
+extern bool assertFileNames;
 
 // Sensor Settings
 extern bool simulateGps;

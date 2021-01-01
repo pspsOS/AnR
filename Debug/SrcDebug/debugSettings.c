@@ -9,7 +9,7 @@
 
 // General Settings
 bool notifyWhenReadDisabled = true;
-
+bool assertFileNames = true;
 
 // Sensor Settings
 bool simulateGps = true;

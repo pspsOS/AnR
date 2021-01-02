@@ -6,7 +6,7 @@
  */
 
 #include "../IncPSP/common.h"
-
+#include <unistd.h>
 /* Global variable declarations */
 
 // acquisition

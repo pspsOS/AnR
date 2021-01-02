@@ -8,8 +8,8 @@
 #include "../IncPSP/acquisition.h"
 
 #ifndef NDEBUG
-#include <unistd.h>
 #include <debugSettings.h>
+#include <unistd.h>
 #endif
 
 // Acquisition Finite States
@@ -25,10 +25,10 @@
 char gpsNmea[MAX_NMEA];
 ui8 daqScaling;
 ui8 daqScaler;
-ui8 gpsNominal;
-ui8 bmpNominal;
-ui8 imuNominal;
-ui8 alaNominal;
+bool gpsNominal;
+bool bmpNominal;
+bool imuNominal;
+bool alaNominal;
 ui8 sendDaqStatus;
 ui8 gpsCounter;
 ui8 bmpCounter;
@@ -44,7 +44,7 @@ ui8 _nmeaAddrEnd;
 	FILE *_gpsFile;
 	FILE *_bmpFile;
 	FILE *_imuFile;
-	char _buff[255];
+	FILE *_alaFile;
 #endif
 
 
@@ -75,6 +75,10 @@ void setup_A() {
 	fsmState = ACQUIRE_IMU_BMP_GPS;
 	hasUpdate = 0;
 
+
+	#ifndef NDEBUG
+		notifyGeneralSettings_DS();
+	#endif
 
 	// Setup sensors
 	gpsSetup_A();
@@ -125,23 +129,7 @@ void loop_A() {
  */
 void gpsSetup_A() {
 	#ifndef NDEBUG
-		if(!simulateGps) {
-			if(notifyWhenReadDisabled)
-				print("GPS simulation disabled\n");
-			gpsNominal = false;
-			return;
-		}
-		if( access(gpsFileName, F_OK ) == 0 ) {
-			prints("GPS File: \"%s\"\n", gpsFileName);
-			gpsNominal = true;
-			_gpsFile = fopen(gpsFileName, "r");
-
-		} else {
-			printe("GPS File: \"%s\" NOT FOUND\n", gpsFileName);
-			gpsNominal = false;
-			if(assertFileNames) assert(!assertFileNames);
-		}
-
+		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
 	#endif
@@ -161,22 +149,7 @@ void gpsSetup_A() {
  */
 void bmpSetup_A() {
 	#ifndef NDEBUG
-		if(!simulateBmp) {
-			print("BMP simulation disabled\n");
-			bmpNominal = false;
-			return;
-		}
-		if( access(bmpFileName, F_OK ) == 0 ) {
-			prints("BMP File: \"%s\"\n", bmpFileName);
-			bmpNominal = true;
-			_bmpFile = fopen(bmpFileName, "r");
-
-		} else {
-			printe("BMP File: \"%s\" NOT FOUND\n", bmpFileName);
-			bmpNominal = false;
-			if(assertFileNames) assert(!assertFileNames);
-		}
-
+		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
 		// TODO: Implement bmpSetup
 	#endif
@@ -196,22 +169,7 @@ void bmpSetup_A() {
  */
 void imuSetup_A() {
 	#ifndef NDEBUG
-		if(!simulateImu) {
-			print("IMU simulation disabled\n");
-			imuNominal = false;
-			return;
-		}
-		if( access(imuFileName, F_OK ) == 0 ) {
-			prints("IMU File: \"%s\"\n", imuFileName);
-			imuNominal = true;
-			_imuFile = fopen(imuFileName, "r");
-
-		} else {
-			printe("IMU File: \"%s\" NOT FOUND\n", imuFileName);
-			imuNominal = false;
-			if(assertFileNames) assert(!assertFileNames);
-		}
-
+		_imuFile = setupSensorFile_DS(IMU, &imuNominal);
 	#else
 		// TODO: Implement imuSetup
 	#endif
@@ -231,7 +189,7 @@ void imuSetup_A() {
  */
 void alaSetup_A() {
 	#ifndef NDEBUG
-		alaNominal = true;
+		_alaFile = setupSensorFile_DS(ALA, &alaNominal);
 	#else
 		// TODO: Implement alaSetup
 	#endif

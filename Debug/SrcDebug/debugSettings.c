@@ -9,6 +9,7 @@
 
 // General Settings
 bool notifyWhenReadDisabled = true;
+bool notifyWhenReadAborted = false;
 bool assertFileNames = true;
 
 // Sensor Settings

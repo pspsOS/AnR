@@ -11,7 +11,10 @@
 #include "common.h"
 
 // General Settings
+extern bool notifyGeneralSettings;
+
 extern bool notifyWhenReadDisabled;
+extern bool notifyWhenReadAborted;
 extern bool assertFileNames;
 
 // Sensor Settings

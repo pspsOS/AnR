@@ -84,6 +84,7 @@ void setup_A() {
 
 	// Initialize interface structs
 	g_daqStatusData.lock = false;
+	g_daqScalingData.lock = false;
 	sendUpdate_A();
 }
 
@@ -95,6 +96,7 @@ void loop_A() {
 		bmpRead_A();
 	case ACQUIRE_IMU:
 		imuRead_A();
+		break;
 	}
 
 /*	if(daqScaling) {
@@ -255,7 +257,8 @@ void gpsRead_A() {
 
 	#ifndef NDEBUG
 		if(!simulateGps) {
-			prints("%s\n", "GPS read aborted.");
+			if(notifyWhenReadAborted)
+				print("GPS read aborted.\n");
 			return;
 		}
 		fscanf(_gpsFile, "%s", gpsNmea);
@@ -332,7 +335,72 @@ void imuRead_A() {
  * Date: 12/23/2020
  */
 void checkStatus_A() {
+	// Check for daqScaling update
+	while(g_daqScalingData.lock) {
+		retryTakeDelay(0);
+	}
+	g_daqScalingData.lock = true;
+	if(g_daqScalingData.hasUpdate) {
+		daqScaling = g_daqScalingData.enableDaqScaling;
+		g_daqScalingData.hasUpdate = false;
+		sendDaqStatus = true;
+	}
+	g_daqScalingData.lock = false;
 
+
+	// GPS handling
+	if(!gpsNominal) {
+		gpsSetup_A();
+		if(gpsNominal) {
+			sendDaqStatus = true;
+		}
+	}
+
+
+	// BMP Handling
+	if(!bmpNominal) {
+		bmpSetup_A();
+		if(bmpNominal) {
+			sendDaqStatus = true;
+		}
+	}
+
+
+	// IMU Handling
+	if(!imuNominal) {
+		imuSetup_A();
+		if(imuNominal) {
+			sendDaqStatus = true;
+		}
+	}
+
+
+	// ALA Handling
+	if(!alaNominal) {
+		alaSetup_A();
+		if(alaNominal) {
+			sendDaqStatus = true;
+		}
+	}
+
+
+	// Update Handling
+	if(sendDaqStatus) {
+		while(g_daqStatusData.lock) {
+			retryTakeDelay(0);
+		}
+		g_daqStatusData.lock = true;
+		g_daqStatusData.daqScaling = daqScaling;
+		g_daqStatusData.gpsNominal = gpsNominal;
+		g_daqStatusData.bmpNominal = bmpNominal;
+		g_daqStatusData.imuNominal = imuNominal;
+		g_daqStatusData.alaNominal = alaNominal;
+		g_daqStatusData.hasUpdate = true;
+		g_daqStatusData.lock = false;
+
+		// Reset send status
+		sendDaqStatus = false;
+	}
 }
 
 /**

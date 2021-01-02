@@ -11,6 +11,7 @@
 
 // acquisition
 volatile daqStatusData_t g_daqStatusData = {0};
+volatile daqScalingData_t g_daqScalingData = {0};
 volatile gpsData_t g_gpsData = {0};
 volatile bmpData_t g_bmpData = {0};
 volatile imuData_t g_imuData = {0};

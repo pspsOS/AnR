@@ -88,6 +88,11 @@ typedef struct daqStatusData {
 	bool lock;
 } daqStatusData_t;
 
+typedef struct daqScalingData {
+	bool enableDaqScaling;
+	bool hasUpdate;
+	bool lock;
+} daqScalingData_t;
 
 typedef struct gpsData {
 	ui32 timeStamp;
@@ -189,6 +194,7 @@ typedef struct staticOrientationNode {
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
+extern volatile daqScalingData_t g_daqScalingData;
 extern volatile gpsData_t g_gpsData;
 extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;

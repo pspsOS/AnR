@@ -86,6 +86,7 @@ void loop_M() {
 /**
  * @brief Check new battery voltage
  * This function checks the battery voltage and stores it as a local float
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -95,16 +96,13 @@ void loop_M() {
  */
 
 void checkBatteryVoltage_M() {
-	#ifndef NDEBUG
-		batteryVoltage = 7.4;
-		#else
-			// TODO: Implement battery voltage reading from hardware
-		#endif
+	// TODO: Implement battery voltage reading from hardware
 }
 
 /**
  * @brief Check new continuity for each parachute charge
  * This function checks the continuity of all 4 parachute charges and stores as a local bool array
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -115,17 +113,14 @@ void checkBatteryVoltage_M() {
 
 void checkContinuity_M() {
 	for (ui8 i = 0; i < 4; i++) {
-		#ifndef NDEBUG
-			continuity[i] = true;
-		#else
-			// TODO: Implement continuity reading from hardware
-		#endif
+		// TODO: Implement continuity reading from hardware
 	}
 }
 
 /**
  * @brief Check new button state
  * This function checks the button state and stores it as a local bool
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -135,11 +130,7 @@ void checkContinuity_M() {
  */
 
 void checkButtonState_M() {
-	#ifndef NDEBUG
-		buttonState = false;
-		#else
-			// TODO: Implement button state reading from hardware
-		#endif
+	// TODO: Implement button state reading from hardware
 }
 
 /**

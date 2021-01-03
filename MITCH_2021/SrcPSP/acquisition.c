@@ -22,24 +22,24 @@
 
 /* Local variable declarations */
 
-char gpsNmea[MAX_NMEA];
-ui8 daqScaling;
-ui8 daqScaler;
-bool gpsNominal;
-bool bmpNominal;
-bool imuNominal;
-bool alaNominal;
-ui8 sendDaqStatus;
-ui8 gpsCounter;
-ui8 bmpCounter;
-ui8 fsmState;
-ui8 hasUpdate;
+char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
+bool daqScaling;        // Enables/Disables DAQ Scaling
+ui8 daqScaler;          // DAQ Scaling number – Sets the ratio
+bool gpsNominal;        // Indicates whether the GPS is nominal
+bool bmpNominal;        // Indicates whether the BMP is nominal
+bool imuNominal;        // Indicates whether the IMU is nominal
+bool alaNominal;        // Indicates whether the ALA is nominal
+ui8 sendDaqStatus;      // Indicates whether to update the daqStatusData struct
+ui8 gpsCounter;         // Counter used in DAQ Scaling for Finite State Machine
+ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
+ui8 fsmState;           // Defines state of Finite State Machine
+//ui8 hasUpdate;          // Indicates whether there is an update
 
 // Used for parsing NMEA data
 ui8 _nmeaAddrStart;
 ui8 _nmeaAddrEnd;
 
-// File load buffer
+// File pointers for Debugging
 #ifndef NDEBUG
 	FILE *_gpsFile;
 	FILE *_bmpFile;
@@ -73,7 +73,7 @@ void setup_A() {
 	gpsCounter = 0;
 	bmpCounter = 0;
 	fsmState = ACQUIRE_IMU_BMP_GPS;
-	hasUpdate = 0;
+	//hasUpdate = 0;
 
 
 	#ifndef NDEBUG

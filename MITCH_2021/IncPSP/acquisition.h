@@ -13,7 +13,7 @@
 // Interface Structs
 
 // Parent Functions
-void setup();
+void setup_A();
 void loop_A();
 
 
@@ -27,7 +27,6 @@ void alaSetup_A();
 void gpsRead_A();
 void bmpRead_A();
 void imuRead_A();
-
 void checkStatus_A();
 void sendUpdate_A();
 

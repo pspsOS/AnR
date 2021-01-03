@@ -21,11 +21,11 @@
 // General Settings
 bool notifyGeneralSettings = true;
 
-bool notifyWhenReadDisabled = true;
+bool notifyWhenDisabled = true;
 bool notifyWhenReadAborted = false;
 bool assertFileNames = true;
 
-// Sensor Settings
+// Acquisition Settings
 bool simulateGps = true;
 char gpsFileName[] = "TestData/gpsTestData.txt";
 
@@ -38,6 +38,9 @@ char imuFileName[] = "TestData/imuTestData.txt";
 bool simulateAla = false;
 char alaFileName[] = "TestData/alaTestData.txt";
 
+// Monitoring Settings
+bool simulateMonitoring = true;
+char monitoringFileName[] = "TestData/monitoringTestData.txt";
 
 /** notifyGeneralSettings_DS()
  * @brief Notify General Settings
@@ -54,7 +57,7 @@ void notifyGeneralSettings_DS() {
 		print("=================================\n");
 		print("DEBUG SETTINGS\n");
 		//print("=================================\n");
-		prints("notifyWhenReadDisabled = %s\n", (notifyWhenReadDisabled) ? _TRUE : _FALSE);
+		prints("notifyWhenDisabled = %s\n", (notifyWhenDisabled) ? _TRUE : _FALSE);
 		prints("notifyWhenReadAborted = %s\n", (notifyWhenReadAborted) ? _TRUE : _FALSE);
 		prints("assertFileNames = %s\n", (assertFileNames) ? _TRUE : _FALSE);
 		print("=================================\n\n");
@@ -101,7 +104,7 @@ FILE *setupSensorFile_DS(ui8 sensor, bool *nominal) {
 
 
 	if(!simulate) {
-		if(notifyWhenReadDisabled)
+		if(notifyWhenDisabled)
 			prints("%s simulation disabled\n", strName);
 		*nominal = false;
 		return NULL;
@@ -114,6 +117,34 @@ FILE *setupSensorFile_DS(ui8 sensor, bool *nominal) {
 	} else {
 		printe("%s File: \"%s\" NOT FOUND\n", strName, fileName);
 		*nominal = false;
+		if(assertFileNames) assert(!assertFileNames);
+		return NULL;
+	}
+}
+
+/**
+ * @brief setup monitoring simulation
+ * check if simulating then access monitoringTestData.txt
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 1/3/2021
+ */
+FILE *setupMonitoringFile_DS() {
+	if (!simulateMonitoring) {
+		if (notifyWhenDisabled) {
+			print("Monitoring simulation disabled\n");
+		}
+		return NULL;
+	}
+	if( access(monitoringFileName, F_OK) == 0 ) {
+		prints("Monitoring File: \"%s\"\n", monitoringFileName);
+		return fopen(monitoringFileName, "r");
+
+	} else {
+		printe("Monitoring File: \"%s\" NOT FOUND\n", monitoringFileName);
 		if(assertFileNames) assert(!assertFileNames);
 		return NULL;
 	}

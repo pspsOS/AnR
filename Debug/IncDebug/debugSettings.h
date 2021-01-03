@@ -19,11 +19,11 @@
 // General Settings
 extern bool notifyGeneralSettings;
 
-extern bool notifyWhenReadDisabled;
+extern bool notifyWhenDisabled;
 extern bool notifyWhenReadAborted;
 extern bool assertFileNames;
 
-// Sensor Settings
+// Acquisition Settings
 extern bool simulateGps;
 extern char gpsFileName[];
 
@@ -33,7 +33,21 @@ extern char bmpFileName[];
 extern bool simulateImu;
 extern char imuFileName[];
 
+
+// Monitoring Settings
+extern bool simulateMonitoring;
+extern char monitoringFileName[];
+
+
+// General Functions
 void notifyGeneralSettings_DS();
+
+
+// Acquisition Functions
 FILE *setupSensorFile_DS(ui8 sensor, bool *nominal);
+
+
+// Monitoring Functions
+FILE *setupMonitoringFile_DS();
 
 #endif /* DEBUGSETTINGS_H_ */

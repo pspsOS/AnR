@@ -7,14 +7,24 @@
 
 #include "../IncPSP/monitoring.h"
 
+#ifndef NDEBUG
+#include <debugSettings.h>
+#include <unistd.h>
+#endif
+
 /* Global variable declarations */
 
 
 /* Local variable declarations */
 
-float batteryVoltage;
-bool continuity[4];
-bool buttonState;
+float batteryVoltage; // Voltage of battery (V)
+bool continuity[4]; // Continuity status of parachute deployment charges
+bool buttonState; // State of button (on/off)
+
+// File pointers for Debugging
+#ifndef NDEBUG
+	FILE *_monitoringFile;
+#endif
 
 /**
  * @brief setup
@@ -29,6 +39,11 @@ bool buttonState;
 
 void setup_M() {
 	//initialize variables
+	#ifndef NDEBUG
+		_monitoringFile = setupMonitoringFile_DS();
+	#else
+		// TODO: Implement Monitoring Setup
+	#endif
 	batteryVoltage = 7.4;
 	for (ui8 i = 0; i < 4; i++) {
 		continuity[i] = true;
@@ -48,9 +63,23 @@ void setup_M() {
  */
 
 void loop_M() {
-	checkBatteryVoltage_M();
-	checkContinuity_M();
-	checkButtonState_M();
+	#ifndef NDEBUG
+		if(!simulateMonitoring) {
+			if(notifyWhenReadAborted)
+				print("Monitoring read aborted.\n");
+			return;
+		}
+		fscanf(_monitoringFile, "%f", &batteryVoltage);
+		fscanf(_monitoringFile, "%d", &continuity[0]);
+		fscanf(_monitoringFile, "%d", &continuity[1]);
+		fscanf(_monitoringFile, "%d", &continuity[2]);
+		fscanf(_monitoringFile, "%d", &continuity[3]);
+		fscanf(_monitoringFile, "%d", &buttonState);
+	#else
+		checkBatteryVoltage_M();
+		checkContinuity_M();
+		checkButtonState_M();
+	#endif
 	sendUpdate_M();
 }
 

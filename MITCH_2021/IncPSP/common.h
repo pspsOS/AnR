@@ -131,15 +131,6 @@ typedef struct imuData {
 
 } imuData_t;
 
-
-typedef struct monitorData {
-	ui32 timeStamp;
-	ui8 voltage;
-	ui8 monitorStatus;
-
-} monitorData_t;
-
-
 typedef struct processedData {
 	ui32 timeStamp;
 
@@ -150,6 +141,7 @@ typedef struct monitoringData {
 	float batteryVoltage;
 	bool continuity[4];
 	bool buttonState;
+	bool hardwareDeploymentDisable;
 	bool hasUpdate;
 	bool lock;
 

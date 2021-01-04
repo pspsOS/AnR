@@ -17,6 +17,7 @@ void loop_M();
 void checkBatteryVoltage();
 void checkContinuity();
 void checkButtonState();
+void checkHardwareDeploymentDisable_M();
 void sendUpdate_M();
 
 #endif /* INC_MONITORING_H_ */

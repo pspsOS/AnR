@@ -20,6 +20,7 @@
 float batteryVoltage; // Voltage of battery (V)
 bool continuity[4]; // Continuity status of parachute deployment charges
 bool buttonState; // State of button (on/off)
+bool hardwareDeploymentDisable; // Terminal block disables deployment in hardware
 
 // File pointers for Debugging
 #ifndef NDEBUG
@@ -75,10 +76,13 @@ void loop_M() {
 		fscanf(_monitoringFile, "%d", &continuity[2]);
 		fscanf(_monitoringFile, "%d", &continuity[3]);
 		fscanf(_monitoringFile, "%d", &buttonState);
+		fscanf(_monitoringFile, "%d", &hardwareDeploymentDisable);
+		prints("%d\n", hardwareDeploymentDisable);
 	#else
 		checkBatteryVoltage_M();
 		checkContinuity_M();
 		checkButtonState_M();
+		checkHardwareDeploymentDisable_M();
 	#endif
 	sendUpdate_M();
 }
@@ -134,6 +138,22 @@ void checkButtonState_M() {
 }
 
 /**
+ * @brief check the hardware deployment disable
+ * Checks if the hardware has disabled deployment
+ * Never accessed for debug
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 1/3/2021
+ */
+
+void checkHardwareDeploymentDisable_M() {
+	// TODO: Implement hardware deployment disable reading from hardware
+}
+
+/**
  * @brief send updated monitoring data
  * Takes local monitoring data and updates global monitoring variables with local data
  *
@@ -155,6 +175,7 @@ void sendUpdate_M() {
 		g_monitoringData.continuity[i] = continuity[i];
 	}
 	g_monitoringData.buttonState = buttonState;
+	g_monitoringData.hardwareDeploymentDisable = hardwareDeploymentDisable;
 	g_monitoringData.hasUpdate = true;
 	g_monitoringData.lock = false;
 }

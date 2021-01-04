@@ -163,7 +163,7 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
-
+/* Node structures */
 
 typedef struct altitudeNode {
 	float altitude;
@@ -176,7 +176,6 @@ typedef struct alaNode {
 	bool lock;
 	alaNode_t *nextNode;
 } alaNode_t;
-
 
 typedef struct staticOrientationNode {
 	bool lock;
@@ -196,8 +195,8 @@ extern volatile transmissionData_t g_transmissionData;
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
 
-extern altitudeNode_t *g_headAltitudeNode;
-extern alaNode_t *g_headALANode;
-extern staticOrientationNode_t *g_headStaticOrientationNode;
+extern altitudeNode_t *g_newAltitudeNode;
+extern alaNode_t *g_newALANode;
+extern staticOrientationNode_t *g_newStaticOrientationNode;
 
 #endif /* COMMON_H_ */

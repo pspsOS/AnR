@@ -64,7 +64,14 @@ staticOrientationNode_t *createOrientationList(ui8 listSize) {
 bool setupLinkedLists() {
 	g_newAltitudeNode = createAltitudeList(ALTITUDE_LIST_SIZE);
 	g_newALANode = createALAList(ALA_LIST_SIZE);
-	g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
+
+	// This was causing an error so I made some changes
+
+	// Start of Jeff Code
+	//g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
+
+	return false;
+	// End of Jeff Code
 }
 
 

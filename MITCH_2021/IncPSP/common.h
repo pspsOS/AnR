@@ -45,6 +45,7 @@
 
 #define ALTITUDE_LIST_SIZE (20)
 #define ALA_LIST_SIZE (40)
+#define STATIC_ORIENTATION_LIST_SIZE (20)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -64,11 +65,6 @@ typedef uint8_t ui8;
 typedef uint16_t ui16;
 typedef uint32_t ui32;
 
-
-/* Common Function Prototypes */
-
-ui32 getTimeStamp(void);
-void retryTakeDelay(int length);
 
 /* Typedef structs and types */
 
@@ -163,7 +159,7 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
-
+/* Node structures */
 
 typedef struct altitudeNode {
 	float altitude;
@@ -176,7 +172,6 @@ typedef struct alaNode {
 	bool lock;
 	alaNode_t *nextNode;
 } alaNode_t;
-
 
 typedef struct staticOrientationNode {
 	bool lock;
@@ -196,8 +191,16 @@ extern volatile transmissionData_t g_transmissionData;
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
 
-extern altitudeNode_t *g_headAltitudeNode;
-extern alaNode_t *g_headALANode;
-extern staticOrientationNode_t *g_headStaticOrientationNode;
+extern altitudeNode_t *g_newAltitudeNode;
+extern alaNode_t *g_newALANode;
+extern staticOrientationNode_t *g_newStaticOrientationNode;
+
+/* Common Function Prototypes */
+
+ui32 getTimeStamp(void);
+void retryTakeDelay(int length);
+altitudeNode_t *createAltitudeList(ui8 );
+alaNode_t *createALAList(ui8 );
+staticOrientationNode_t *createOrientationList(ui8 );
 
 #endif /* COMMON_H_ */

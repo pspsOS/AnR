@@ -14,9 +14,9 @@
 
 void setup_M();
 void loop_M();
-void checkBatteryVoltage();
-void checkContinuity();
-void checkButtonState();
+void checkBatteryVoltage_M();
+void checkContinuity_M();
+void checkButtonState_M();
 void checkHardwareDeploymentDisable_M();
 void sendUpdate_M();
 

@@ -23,23 +23,49 @@ volatile transmissionData_t g_transmissionData = {0};
 volatile ui8 g_currentNominalMode = 0;
 volatile ui8 g_currentContingency = 0;
 // pointers
-altitudeNode_t *g_headAltitudeNode = NULL;
-alaNode_t *g_headALANode = NULL;
-staticOrientationNode_t *g_headStaticOrientationNode = NULL;
+altitudeNode_t *g_newAltitudeNode = NULL;
+alaNode_t *g_newALANode = NULL;
+staticOrientationNode_t *g_newStaticOrientationNode = NULL;
 
 
-/*void *createLinkedList(void listType, ui8 listSize) {
-	void *headNode = calloc(sizeof(listType), 1);
-	void *currentPointer = headNode;
+altitudeNode_t *createAltitudeList(ui8 listSize) {
+	altitudeNode_t *headNode = calloc(sizeof(altitudeNode_t), 1);
+	altitudeNode_t *currentPointer = headNode;
 	for (ui8 i = 1; i < listSize; i++) {
-		currentPointer->nextNode = calloc(sizeof(listType), 1);
+		currentPointer->nextNode = calloc(sizeof(altitudeNode_t), 1);
 		currentPointer = currentPointer->nextNode;
 	}
 	currentPointer->nextNode = headNode;
 	return headNode;
-}*/
+}
 
+alaNode_t *createALAList(ui8 listSize) {
+	alaNode_t *headNode = calloc(sizeof(alaNode_t), 1);
+	alaNode_t *currentPointer = headNode;
+	for (ui8 i = 1; i < listSize; i++) {
+		currentPointer->nextNode = calloc(sizeof(alaNode_t), 1);
+		currentPointer = currentPointer->nextNode;
+	}
+	currentPointer->nextNode = headNode;
+	return headNode;
+}
 
+staticOrientationNode_t *createOrientationList(ui8 listSize) {
+	staticOrientationNode_t *headNode = calloc(sizeof(staticOrientationNode_t), 1);
+	staticOrientationNode_t *currentPointer = headNode;
+	for (ui8 i = 1; i < listSize; i++) {
+		currentPointer->nextNode = calloc(sizeof(staticOrientationNode_t), 1);
+		currentPointer = currentPointer->nextNode;
+	}
+	currentPointer->nextNode = headNode;
+	return headNode;
+}
+
+bool setupLinkedLists() {
+	g_newAltitudeNode = createAltitudeList(ALTITUDE_LIST_SIZE);
+	g_newALANode = createALAList(ALA_LIST_SIZE);
+	g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
+}
 
 
 /**

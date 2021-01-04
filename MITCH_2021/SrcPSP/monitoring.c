@@ -8,8 +8,8 @@
 #include "../IncPSP/monitoring.h"
 
 #ifndef NDEBUG
-#include <debugSettings.h>
-#include <unistd.h>
+	#include <debugSettings.h>
+	#include <unistd.h>
 #endif
 
 /* Global variable declarations */
@@ -50,6 +50,7 @@ void setup_M() {
 		continuity[i] = true;
 	}
 	buttonState = false;
+	hardwareDeploymentDisable = false;
 }
 
 /**
@@ -77,7 +78,6 @@ void loop_M() {
 		fscanf(_monitoringFile, "%d", &continuity[3]);
 		fscanf(_monitoringFile, "%d", &buttonState);
 		fscanf(_monitoringFile, "%d", &hardwareDeploymentDisable);
-		prints("%d\n", hardwareDeploymentDisable);
 	#else
 		checkBatteryVoltage_M();
 		checkContinuity_M();

@@ -7,8 +7,6 @@
 
 #include "../IncPSP/processing.h"
 
-//#include <stdbool.h>
-
 #ifndef NDEBUG
 #include <debugSettings.h>
 #include <unistd.h>
@@ -149,7 +147,7 @@ bool pointyEndUp_P() {
 
 	assert((x * x + y * y) != 0);
 
-	return ((z*z / (x * x + y * y)) > TAN_THETA_SQUARED) && (z < 0) && ((x * x + y * y) > MIN_HORZ_ACCL_SQ);
+	return ((z*z / (x * x + y * y)) > TAN_THETA_SQUARED) && (z < 0);
 }
 
 

@@ -40,6 +40,7 @@
 /* User-defined Constants*/
 
 #define MAX_NMEA (80)
+#define DEFAULT_DAQ_SCALER (10)
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 

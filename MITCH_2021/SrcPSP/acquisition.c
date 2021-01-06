@@ -21,7 +21,6 @@
 
 
 /* Local variable declarations */
-
 char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
 bool daqScaling;        // Enables/Disables DAQ Scaling
 ui8 daqScaler;          // DAQ Scaling number – Sets the ratio
@@ -29,11 +28,10 @@ bool gpsNominal;        // Indicates whether the GPS is nominal
 bool bmpNominal;        // Indicates whether the BMP is nominal
 bool imuNominal;        // Indicates whether the IMU is nominal
 bool alaNominal;        // Indicates whether the ALA is nominal
-ui8 sendDaqStatus;      // Indicates whether to update the daqStatusData struct
+bool sendDaqStatus;     // Indicates whether to update the daqStatusData struct
 ui8 gpsCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
-//ui8 hasUpdate;          // Indicates whether there is an update
 
 // Used for parsing NMEA data
 ui8 _nmeaAddrStart;
@@ -64,7 +62,7 @@ void setup_A() {
 
 	// Initialize local variables
 	daqScaling = false;
-	daqScaler = 10;
+	daqScaler = DEFAULT_DAQ_SCALER;
 	gpsNominal = false;
 	bmpNominal = false;
 	imuNominal = false;
@@ -73,12 +71,6 @@ void setup_A() {
 	gpsCounter = 0;
 	bmpCounter = 0;
 	fsmState = ACQUIRE_IMU_BMP_GPS;
-	//hasUpdate = 0;
-
-
-	#ifndef NDEBUG
-		notifyGeneralSettings_DS();
-	#endif
 
 	// Setup sensors
 	gpsSetup_A();
@@ -86,9 +78,11 @@ void setup_A() {
 	imuSetup_A();
 	alaSetup_A();
 
-	// Initialize interface structs
+	// Unlock initialized interface structs
 	g_daqStatusData.lock = false;
 	g_daqScalingData.lock = false;
+
+	// Send update
 	sendUpdate_A();
 }
 
@@ -305,7 +299,6 @@ void checkStatus_A() {
 	}
 	g_daqScalingData.lock = false;
 
-
 	// GPS handling
 	if(!gpsNominal) {
 		gpsSetup_A();
@@ -313,7 +306,6 @@ void checkStatus_A() {
 			sendDaqStatus = true;
 		}
 	}
-
 
 	// BMP Handling
 	if(!bmpNominal) {
@@ -323,7 +315,6 @@ void checkStatus_A() {
 		}
 	}
 
-
 	// IMU Handling
 	if(!imuNominal) {
 		imuSetup_A();
@@ -331,7 +322,6 @@ void checkStatus_A() {
 			sendDaqStatus = true;
 		}
 	}
-
 
 	// ALA Handling
 	if(!alaNominal) {
@@ -341,26 +331,11 @@ void checkStatus_A() {
 		}
 	}
 
-
-	// Update Handling
+	// Send update if needed
 	if(sendDaqStatus) {
-		while(g_daqStatusData.lock) {
-			retryTakeDelay(0);
-		}
-		g_daqStatusData.lock = true;
-		g_daqStatusData.daqScaling = daqScaling;
-		g_daqStatusData.gpsNominal = gpsNominal;
-		g_daqStatusData.bmpNominal = bmpNominal;
-		g_daqStatusData.imuNominal = imuNominal;
-		g_daqStatusData.alaNominal = alaNominal;
-		g_daqStatusData.hasUpdate = true;
-		g_daqStatusData.lock = false;
-
-		// Reset send status
-		sendDaqStatus = false;
+		sendUpdate_A();
 	}
 }
-
 /**
  * @brief Send Update
  * Updates the daqStatusData interface struct.

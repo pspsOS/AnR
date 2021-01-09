@@ -47,7 +47,7 @@ float temp_g = 288.16; // Ground temperature
 float temp_trop_p = 216.66; // Temperature in the tropopause
 float trop_p_alt = 11000; // in m
 
-#define a_trop = (temp_trop_p - temp_g)/(trop_p_alt - 0);
+float a_trop = 0; //(temp_trop_p - temp_g)/(trop_p_alt - 0);
 
 float time_var; // Local time variable
 float new_time; // Local time variable
@@ -201,7 +201,7 @@ void processData_P() {
 		new_time = g_bmpData.timeStamp;
 
 		CalcAltBMP_P();
-		CalcVelBMP_P();
+		//CalcVelBMP_P();
 
 		time_var = new_time;
 	}
@@ -257,15 +257,15 @@ void CalcFlightDataBMP_P() {
 	new_vert_speed = delta_alt/delta_time;
 
 	Speed_Norm = sqrt(Horz_vel_SQRD + pow(new_vert_speed, 2));
-	Vert_Orientation = arctan(Horz_vel_SQRD/new_vert_speed);
+	Vert_Orientation = atan(Horz_vel_SQRD/new_vert_speed);
 
 
 
 	acclZ_bmp = (new_vert_speed - vert_speed) / delta_time;
 
-	if (abs(acclZ_bmp - accZ) < threshold_check) {
-
-	}
+	//if (abs(acclZ_bmp - accZ) < threshold_check) {
+//
+//	}
 
 
 	vert_speed = new_vert_speed;

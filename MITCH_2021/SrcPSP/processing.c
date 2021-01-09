@@ -6,6 +6,7 @@
  */
 
 #include "../IncPSP/processing.h"
+#include <math.h>
 
 #ifndef NDEBUG
 #include <debugSettings.h>

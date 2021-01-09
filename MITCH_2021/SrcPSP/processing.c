@@ -88,6 +88,7 @@ bool getBMPData_P() {
 
 	g_bmpData.timeStamp = getTimeStamp();
 
+	return true;
 }
 
 
@@ -126,6 +127,7 @@ bool getIMUData_P() {
 
 	g_imuData.timeStamp = getTimeStamp();
 
+	return true;
 }
 
 
@@ -152,6 +154,7 @@ bool getGPSData_P() {
 
 	g_gpsData.timeStamp = getTimeStamp();
 
+	return true;
 }
 
 

@@ -47,7 +47,7 @@ float temp_g = 288.16; // Ground temperature
 float temp_trop_p = 216.66; // Temperature in the tropopause
 float trop_p_alt = 11000; // in m
 
-float a_trop = (temp_trop_p - temp_g)/(trop_p_alt - 0);
+#define a_trop = (temp_trop_p - temp_g)/(trop_p_alt - 0);
 
 float time_var; // Local time variable
 float new_time; // Local time variable
@@ -182,13 +182,13 @@ void processData_P() {
 		temp_alt_bmp = g_bmpData.temperature;
 		pres_alt_bmp = g_bmpData.pressure;
 
-		if (abs(temp_alt_bmp - temp_g) > threshold_temp) {
+		//if (abs(temp_alt_bmp - temp_g) > threshold_temp) {
 			// some raise issue
-		}
+		//}
 
-		if (abs(pres_alt_bmp - (1.01325 * pow(10,5))) > threshold_pres) {
+		//if (abs(pres_alt_bmp - (1.01325 * pow(10,5))) > threshold_pres) {
 			// some raise issue
-		}
+		//}
 
 		Calc_Alt = 0;
 		vert_speed = 0;

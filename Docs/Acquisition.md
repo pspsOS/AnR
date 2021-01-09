@@ -324,10 +324,38 @@ void checkStatus_A() {
 	}
 }
 ```
-The above function checks to see if DAQ Scaling should be enabled/disabled, handles the sensors, and 
+The above function is exceuted in between sensor data acquisitions and handles settings and sensor updates. This function has different sections, each denoted by their own comment header. <br>
+#### Check for daqScaling update
+In this section, the global struct g_daqScalingData is checked to see if the local variable should be updated.
+```c
+	while(g_daqScalingData.lock) {
+		retryTakeDelay(0);
+	}
+    g_daqScalingData.lock = true;
+```
+> Wait for global struct to be unlocked, then lock it immediately when available.
 <br><br>
 
+```c
+	if(g_daqScalingData.hasUpdate) {
+		daqScaling = g_daqScalingData.enableDaqScaling;
+		g_daqScalingData.hasUpdate = false;
+		sendDaqStatus = true;
+	}
+```
+> If g_daqScalingData has an update, set the local __daqScaling__ variable to the value of g_daqScalingData.**enableDaqScaling**. <br>
+> Then, g_daqScalingData.**hasUpdate** is set to false, indicating that the update has been read and addressed.<br>
+> Lastly, the local variable __sendDaqStatus__ is set to true, signifying that there has been an update to the DAQ Status. 
+<br><br>
 
+```c
+	g_daqScalingData.lock = false;
+```
+> The global struct is unlocked again.
+<br><br>
+
+#### GPS, BMP, IMU and ALA handling 
+In these four sections,
 
 
 ### _A()

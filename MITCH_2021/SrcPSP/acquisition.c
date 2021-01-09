@@ -8,7 +8,7 @@
 #include "../IncPSP/acquisition.h"
 
 #ifndef NDEBUG
-	#include "debugSettings.h"
+	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
 #endif
 

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 //#define NDEBUG
 
@@ -57,6 +58,8 @@
 #define TOUCHDOWN (6)
 #define PROGRAM_END (7)
 
+// Function returns
+#define SUCCESSFUL_RETURN (0)
 
 
 
@@ -175,6 +178,7 @@ typedef struct alaNode {
 } alaNode_t;
 
 typedef struct staticOrientationNode {
+	float staticOrientation;
 	bool lock;
 	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
@@ -191,6 +195,7 @@ extern volatile transmissionData_t g_transmissionData;
 
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
+extern volatile ui32 g_launchTime;
 
 extern altitudeNode_t *g_newAltitudeNode;
 extern alaNode_t *g_newALANode;
@@ -198,10 +203,23 @@ extern staticOrientationNode_t *g_newStaticOrientationNode;
 
 /* Common Function Prototypes */
 
-ui32 getTimeStamp(void);
-void retryTakeDelay(int length);
+ui32 getTimeStamp(void );
+void retryTakeDelay(int );
+
 altitudeNode_t *createAltitudeList(ui8 );
 alaNode_t *createALAList(ui8 );
 staticOrientationNode_t *createStaticOrientationList(ui8 );
+int setupLinkedLists();
+
+int freeAltitudeList(altitudeNode_t *);
+int freeALAList(alaNode_t *);
+int freeStaticOrientationList(staticOrientationNode_t *);
+int freeAllLists();
+
+int insertNewAltitude(float );
+int insertNewALA(float );
+int insertNewStaticOrientation(float );
+
+float calcAvgAlt();
 
 #endif /* COMMON_H_ */

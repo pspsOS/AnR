@@ -15,6 +15,7 @@ volatile daqScalingData_t g_daqScalingData = {0};
 volatile gpsData_t g_gpsData = {0};
 volatile bmpData_t g_bmpData = {0};
 volatile imuData_t g_imuData = {0};
+//
 // monitoring
 volatile monitoringData_t g_monitoringData = {0};
 // transmission
@@ -61,19 +62,125 @@ staticOrientationNode_t *createStaticOrientationList(ui8 listSize) {
 	return headNode;
 }
 
-bool setupLinkedLists() {
+int setupLinkedLists() {
 	g_newAltitudeNode = createAltitudeList(ALTITUDE_LIST_SIZE);
 	g_newALANode = createALAList(ALA_LIST_SIZE);
 	g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
 
-	// This was causing an error so I made some changes
-
-	// Start of Jeff Code
-
-
-	return false;
-	// End of Jeff Code
+	return SUCCESSFUL_RETURN;
 }
+
+int freeAltitudeList(altitudeNode_t *someAltitudePtr) {
+	altitudeNode_t *nextPtr = NULL;
+
+	while (someAltitudePtr != NULL) {
+		nextPtr = someAltitudePtr->nextNode;
+		free(someAltitudePtr);
+		someAltitudePtr = NULL;
+		someAltitudePtr = nextPtr;
+	}
+
+	return SUCCESSFUL_RETURN;
+}
+
+int freeALAList(alaNode_t *someALAPtr) {
+	alaNode_t *nextPtr = NULL;
+
+	while (someALAPtr != NULL) {
+		nextPtr = someALAPtr->nextNode;
+		free(someALAPtr);
+		someALAPtr = NULL;
+		someALAPtr = nextPtr;
+	}
+
+	return SUCCESSFUL_RETURN;
+}
+
+int freeStaticOrientationList(staticOrientationNode_t *someStaticOrientationPtr) {
+	staticOrientationNode_t *nextPtr = NULL;
+
+	while (someStaticOrientationPtr != NULL) {
+		nextPtr = someStaticOrientationPtr->nextNode;
+		free(someStaticOrientationPtr);
+		someStaticOrientationPtr = NULL;
+		someStaticOrientationPtr = nextPtr;
+	}
+
+	return SUCCESSFUL_RETURN;
+}
+
+int freeAllLists() {
+	int counter = 0;
+
+	counter += freeAltitudeList(g_newAltitudeNode);
+	counter += freeALAList(g_newALANode);
+	counter += freeStaticOrientationList(g_newStaticOrientationNode);
+
+	return counter;
+}
+
+int insertNewAltitude(float newAltitude) {
+	altitudeNode_t *lastNewNode = g_newAltitudeNode;
+	g_newAltitudeNode = lastNewNode->nextNode;
+
+	while (g_newAltitudeNode->lock) {
+		retryTakeDelay(0);
+	}
+	g_newAltitudeNode->lock = true;
+	g_newAltitudeNode->altitude = newAltitude;
+	g_newAltitudeNode->lock = false;
+
+	return SUCCESSFUL_RETURN;
+}
+
+int insertNewALA(float newALA) {
+	alaNode_t *lastNewNode = g_newALANode;
+	g_newALANode = lastNewNode->nextNode;
+
+	while (g_newALANode->lock) {
+		retryTakeDelay(0);
+	}
+	g_newALANode->lock = true;
+	g_newALANode->gForce = newALA;
+	g_newALANode->lock = false;
+
+	return SUCCESSFUL_RETURN;
+}
+
+int insertNewStaticOrientation(float newStaticOrientation) {
+	staticOrientationNode_t *lastNewNode = g_newStaticOrientationNode;
+	g_newStaticOrientationNode = lastNewNode->nextNode;
+
+	while (g_newStaticOrientationNode->lock) {
+		retryTakeDelay(0);
+	}
+	g_newStaticOrientationNode->lock = true;
+	g_newStaticOrientationNode->staticOrientation = newStaticOrientation;
+	g_newStaticOrientationNode->lock = false;
+
+	return SUCCESSFUL_RETURN;
+}
+
+float calcAvgAlt() {
+	altitudeNode_t *someAltPtr = g_newAltitudeNode;
+	float avgAlt = 0;
+	int counter = 0;
+
+	for (int i = 0; i < ALTITUDE_LIST_SIZE; i++) {
+		if (!someAltPtr->lock) {
+			someAltPtr->lock = true;
+			avgAlt += someAltPtr->altitude;
+			counter++;
+			someAltPtr->lock = false;
+		}
+
+		someAltPtr = someAltPtr->nextNode;
+	}
+
+	return (avgAlt / counter);
+}
+
+
 
 
 /**

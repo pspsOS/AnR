@@ -18,7 +18,7 @@ bool IMUDStatus = false;
 bool GPSDStatus = false;
 bool Upright_OnPad = false;
 
-float pressure_bmp;
+float pressure_bmp = 0;
 float temperature_bmp;
 float alt_gps;
 float speed_gps;
@@ -46,8 +46,7 @@ float v_s_alt; // Speed of Sound in m/s at the altitude
 float temp_g = 288.16; // Ground temperature
 float temp_trop_p = 216.66; // Temperature in the tropopause
 float trop_p_alt = 11000; // in m
-
-#define a_trop = (temp_trop_p - temp_g)/(trop_p_alt - 0);
+float a_trop;
 
 float time_var; // Local time variable
 float new_time; // Local time variable
@@ -163,7 +162,7 @@ bool getGPSData_P() {
  */
 
 void processData_P() {
-	if (g_bmpData.hasUpdate && g_bmpData.lock) {
+	if (g_bmpData.hasUpdate && !g_bmpData.lock) {
 		getBMPData_P();
 	}
 
@@ -174,6 +173,8 @@ void processData_P() {
 	if (g_gpsData.hasUpdate && g_bmpData.lock) {
 		getGPSData_P();
 	}
+
+	//g_launchTime
 
 	if (g_bmpData.timeStamp == 0) {
 
@@ -192,7 +193,7 @@ void processData_P() {
 
 		Calc_Alt = 0;
 		vert_speed = 0;
-		time_var = g_bmpData.timeStamp;
+		time_var = g_bmpData.timeStamp / pow(10,3);
 	}
 	else {
 		new_temp = g_bmpData.temperature;
@@ -201,7 +202,7 @@ void processData_P() {
 		new_time = g_bmpData.timeStamp;
 
 		CalcAltBMP_P();
-		CalcVelBMP_P();
+		CalcFlightDataBMP_P();
 
 		time_var = new_time;
 	}
@@ -236,12 +237,13 @@ void transmitData_P() {
  * @date 12/29/2020
  */
 bool pointyEndUp_P() {
-	assert((accX_imu * accX_imu + accY_imu * accY_imu) != 0);
+//	if((accX_imu * accX_imu + accY_imu * accY_imu) == 0) asdfasf = 0.000001;
 
 	return ((accZ*accZ / (accX_imu * accX_imu + accY_imu * accY_imu)) > TAN_THETA_SQUARED) && (accZ < 0);
 }
 
 void CalcAltBMP_P() {
+	a_trop = (temp_trop_p - temp_g)/(trop_p_alt);
 	delta_alt = (new_temp - temp_alt_bmp) / a_trop;
 	Calc_Alt += delta_alt;
 
@@ -257,15 +259,15 @@ void CalcFlightDataBMP_P() {
 	new_vert_speed = delta_alt/delta_time;
 
 	Speed_Norm = sqrt(Horz_vel_SQRD + pow(new_vert_speed, 2));
-	Vert_Orientation = arctan(Horz_vel_SQRD/new_vert_speed);
+	Vert_Orientation = atan(Horz_vel_SQRD/new_vert_speed);
 
 
 
 	acclZ_bmp = (new_vert_speed - vert_speed) / delta_time;
 
-	if (abs(acclZ_bmp - accZ) < threshold_check) {
-
-	}
+	//if (abs(acclZ_bmp - accZ) < threshold_check) {
+//
+	//}
 
 
 	vert_speed = new_vert_speed;

@@ -12,20 +12,21 @@
 
 // Interface Structs
 
+// Parent Functions
+void setup_A();
+void loop_A();
+
 
 // Setup
-void setup();
-
-bool gpsSetup_A();
-bool bmpSetup_A();
-bool imuSetup_A();
-bool alaSetup_A();
+void gpsSetup_A();
+void bmpSetup_A();
+void imuSetup_A();
+void alaSetup_A();
 
 // Loop
 void gpsRead_A();
 void bmpRead_A();
 void imuRead_A();
-
 void checkStatus_A();
 void sendUpdate_A();
 

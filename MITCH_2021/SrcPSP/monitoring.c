@@ -7,14 +7,25 @@
 
 #include "../IncPSP/monitoring.h"
 
+#ifndef NDEBUG
+	#include <debugSettings.h>
+	#include <unistd.h>
+#endif
+
 /* Global variable declarations */
 
 
 /* Local variable declarations */
 
-float batteryVoltage;
-bool continuity[4];
-bool buttonState;
+float batteryVoltage; // Voltage of battery (V)
+bool continuity[4]; // Continuity status of parachute deployment charges
+bool buttonState; // State of button (on/off)
+bool hardwareDeploymentDisable; // Terminal block disables deployment in hardware
+
+// File pointers for Debugging
+#ifndef NDEBUG
+	FILE *_monitoringFile;
+#endif
 
 /**
  * @brief setup
@@ -29,11 +40,17 @@ bool buttonState;
 
 void setup_M() {
 	//initialize variables
+	#ifndef NDEBUG
+		_monitoringFile = setupMonitoringFile_DS();
+	#else
+		// TODO: Implement Monitoring Setup
+	#endif
 	batteryVoltage = 7.4;
 	for (ui8 i = 0; i < 4; i++) {
 		continuity[i] = true;
 	}
 	buttonState = false;
+	hardwareDeploymentDisable = false;
 }
 
 /**
@@ -48,15 +65,32 @@ void setup_M() {
  */
 
 void loop_M() {
-	checkBatteryVoltage_M();
-	checkContinuity_M();
-	checkButtonState_M();
+	#ifndef NDEBUG
+		if(!simulateMonitoring) {
+			if(notifyWhenReadAborted)
+				print("Monitoring read aborted.\n");
+			return;
+		}
+		fscanf(_monitoringFile, "%f", &batteryVoltage);
+		fscanf(_monitoringFile, "%d", &continuity[0]);
+		fscanf(_monitoringFile, "%d", &continuity[1]);
+		fscanf(_monitoringFile, "%d", &continuity[2]);
+		fscanf(_monitoringFile, "%d", &continuity[3]);
+		fscanf(_monitoringFile, "%d", &buttonState);
+		fscanf(_monitoringFile, "%d", &hardwareDeploymentDisable);
+	#else
+		checkBatteryVoltage_M();
+		checkContinuity_M();
+		checkButtonState_M();
+		checkHardwareDeploymentDisable_M();
+	#endif
 	sendUpdate_M();
 }
 
 /**
  * @brief Check new battery voltage
  * This function checks the battery voltage and stores it as a local float
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -66,16 +100,13 @@ void loop_M() {
  */
 
 void checkBatteryVoltage_M() {
-	#ifndef NDEBUG
-		batteryVoltage = 7.4;
-		#else
-			// TODO: Implement battery voltage reading from hardware
-		#endif
+	// TODO: Implement battery voltage reading from hardware
 }
 
 /**
  * @brief Check new continuity for each parachute charge
  * This function checks the continuity of all 4 parachute charges and stores as a local bool array
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -86,17 +117,14 @@ void checkBatteryVoltage_M() {
 
 void checkContinuity_M() {
 	for (ui8 i = 0; i < 4; i++) {
-		#ifndef NDEBUG
-			continuity[i] = true;
-		#else
-			// TODO: Implement continuity reading from hardware
-		#endif
+		// TODO: Implement continuity reading from hardware
 	}
 }
 
 /**
  * @brief Check new button state
  * This function checks the button state and stores it as a local bool
+ * Never accessed for debug
  *
  * @param None
  * @retval None
@@ -106,11 +134,23 @@ void checkContinuity_M() {
  */
 
 void checkButtonState_M() {
-	#ifndef NDEBUG
-		buttonState = false;
-		#else
-			// TODO: Implement button state reading from hardware
-		#endif
+	// TODO: Implement button state reading from hardware
+}
+
+/**
+ * @brief check the hardware deployment disable
+ * Checks if the hardware has disabled deployment
+ * Never accessed for debug
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Mark Paral
+ * @date 1/3/2021
+ */
+
+void checkHardwareDeploymentDisable_M() {
+	// TODO: Implement hardware deployment disable reading from hardware
 }
 
 /**
@@ -135,6 +175,7 @@ void sendUpdate_M() {
 		g_monitoringData.continuity[i] = continuity[i];
 	}
 	g_monitoringData.buttonState = buttonState;
+	g_monitoringData.hardwareDeploymentDisable = hardwareDeploymentDisable;
 	g_monitoringData.hasUpdate = true;
 	g_monitoringData.lock = false;
 }

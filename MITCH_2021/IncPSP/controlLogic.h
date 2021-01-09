@@ -12,6 +12,8 @@
 
 /* function prototypes */
 
+void loop_C();
+
 void modeLogic_C();
 void prelaunchLogic_C();
 void launchLogic_C();

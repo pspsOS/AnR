@@ -19,5 +19,7 @@ void processData_P();
 void transmitData_P();
 
 bool pointyEndUp_P();
+void CalcAltBMP_P();
+void CalcFlightDataBMP_P();
 
 #endif /* INC_PROCESSING_H_ */

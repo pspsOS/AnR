@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 //#define NDEBUG
 
@@ -22,15 +23,31 @@
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 
+#ifndef NDEBUG
+#define ENABLE_PRINT 1
+#else
+#define ENABLE_PRINT 0
+#endif
+
+#define print(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stdout, fmt); } while (0)
+
+#define prints(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
+#define printe(fmt, ...) \
+            do { if (ENABLE_PRINT) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
+
 
 /* User-defined Constants*/
 
 #define MAX_NMEA (80)
+#define DEFAULT_DAQ_SCALER (10)
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
 #define ALTITUDE_LIST_SIZE (20)
 #define ALA_LIST_SIZE (40)
+#define STATIC_ORIENTATION_LIST_SIZE (20)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -41,6 +58,10 @@
 #define TOUCHDOWN (6)
 #define PROGRAM_END (7)
 
+// Function returns
+#define SUCCESSFUL_RETURN (0)
+
+
 
 /* User typedef */
 
@@ -48,11 +69,6 @@ typedef uint8_t ui8;
 typedef uint16_t ui16;
 typedef uint32_t ui32;
 
-
-/* Common Function Prototypes */
-
-ui32 getTimeStamp(void);
-void retryTakeDelay(int length);
 
 /* Typedef structs and types */
 
@@ -72,6 +88,11 @@ typedef struct daqStatusData {
 	bool lock;
 } daqStatusData_t;
 
+typedef struct daqScalingData {
+	bool enableDaqScaling;
+	bool hasUpdate;
+	bool lock;
+} daqScalingData_t;
 
 typedef struct gpsData {
 	ui32 timeStamp;
@@ -110,15 +131,6 @@ typedef struct imuData {
 
 } imuData_t;
 
-
-typedef struct monitorData {
-	ui32 timeStamp;
-	ui8 voltage;
-	ui8 monitorStatus;
-
-} monitorData_t;
-
-
 typedef struct processedData {
 	ui32 timeStamp;
 
@@ -129,6 +141,7 @@ typedef struct monitoringData {
 	float batteryVoltage;
 	bool continuity[4];
 	bool buttonState;
+	bool hardwareDeploymentDisable;
 	bool hasUpdate;
 	bool lock;
 
@@ -150,7 +163,7 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
-
+/* Node structures */
 
 typedef struct altitudeNode {
 	float altitude;
@@ -164,8 +177,8 @@ typedef struct alaNode {
 	alaNode_t *nextNode;
 } alaNode_t;
 
-
 typedef struct staticOrientationNode {
+	float staticOrientation;
 	bool lock;
 	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
@@ -173,6 +186,7 @@ typedef struct staticOrientationNode {
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
+extern volatile daqScalingData_t g_daqScalingData;
 extern volatile gpsData_t g_gpsData;
 extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
@@ -181,9 +195,31 @@ extern volatile transmissionData_t g_transmissionData;
 
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
+extern volatile ui32 g_launchTime;
 
-extern altitudeNode_t *g_headAltitudeNode;
-extern alaNode_t *g_headALANode;
-extern staticOrientationNode_t *g_headStaticOrientationNode;
+extern altitudeNode_t *g_newAltitudeNode;
+extern alaNode_t *g_newALANode;
+extern staticOrientationNode_t *g_newStaticOrientationNode;
+
+/* Common Function Prototypes */
+
+ui32 getTimeStamp(void );
+void retryTakeDelay(int );
+
+altitudeNode_t *createAltitudeList(ui8 );
+alaNode_t *createALAList(ui8 );
+staticOrientationNode_t *createStaticOrientationList(ui8 );
+int setupLinkedLists();
+
+int freeAltitudeList(altitudeNode_t *);
+int freeALAList(alaNode_t *);
+int freeStaticOrientationList(staticOrientationNode_t *);
+int freeAllLists();
+
+int insertNewAltitude(float );
+int insertNewALA(float );
+int insertNewStaticOrientation(float );
+
+float calcAvgAlt();
 
 #endif /* COMMON_H_ */

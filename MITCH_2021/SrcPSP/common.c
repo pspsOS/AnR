@@ -50,7 +50,7 @@ alaNode_t *createALAList(ui8 listSize) {
 	return headNode;
 }
 
-staticOrientationNode_t *createOrientationList(ui8 listSize) {
+staticOrientationNode_t *createStaticOrientationList(ui8 listSize) {
 	staticOrientationNode_t *headNode = calloc(sizeof(staticOrientationNode_t), 1);
 	staticOrientationNode_t *currentPointer = headNode;
 	for (ui8 i = 1; i < listSize; i++) {
@@ -64,11 +64,12 @@ staticOrientationNode_t *createOrientationList(ui8 listSize) {
 bool setupLinkedLists() {
 	g_newAltitudeNode = createAltitudeList(ALTITUDE_LIST_SIZE);
 	g_newALANode = createALAList(ALA_LIST_SIZE);
+	g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
 
 	// This was causing an error so I made some changes
 
 	// Start of Jeff Code
-	//g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
+
 
 	return false;
 	// End of Jeff Code

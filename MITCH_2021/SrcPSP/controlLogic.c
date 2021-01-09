@@ -7,10 +7,19 @@
 
 #include "../IncPSP/controlLogic.h"
 
-/* extern definitions */
 
 
+void loop_C() {
+	modeLogic_C();
 
+	bool modeChange = determineMode_C();
+
+	if (modeChange) {
+		// TODO: Send Transition data
+	}
+
+	//TODO: Send info to storage and transition
+}
 
 /**
  * @brief Encapsulates logic functions
@@ -66,7 +75,9 @@ void modeLogic_C() {
  */
 
 void prelaunchLogic_C() {
+	//TODO: Play Buzzer
 
+	//TODO: Check button and set
 }
 
 
@@ -163,26 +174,29 @@ void touchdownLogic_C() {
  */
 
 bool determineMode_C() {
+	bool modeChange = false;
 	switch (g_currentNominalMode) {
 		case PRELAUNCH:
-			checkPrelaunchTrans_C();
+			modeChange = checkPrelaunchTrans_C();
 			break;
 		case LAUNCH:
-			checkLaunchTrans_C();
+			modeChange = checkLaunchTrans_C();
 			break;
 		case ASCENT:
-			checkAscentTrans_C();
+			modeChange = checkAscentTrans_C();
 			break;
 		case DESCENT_DROGUE:
-			checkDescentDrogueTrans_C();
+			modeChange = checkDescentDrogueTrans_C();
 			break;
 		case DESCENT_MAIN:
-			checkDescentMainTrans_C();
+			modeChange = checkDescentMainTrans_C();
 			break;
 		case TOUCHDOWN:
-			checkProgramEnd_C();
+			modeChange = checkProgramEnd_C();
 			break;
 	}
+
+	return modeChange;
 }
 
 
@@ -273,13 +287,6 @@ bool checkDescentMainTrans_C() {
 }
 
 
-/* TODO: Implement checkPrelaunchTrans
- * Determines if conditions have been met to move from touchdown mode to program end
- * Conditions: ???
- *
- * Author: Vishnu Vijay
- * Date: 12/23/20
- */
 /**
  * @brief Changes mode from TOUCHDOWN to PROGRAMEND
  * Determines if conditions have been met to move from TOUCHDOWN to PROGRAMEND mode

@@ -202,6 +202,6 @@ ui32 getTimeStamp(void);
 void retryTakeDelay(int length);
 altitudeNode_t *createAltitudeList(ui8 );
 alaNode_t *createALAList(ui8 );
-staticOrientationNode_t *createOrientationList(ui8 );
+staticOrientationNode_t *createStaticOrientationList(ui8 );
 
 #endif /* COMMON_H_ */

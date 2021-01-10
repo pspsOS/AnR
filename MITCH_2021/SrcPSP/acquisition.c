@@ -23,7 +23,7 @@
 /* Local variable declarations */
 char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
 bool daqScaling;        // Enables/Disables DAQ Scaling
-ui8 daqScaler;          // DAQ Scaling number – Sets the ratio
+ui8 daqScaler;          // DAQ Scaling number ï¿½ Sets the ratio
 bool gpsNominal;        // Indicates whether the GPS is nominal
 bool bmpNominal;        // Indicates whether the BMP is nominal
 bool imuNominal;        // Indicates whether the IMU is nominal
@@ -215,7 +215,7 @@ void gpsRead_A() {
 		}
 		fscanf(_gpsFile, "%s", gpsNmea);
 	#else
-		TODO: Implement gpsRead w/ hardware
+		//TODO: Implement gpsRead w/ hardware
 	#endif
 
 	print("Reading:",);

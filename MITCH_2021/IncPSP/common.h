@@ -16,7 +16,11 @@
 #include <assert.h>
 #include <math.h>
 
-//#define NDEBUG
+#define NDEBUG
+
+#ifdef NDEBUG
+#include "stm32f4xx_hal.h"
+#endif
 
 /* User-defined Macros */
 

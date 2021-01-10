@@ -16,7 +16,7 @@
  * Date: 12/24/2020
  */
 bool storageSetup() {
-
+	return true;
 }
 
 

@@ -80,6 +80,10 @@ void Error_Handler(void);
 #define CS1_GPIO_Port GPIOC
 #define CS2_Pin GPIO_PIN_5
 #define CS2_GPIO_Port GPIOC
+#define ACCEL_ANALOG_Pin GPIO_PIN_0
+#define ACCEL_ANALOG_GPIO_Port GPIOB
+#define BATT_MEAS_Pin GPIO_PIN_1
+#define BATT_MEAS_GPIO_Port GPIOB
 #define ARMED_LED_Pin GPIO_PIN_13
 #define ARMED_LED_GPIO_Port GPIOF
 #define CENTRAL_NOMINAL_Pin GPIO_PIN_14

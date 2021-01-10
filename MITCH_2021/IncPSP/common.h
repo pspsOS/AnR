@@ -18,6 +18,10 @@
 
 //#define NDEBUG
 
+#ifdef NDEBUG
+#include "stm32f4xx_hal.h"
+#endif
+
 /* User-defined Macros */
 
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))

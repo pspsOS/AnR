@@ -17,6 +17,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
@@ -67,15 +68,16 @@ SPI_HandleTypeDef hspi3;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
 
-osThreadId ControlLogicHandle;
-uint32_t ControlLogicBuffer[ 128 ];
-osStaticThreadDef_t ControlLogicControlBlock;
+osThreadId defaultTaskHandle;
 osThreadId AcquisitionHandle;
 uint32_t AcquisitionBuffer[ 128 ];
 osStaticThreadDef_t AcquisitionControlBlock;
 osThreadId ProcessingHandle;
 uint32_t ProcessingBuffer[ 128 ];
 osStaticThreadDef_t ProcessingControlBlock;
+osThreadId ControlLogicHandle;
+uint32_t ControlLogicBuffer[ 128 ];
+osStaticThreadDef_t ControlLogicControlBlock;
 osThreadId MonitoringHandle;
 uint32_t MonitoringBuffer[ 128 ];
 osStaticThreadDef_t MonitoringControlBlock;
@@ -99,12 +101,13 @@ static void MX_SPI3_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART6_UART_Init(void);
 static void MX_USB_OTG_FS_USB_Init(void);
-void startControlLogic(void const * argument);
-void startAcquisition(void const * argument);
+void StartDefaultTask(void const * argument);
+void setupAcquisition(void const * argument);
 void startProcessing(void const * argument);
+void startControlLogic(void const * argument);
 void startMonitoring(void const * argument);
-void startStorage(void const * argument);
-void startTransmission(void const * argument);
+void setupStorage(void const * argument);
+void setupTransmission(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -171,28 +174,32 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of ControlLogic */
-  osThreadStaticDef(ControlLogic, startControlLogic, osPriorityNormal, 0, 128, ControlLogicBuffer, &ControlLogicControlBlock);
-  ControlLogicHandle = osThreadCreate(osThread(ControlLogic), NULL);
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of Acquisition */
-  osThreadStaticDef(Acquisition, startAcquisition, osPriorityRealtime, 0, 128, AcquisitionBuffer, &AcquisitionControlBlock);
+  osThreadStaticDef(Acquisition, setupAcquisition, osPriorityRealtime, 0, 128, AcquisitionBuffer, &AcquisitionControlBlock);
   AcquisitionHandle = osThreadCreate(osThread(Acquisition), NULL);
 
   /* definition and creation of Processing */
   osThreadStaticDef(Processing, startProcessing, osPriorityNormal, 0, 128, ProcessingBuffer, &ProcessingControlBlock);
   ProcessingHandle = osThreadCreate(osThread(Processing), NULL);
 
+  /* definition and creation of ControlLogic */
+  osThreadStaticDef(ControlLogic, startControlLogic, osPriorityNormal, 0, 128, ControlLogicBuffer, &ControlLogicControlBlock);
+  ControlLogicHandle = osThreadCreate(osThread(ControlLogic), (void*) hotBoot);
+
   /* definition and creation of Monitoring */
   osThreadStaticDef(Monitoring, startMonitoring, osPriorityLow, 0, 128, MonitoringBuffer, &MonitoringControlBlock);
-  MonitoringHandle = osThreadCreate(osThread(Monitoring), NULL);
+  MonitoringHandle = osThreadCreate(osThread(Monitoring), (void*) hotBoot);
 
   /* definition and creation of Storage */
-  osThreadStaticDef(Storage, startStorage, osPriorityHigh, 0, 128, StorageBuffer, &StorageControlBlock);
+  osThreadStaticDef(Storage, setupStorage, osPriorityHigh, 0, 128, StorageBuffer, &StorageControlBlock);
   StorageHandle = osThreadCreate(osThread(Storage), NULL);
 
   /* definition and creation of Transmission */
-  osThreadStaticDef(Transmission, startTransmission, osPriorityHigh, 0, 128, TransmissionBuffer, &TransmissionControlBlock);
+  osThreadStaticDef(Transmission, setupTransmission, osPriorityHigh, 0, 128, TransmissionBuffer, &TransmissionControlBlock);
   TransmissionHandle = osThreadCreate(osThread(Transmission), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -203,6 +210,7 @@ int main(void)
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -227,8 +235,7 @@ void SystemClock_Config(void)
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -244,7 +251,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB buses clocks
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -647,14 +654,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_startControlLogic */
+/* USER CODE BEGIN Header_StartDefaultTask */
 /**
-* @brief Function implementing the ControlLogic thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_startControlLogic */
-void startControlLogic(void const * argument)
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -665,22 +672,22 @@ void startControlLogic(void const * argument)
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_startAcquisition */
+/* USER CODE BEGIN Header_setupAcquisition */
 /**
 * @brief Function implementing the Acquisition thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_startAcquisition */
-void startAcquisition(void const * argument)
+/* USER CODE END Header_setupAcquisition */
+void setupAcquisition(void const * argument)
 {
-  /* USER CODE BEGIN startAcquisition */
+  /* USER CODE BEGIN setupAcquisition */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END startAcquisition */
+  /* USER CODE END setupAcquisition */
 }
 
 /* USER CODE BEGIN Header_startProcessing */
@@ -699,6 +706,24 @@ void startProcessing(void const * argument)
     osDelay(1);
   }
   /* USER CODE END startProcessing */
+}
+
+/* USER CODE BEGIN Header_startControlLogic */
+/**
+* @brief Function implementing the ControlLogic thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_startControlLogic */
+void startControlLogic(void const * argument)
+{
+  /* USER CODE BEGIN startControlLogic */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END startControlLogic */
 }
 
 /* USER CODE BEGIN Header_startMonitoring */
@@ -721,43 +746,43 @@ void startMonitoring(void const * argument)
   /* USER CODE END startMonitoring */
 }
 
-/* USER CODE BEGIN Header_startStorage */
+/* USER CODE BEGIN Header_setupStorage */
 /**
 * @brief Function implementing the Storage thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_startStorage */
-void startStorage(void const * argument)
+/* USER CODE END Header_setupStorage */
+void setupStorage(void const * argument)
 {
-  /* USER CODE BEGIN startStorage */
+  /* USER CODE BEGIN setupStorage */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END startStorage */
+  /* USER CODE END setupStorage */
 }
 
-/* USER CODE BEGIN Header_startTransmission */
+/* USER CODE BEGIN Header_setupTransmission */
 /**
 * @brief Function implementing the Transmission thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_startTransmission */
-void startTransmission(void const * argument)
+/* USER CODE END Header_setupTransmission */
+void setupTransmission(void const * argument)
 {
-  /* USER CODE BEGIN startTransmission */
+  /* USER CODE BEGIN setupTransmission */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END startTransmission */
+  /* USER CODE END setupTransmission */
 }
 
- /**
+/**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM1 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment

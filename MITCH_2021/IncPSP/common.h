@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <math.h>
 
-#define NDEBUG
+//#define NDEBUG
 
 #ifdef NDEBUG
 #include "stm32f4xx_hal.h"
@@ -72,7 +72,7 @@
 typedef uint8_t ui8;
 typedef uint16_t ui16;
 typedef uint32_t ui32;
-
+typedef int32_t i32;
 
 /* Typedef structs and types */
 
@@ -111,8 +111,8 @@ typedef struct gpsData {
 
 typedef struct bmpData {
 	ui32 timeStamp;
-	float pressure;
-	float temperature;
+	i32 pressure;     // MIN: 1000, MAX: 120000, VALUE: 110002 = 1100.02 mbar
+	i32 temperature;  // MIN:-4000, MAX: 8500,   VALUE: 2000 = 20.00 degC
 	bool hasUpdate;
 	bool lock;
 } bmpData_t;

@@ -4,8 +4,8 @@
  * Author: Dawson Moore (11/9/2019)
  */
 
-#include <genericInterface.h>
-#include "stm32f4xx_hal_gpio.h"
+#include "genericInterface.h"
+
 
 
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin)

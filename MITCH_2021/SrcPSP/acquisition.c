@@ -379,8 +379,33 @@ void sendUpdate_A() {
 	g_daqStatusData.alaNominal = alaNominal;
 	g_daqStatusData.hasUpdate = true;
 	g_daqStatusData.lock = false;
+
+	updateLeds_A();
 }
 
+
+/**
+ * @brief Updates Sensor LEDs
+ *
+ * @author Jeff Kaji
+ * @date 01/11/2021
+ */
+void updateLeds_A() {
+#ifdef NDEBUG
+	HAL_GPIO_WritePin(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin, imuNominal);
+	HAL_GPIO_WritePin(U2S_CHECK_GPIO_Port, U2S_CHECK_Pin, alaNominal);
+	HAL_GPIO_WritePin(U3S_CHECK_GPIO_Port, U3S_CHECK_Pin, bmpNominal);
+	HAL_GPIO_WritePin(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin, gpsNominal);
+
+	if(gpsNominal && bmpNominal && imuNominal && alaNominal) {
+		HAL_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_RESET);
+	} else {
+		HAL_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET);
+	}
+}
+#endif
 /**
  * @brief Split NMEA String
  * Takes raw NMEA string and replaces ',' with 0, splitting each substring

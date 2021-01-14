@@ -51,7 +51,8 @@
 
 #define ALTITUDE_LIST_SIZE (20)
 #define ALA_LIST_SIZE (40)
-#define STATIC_ORIENTATION_LIST_SIZE (20)
+#define STATIC_ORIENTATION_LIST_SIZE (40)
+#define IMU_LIST_SIZE (40)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -79,6 +80,7 @@ typedef uint32_t ui32;
 typedef struct altitudeNode altitudeNode_t;
 typedef struct alaNode alaNode_t;
 typedef struct staticOrientationNode staticOrientationNode_t;
+typedef struct imuNode imuNode_t;
 
 
 typedef struct daqStatusData {
@@ -167,6 +169,7 @@ typedef struct transmissionData {
 	bool hasUpdate;
 } transmissionData_t;
 
+
 /* Node structures */
 
 typedef struct altitudeNode {
@@ -182,10 +185,26 @@ typedef struct alaNode {
 } alaNode_t;
 
 typedef struct staticOrientationNode {
-	float staticOrientation;
+	bool staticOrientation;
+	int numNotOptimal;
 	bool lock;
 	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
+
+typedef struct imuNode {
+	float accX;
+	float accY;
+	float accZ;
+	float gyrX;
+	float gyrY;
+	float gyrZ;
+	float magX;
+	float magY;
+	float magZ;
+	bool lock;
+	imuNode_t *nextNode;
+} imuNode_t;
+
 
 /* Extern variable definitions */
 
@@ -197,32 +216,38 @@ extern volatile imuData_t g_imuData;
 extern volatile monitoringData_t g_monitoringData;
 extern volatile transmissionData_t g_transmissionData;
 
-extern volatile ui8 g_currentNominalMode;
-extern volatile ui8 g_currentContingency;
-extern volatile ui32 g_launchTime;
+extern volatile uint8_t g_currentNominalMode;
+extern volatile uint8_t g_currentContingency;
+extern volatile uint32_t g_launchTime;
+extern volatile bool g_chuteDisarm;
+extern volatile bool g_chuteDeployable;
 
 extern altitudeNode_t *g_newAltitudeNode;
 extern alaNode_t *g_newALANode;
 extern staticOrientationNode_t *g_newStaticOrientationNode;
+extern imuNode_t *g_newIMUNode;
 
 /* Common Function Prototypes */
 
 ui32 getTimeStamp(void );
 void retryTakeDelay(int );
 
-altitudeNode_t *createAltitudeList(ui8 );
-alaNode_t *createALAList(ui8 );
-staticOrientationNode_t *createStaticOrientationList(ui8 );
+altitudeNode_t *createAltitudeList(uint16_t );
+alaNode_t *createALAList(uint16_t );
+staticOrientationNode_t *createStaticOrientationList(uint16_t );
+imuNode_t *createIMUList(uint16_t );
 int setupLinkedLists();
 
 int freeAltitudeList(altitudeNode_t *);
 int freeALAList(alaNode_t *);
 int freeStaticOrientationList(staticOrientationNode_t *);
+int freeIMUList(imuNode_t *);
 int freeAllLists();
 
 int insertNewAltitude(float );
 int insertNewALA(float );
-int insertNewStaticOrientation(float );
+int insertNewStaticOrientation();
+int insertNewIMUNode();
 
 float calcAvgAlt();
 

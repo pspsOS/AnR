@@ -7,6 +7,12 @@
 
 #include "../IncPSP/controlLogic.h"
 
+#define REQUIRED_TIME_FROM_STARTUP (1200000)
+#define ACCEPTABLE_PERCENT_ERROR (5)
+
+
+volatile uint32_t g_launchTime = 0;
+
 
 
 void loop_C() {
@@ -15,6 +21,7 @@ void loop_C() {
 	bool modeChange = determineMode_C();
 
 	if (modeChange) {
+		g_currentNominalMode++;
 		// TODO: Send Transition data
 	}
 
@@ -213,8 +220,33 @@ bool determineMode_C() {
  */
 
 bool checkPrelaunchTrans_C() {
+	bool timeSatisfied = false;
+	if (getTimeStamp() > REQUIRED_TIME_FROM_STARTUP) {
+		timeSatisfied = true;
+	}
 
-	return 0;
+	bool orientationSatisfied = false;
+	if (g_newStaticOrientationNode->numNotOptimal == 0) {
+		orientationSatisfied = true;
+	}
+
+	bool stillnessSatisfied = false;
+	insertNewIMUNode();
+	stillnessSatisfied = determineStillness_C();
+
+	if (timeSatisfied && orientationSatisfied && stillnessSatisfied) {
+		//TODO: Store stopRewrite Address Marker
+
+		//TODO: Set hotBoot to true
+
+		g_chuteDeployable = true;
+		g_daqStatusData.daqScaling = true;
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -301,4 +333,99 @@ bool checkDescentMainTrans_C() {
 
 bool checkProgramEnd_C() {
 	return 0;
+}
+
+
+bool determineStillness_C() {
+	float minAccX = 0;
+	float maxAccX = 0;
+	float avgAccX = 0;
+	float minAccY = 0;
+	float maxAccY = 0;
+	float avgAccY = 0;
+	float minAccZ = 0;
+	float maxAccZ = 0;
+	float avgAccZ = 0;
+
+	float minGyrX = 0;
+	float maxGyrX = 0;
+	float avgGyrX = 0;
+	float minGyrY = 0;
+	float maxGyrY = 0;
+	float avgGyrY = 0;
+	float minGyrZ = 0;
+	float maxGyrZ = 0;
+	float avgGyrZ = 0;
+
+	imuNode_t *tempPtr = g_newIMUNode;
+	imuNode_t newestData = {0};
+	for (int i = 0; i < IMU_LIST_SIZE; i++) {
+		while (tempPtr->lock) {
+			retryTakeDelay(0);
+		}
+
+		tempPtr->lock = true;
+		tempPtr->accX = newestData.accX;
+		tempPtr->accY = newestData.accY;
+		tempPtr->accZ = newestData.accZ;
+		tempPtr->gyrX = newestData.gyrX;
+		tempPtr->gyrY = newestData.gyrY;
+		tempPtr->gyrZ = newestData.gyrZ;
+		tempPtr->lock = false;
+
+		avgAccX += newestData.accX / IMU_LIST_SIZE;
+		avgAccY += newestData.accY / IMU_LIST_SIZE;
+		avgAccZ += newestData.accZ / IMU_LIST_SIZE;
+		avgGyrX += newestData.gyrX / IMU_LIST_SIZE;
+		avgGyrY += newestData.gyrY / IMU_LIST_SIZE;
+		avgGyrZ += newestData.gyrZ / IMU_LIST_SIZE;
+
+		if (newestData.accX < minAccX) {
+			minAccX = newestData.accX;
+		}
+		if (newestData.accX > maxAccX) {
+			maxAccX = newestData.accX;
+		}
+		if (newestData.accY < minAccY) {
+			minAccY = newestData.accY;
+		}
+		if (newestData.accY > maxAccY) {
+			maxAccY = newestData.accY;
+		}
+		if (newestData.accZ < minAccZ) {
+			minAccZ = newestData.accZ;
+		}
+		if (newestData.accZ > maxAccZ) {
+			maxAccZ = newestData.accZ;
+		}
+
+		if (newestData.gyrX < minGyrX) {
+			minGyrX = newestData.gyrX;
+		}
+		if (newestData.gyrX > maxGyrX) {
+			maxGyrX = newestData.gyrX;
+		}
+		if (newestData.gyrY < minGyrY) {
+			minGyrY = newestData.gyrY;
+		}
+		if (newestData.gyrY > maxGyrY) {
+			maxGyrY = newestData.gyrY;
+		}
+		if (newestData.gyrZ < minGyrZ) {
+			minGyrZ = newestData.gyrZ;
+		}
+		if (newestData.gyrZ > maxGyrZ) {
+			maxGyrZ = newestData.gyrZ;
+		}
+		tempPtr = tempPtr->nextNode;
+	}
+
+	bool accSatisfied = ((100.0 * (maxAccX - minAccX) / (avgAccX)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAccY - minAccY) / (avgAccY)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAccZ - minAccZ) / (avgAccZ)) <= ACCEPTABLE_PERCENT_ERROR);
+	bool gyrSatisfied = ((100.0 * (maxGyrX - minGyrX) / (avgGyrX)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxGyrY - minGyrY) / (avgGyrY)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxGyrZ - minGyrZ) / (avgGyrZ)) <= ACCEPTABLE_PERCENT_ERROR);
+
+	return (accSatisfied && gyrSatisfied);
 }

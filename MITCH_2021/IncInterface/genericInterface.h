@@ -12,11 +12,13 @@
 
 //Variables
 extern SPI_HandleTypeDef  hspi1;
+extern SPI_HandleTypeDef  hspi3;
 
 //Generic Defines
 #define	GREAT					1
 #define PSP						GREAT //RRaP is better (just saying)
-#define SPI_BUS					&hspi1
+#define SENSORS_SPI_BUS					&hspi1
+#define STORAGE_SPI_BUS					&hspi3
 
 // Sensor Defines
 #define GPS 0
@@ -56,8 +58,8 @@ typedef struct {
 extern sensors_t sensors;
 
 //Prototypes
-HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin);
-HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin);
+HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
+HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 void handleHalError(uint8_t SENSOR);
 #endif
 

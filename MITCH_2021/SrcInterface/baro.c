@@ -25,7 +25,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 
 	//Get values from sensor
 	cmd = D1_1024; //This value will define conversion time, accuracy, and current draw
-	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -33,7 +33,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 	HAL_Delay(CONV_T_1024);
 
 	cmd = 0x00;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -41,7 +41,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 	sensors.digitalPres = (dataIn[0] << 8) | dataIn[1];
 
 	cmd = D2_1024; //This value will define conversion time, accuracy, and current draw
-	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -49,7 +49,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 	HAL_Delay(CONV_T_1024);
 
 	cmd = 0x00;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -97,7 +97,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Reset baro after power on
 	cmd = 0x1E;
-	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -105,7 +105,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C1
 	cmd = 0xA1;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -114,7 +114,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C2
 	cmd = 0xA2;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -123,7 +123,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C3
 	cmd = 0xA3;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -132,7 +132,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C4
 	cmd = 0xA4;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -141,7 +141,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C5
 	cmd = 0xA5;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
@@ -150,7 +150,7 @@ void barometerInit(bool *bmpNomPtr) {
 
 	//Get value of C6
 	cmd = 0xA6;
-	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin))
+	if (recieveSPI(&cmd, 1, dataIn, 2, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;

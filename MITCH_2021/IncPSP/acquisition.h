@@ -29,7 +29,7 @@ void bmpRead_A();
 void imuRead_A();
 void checkStatus_A();
 void sendUpdate_A();
-
+void updateLeds_A();
 
 // Private
 void _splitNmea();

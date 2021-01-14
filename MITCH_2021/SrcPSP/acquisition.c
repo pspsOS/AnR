@@ -7,7 +7,9 @@
 
 #include "../IncPSP/acquisition.h"
 
-#ifndef NDEBUG
+#ifdef NDEBUG
+	#include "../IncInterface/baro.h"
+#else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
 #endif
@@ -145,7 +147,7 @@ void bmpSetup_A() {
 	#ifndef NDEBUG
 		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
-		// TODO: Implement bmpSetup
+		barometerInit(&bmpNominal);
 	#endif
 }
 
@@ -259,7 +261,25 @@ void gpsRead_A() {
  * @date 12/23/2020
  */
 void bmpRead_A() {
+	i32 temperature;
+	i32 pressure;
 
+	barometerRead(&temperature, &pressure);
+
+	if(bmpNominal) {
+		while(g_bmpData.lock)
+			retryTakeDelay(0);
+
+		g_bmpData.lock = true;
+		g_bmpData.timeStamp = getTimeStamp();
+		g_bmpData.pressure = pressure;
+		g_bmpData.temperature = temperature;
+		g_bmpData.hasUpdate = true;
+		g_bmpData.lock = false;
+
+	} else {
+		sendDaqStatus = true;
+	}
 }
 
 

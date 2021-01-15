@@ -263,8 +263,9 @@ void gpsRead_A() {
 void bmpRead_A() {
 	i32 temperature;
 	i32 pressure;
-
+	#ifdef NDEBUG
 	barometerRead(&temperature, &pressure);
+	#endif
 
 	if(bmpNominal) {
 		while(g_bmpData.lock)

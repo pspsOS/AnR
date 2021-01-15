@@ -7,8 +7,10 @@
 
 #include "../IncPSP/monitoring.h"
 
-#ifndef NDEBUG
-	#include <debugSettings.h>
+#ifdef NDEBUG
+	#include "genericInterface.h"
+#else
+	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
 #endif
 
@@ -116,9 +118,12 @@ void checkBatteryVoltage_M() {
  */
 
 void checkContinuity_M() {
-	for (ui8 i = 0; i < 4; i++) {
-		// TODO: Implement continuity reading from hardware
-	}
+	#ifdef NDEBUG
+		continuity[1] = HAL_GPIO_ReadPin(GPIOC, SENSE_A_Pin);
+		continuity[2] = HAL_GPIO_ReadPin(GPIOC, SENSE_B_Pin);
+		continuity[3] = HAL_GPIO_ReadPin(GPIOC, SENSE_C_Pin);
+		continuity[4] = HAL_GPIO_ReadPin(GPIOC, SENSE_D_Pin);
+	#endif
 }
 
 /**
@@ -134,7 +139,9 @@ void checkContinuity_M() {
  */
 
 void checkButtonState_M() {
-	// TODO: Implement button state reading from hardware
+	#ifdef NDEBUG
+		buttonState = HAL_GPIO_ReadPin(GPIOC, DISARM_INPUT_Pin);
+	#endif
 }
 
 /**
@@ -150,7 +157,9 @@ void checkButtonState_M() {
  */
 
 void checkHardwareDeploymentDisable_M() {
-	// TODO: Implement hardware deployment disable reading from hardware
+	#ifdef NDEBUG
+		hardwareDeploymentDisable = HAL_GPIO_ReadPin(GPIOC, CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin);
+	#endif
 }
 
 /**

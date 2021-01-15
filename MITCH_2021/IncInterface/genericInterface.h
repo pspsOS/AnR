@@ -19,6 +19,7 @@ extern SPI_HandleTypeDef  hspi3;
 #define PSP						GREAT //RRaP is better (just saying)
 #define SENSORS_SPI_BUS					&hspi1
 #define STORAGE_SPI_BUS					&hspi3
+#define ADC_VREF				3.3
 
 // Sensor Defines
 #define GPS 0

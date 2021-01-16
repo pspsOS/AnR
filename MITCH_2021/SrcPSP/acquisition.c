@@ -263,8 +263,9 @@ void gpsRead_A() {
 void bmpRead_A() {
 	i32 temperature;
 	i32 pressure;
-
+	#ifdef NDEBUG
 	barometerRead(&temperature, &pressure);
+	#endif
 
 	if(bmpNominal) {
 		while(g_bmpData.lock)
@@ -404,8 +405,8 @@ void updateLeds_A() {
 		HAL_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET);
 	}
-}
 #endif
+}
 /**
  * @brief Split NMEA String
  * Takes raw NMEA string and replaces ',' with 0, splitting each substring

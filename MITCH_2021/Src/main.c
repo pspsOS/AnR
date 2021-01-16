@@ -46,8 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
-#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
+
 
 /* USER CODE END PD */
 

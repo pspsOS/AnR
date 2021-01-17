@@ -58,8 +58,10 @@ float delta_Z_speed;
 float Z_accl;
 float new_Z_accl;
 
+float Vert_vel;
 float tm_apgee;
 
+float apgee;
 
 float Z_speed; // y-axis Speed, e-frame
 float new_Z_speed; // Local y-axis Speed variable, e-frame
@@ -276,9 +278,9 @@ void CalcFlightDataBMP_P() {
 
 	avg_Z_accl = delta_Z_speed / delta_time;
 
-	new_Z_accl = (2 * avg_Z_accl) - Z_ccl;
+	new_Z_accl = (2 * avg_Z_accl) - Z_accl;
 
-	if (new_y_accl != y_accl) {
+	if (new_Z_accl != Z_accl) {
 		//change in flight status
 	}
 
@@ -297,7 +299,7 @@ void CalcFlightDataBMP_P() {
 	Vert_vel = accZ * delta_time; // g-frame
 
 	Speed_Norm = sqrt(pow(Horz_vel, 2) + pow(Vert_vel, 2)); // g-frame
-	Vert_Orientation = atan(Horz_vel_SQRD/new_vert_speed);
+	Vert_Orientation = atan(Horz_vel/Vert_vel);
 
 	//if (abs(acclZ_bmp - accZ) < threshold_check) {
 //

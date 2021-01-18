@@ -233,6 +233,7 @@ int insertNewIMUNode() {
 	g_newIMUNode->magX = newestData.magX;
 	g_newIMUNode->magY = newestData.magY;
 	g_newIMUNode->magZ = newestData.magZ;
+	g_newIMUNode->alaZ = newestData.alaZ;
 	g_newIMUNode->lock = false;
 
 	return SUCCESSFUL_RETURN;

@@ -235,6 +235,8 @@ bool checkPrelaunchTrans_C() {
 	stillnessSatisfied = determineStillness_C();
 
 	if (timeSatisfied && orientationSatisfied && stillnessSatisfied) {
+		//TODO: Send to Transmission & Storage
+
 		//TODO: Store stopRewrite Address Marker
 
 		//TODO: Set hotBoot to true
@@ -263,8 +265,18 @@ bool checkPrelaunchTrans_C() {
  */
 
 bool checkLaunchTrans_C() {
+	bool sustainedZForce = false;
 
-	return 0;
+	bool detectedAscent = false;
+
+	if (sustainedZForce && detectedAscent) {
+		//TODO: Send to Transmission & Storage
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -337,24 +349,27 @@ bool checkProgramEnd_C() {
 
 
 bool determineStillness_C() {
-	float minAccX = 0;
-	float maxAccX = 0;
+	float minAccX = FLT_MAX;
+	float maxAccX = FLT_MIN;
 	float avgAccX = 0;
-	float minAccY = 0;
-	float maxAccY = 0;
+	float minAccY = FLT_MAX;
+	float maxAccY = FLT_MIN;
 	float avgAccY = 0;
-	float minAccZ = 0;
-	float maxAccZ = 0;
+	float minAccZ = FLT_MAX;
+	float maxAccZ = FLT_MIN;
 	float avgAccZ = 0;
+	float minAlaZ = FLT_MAX;
+	float maxAlaZ = FLT_MIN;
+	float avgAlaZ = 0;
 
-	float minGyrX = 0;
-	float maxGyrX = 0;
+	float minGyrX = FLT_MAX;
+	float maxGyrX = FLT_MIN;
 	float avgGyrX = 0;
-	float minGyrY = 0;
-	float maxGyrY = 0;
+	float minGyrY = FLT_MAX;
+	float maxGyrY = FLT_MIN;
 	float avgGyrY = 0;
-	float minGyrZ = 0;
-	float maxGyrZ = 0;
+	float minGyrZ = FLT_MAX;
+	float maxGyrZ = FLT_MIN;
 	float avgGyrZ = 0;
 
 	imuNode_t *tempPtr = g_newIMUNode;
@@ -365,17 +380,19 @@ bool determineStillness_C() {
 		}
 
 		tempPtr->lock = true;
-		tempPtr->accX = newestData.accX;
-		tempPtr->accY = newestData.accY;
-		tempPtr->accZ = newestData.accZ;
-		tempPtr->gyrX = newestData.gyrX;
-		tempPtr->gyrY = newestData.gyrY;
-		tempPtr->gyrZ = newestData.gyrZ;
+		newestData.accX = tempPtr->accX;
+		newestData.accY = tempPtr->accY;
+		newestData.accZ = tempPtr->accZ;
+		newestData.alaZ = tempPtr->alaZ;
+		newestData.gyrX = tempPtr->gyrX;
+		newestData.gyrY = tempPtr->gyrY;
+		newestData.gyrZ = tempPtr->gyrZ;
 		tempPtr->lock = false;
 
 		avgAccX += newestData.accX / IMU_LIST_SIZE;
 		avgAccY += newestData.accY / IMU_LIST_SIZE;
 		avgAccZ += newestData.accZ / IMU_LIST_SIZE;
+		avgAlaZ += newestData.alaZ / IMU_LIST_SIZE;
 		avgGyrX += newestData.gyrX / IMU_LIST_SIZE;
 		avgGyrY += newestData.gyrY / IMU_LIST_SIZE;
 		avgGyrZ += newestData.gyrZ / IMU_LIST_SIZE;
@@ -397,6 +414,12 @@ bool determineStillness_C() {
 		}
 		if (newestData.accZ > maxAccZ) {
 			maxAccZ = newestData.accZ;
+		}
+		if (newestData.alaZ < minAlaZ) {
+			minAlaZ = newestData.alaZ;
+		}
+		if (newestData.alaZ > maxAlaZ) {
+			maxAlaZ = newestData.alaZ;
 		}
 
 		if (newestData.gyrX < minGyrX) {
@@ -422,10 +445,16 @@ bool determineStillness_C() {
 
 	bool accSatisfied = ((100.0 * (maxAccX - minAccX) / (avgAccX)) <= ACCEPTABLE_PERCENT_ERROR) &&
 						((100.0 * (maxAccY - minAccY) / (avgAccY)) <= ACCEPTABLE_PERCENT_ERROR) &&
-						((100.0 * (maxAccZ - minAccZ) / (avgAccZ)) <= ACCEPTABLE_PERCENT_ERROR);
+						((100.0 * (maxAccZ - minAccZ) / (avgAccZ)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAlaZ - minAlaZ) / (avgAlaZ)) <= ACCEPTABLE_PERCENT_ERROR);
 	bool gyrSatisfied = ((100.0 * (maxGyrX - minGyrX) / (avgGyrX)) <= ACCEPTABLE_PERCENT_ERROR) &&
 						((100.0 * (maxGyrY - minGyrY) / (avgGyrY)) <= ACCEPTABLE_PERCENT_ERROR) &&
 						((100.0 * (maxGyrZ - minGyrZ) / (avgGyrZ)) <= ACCEPTABLE_PERCENT_ERROR);
 
 	return (accSatisfied && gyrSatisfied);
+}
+
+
+bool determineSustainedZForce_C() {
+
 }

@@ -201,6 +201,7 @@ typedef struct imuNode {
 	float magX;
 	float magY;
 	float magZ;
+	float alaZ;
 	bool lock;
 	imuNode_t *nextNode;
 } imuNode_t;

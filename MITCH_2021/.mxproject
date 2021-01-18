@@ -12,8 +12,8 @@ HeaderPath=Drivers\STM32F4xx_HAL_Driver\Inc;Drivers\STM32F4xx_HAL_Driver\Inc\Leg
 CDefines=USE_HAL_DRIVER;STM32F429xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=C:/Users/Jeff/Documents/GitHub/AnR/MITCH_2021/Inc
+HeaderPath=C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/Inc
 HeaderFiles=FreeRTOSConfig.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/Jeff/Documents/GitHub/AnR/MITCH_2021/Src
+SourcePath=C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/Src
 SourceFiles=freertos.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;stm32f4xx_hal_timebase_tim.c;main.c;
 

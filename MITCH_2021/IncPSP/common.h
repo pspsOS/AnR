@@ -127,9 +127,9 @@ typedef struct imuData {
 	i16 gyro_xout;
 	i16 gyro_yout;
 	i16 gyro_zout;
-	float magX;
-	float magY;
-	float magZ;
+	i16 mag_xout;
+	i16 mag_yout;
+	i16 mag_zout;
 	float alaZ;
 	bool hasUpdate;
 	bool lock;

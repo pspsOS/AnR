@@ -11,6 +11,8 @@
 #ifndef NDEBUG
 #include <debugSettings.h>
 #include <unistd.h>
+#else
+#include "imu.h"
 #endif
 
 bool bmpDStatus = false;
@@ -120,17 +122,17 @@ bool getIMUData_P() {
 	accZ = g_imuData.alaZ;
 
 	if (accZ == 0) {
-		accZ = g_imuData.accZ;
+		accZ = g_imuData.accel_zout / ACCEL_SENSITIVITY;
 	}
 
-	accX_imu = g_imuData.accX;
-	accY_imu = g_imuData.accY;
-	gyrX_imu = g_imuData.gyrX;
-	gyrY_imu = g_imuData.gyrY;
-	gyrZ_imu = g_imuData.gyrZ;
-	magX_imu = g_imuData.magX;
-	magY_imu = g_imuData.magY;
-	magZ_imu = g_imuData.magZ;
+	accX_imu = g_imuData.accel_xout / ACCEL_SENSITIVITY;
+	accY_imu = g_imuData.accel_yout / ACCEL_SENSITIVITY;
+	gyrX_imu = g_imuData.gyro_xout / GYRO_SENSITIVITY;
+	gyrY_imu = g_imuData.gyro_yout / GYRO_SENSITIVITY;
+	gyrZ_imu = g_imuData.gyro_zout / GYRO_SENSITIVITY;
+	magX_imu = g_imuData.mag_xout / MAG_SENSITIVITY;
+	magY_imu = g_imuData.mag_yout / MAG_SENSITIVITY;
+	magZ_imu = g_imuData.mag_zout / MAG_SENSITIVITY;
 
 	// Reset Update
 	g_imuData.hasUpdate = false;

@@ -72,7 +72,8 @@
 typedef uint8_t ui8;
 typedef uint16_t ui16;
 typedef uint32_t ui32;
-
+typedef int16_t i16;
+typedef int32_t i32;
 
 /* Typedef structs and types */
 
@@ -111,8 +112,8 @@ typedef struct gpsData {
 
 typedef struct bmpData {
 	ui32 timeStamp;
-	float pressure;
-	float temperature;
+	i32 pressure;     // MIN: 1000, MAX: 120000, VALUE: 110002 = 1100.02 mbar
+	i32 temperature;  // MIN:-4000, MAX: 8500,   VALUE: 2000 = 20.00 degC
 	bool hasUpdate;
 	bool lock;
 } bmpData_t;
@@ -120,15 +121,15 @@ typedef struct bmpData {
 
 typedef struct imuData {
 	ui32 timeStamp;
-	float accX;
-	float accY;
-	float accZ;
-	float gyrX;
-	float gyrY;
-	float gyrZ;
-	float magX;
-	float magY;
-	float magZ;
+	i16 accel_xout;
+	i16 accel_yout;
+	i16 accel_zout;
+	i16 gyro_xout;
+	i16 gyro_yout;
+	i16 gyro_zout;
+	i16 mag_xout;
+	i16 mag_yout;
+	i16 mag_zout;
 	float alaZ;
 	bool hasUpdate;
 	bool lock;

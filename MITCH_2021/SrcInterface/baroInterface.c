@@ -6,6 +6,7 @@
 
 #include <baroInterface.h>
 
+extern sensors_t sensors;
 
 /**
  * @brief Barometer Read

@@ -19,10 +19,6 @@
 #define ACQUIRE_IMU_BMP (1)
 #define ACQUIRE_IMU (2)
 
-#define GPS_FREQ (1)   //   1 Hz
-#define BMP_FREQ (10)  //  10 Hz
-#define IMU_FREQ (100) // 100 Hz
-
 /* Global variable declarations */
 
 
@@ -76,7 +72,7 @@ void setup_A() {
 	sendDaqStatus = false;
 	gpsCounter = 0;
 	bmpCounter = 0;
-	fsmState = ACQUIRE_IMU_BMP_GPS;
+
 
 	// Setup sensors
 	gpsSetup_A();
@@ -92,27 +88,8 @@ void setup_A() {
 	sendUpdate_A();
 }
 
-void loop_A() {
-	switch(fsmState) {
-	case ACQUIRE_IMU_BMP_GPS:
-		gpsRead_A();
-	case ACQUIRE_IMU_BMP:
-		bmpRead_A();
-	case ACQUIRE_IMU:
-		imuRead_A();
-		break;
-	}
-
-/*	if(daqScaling) {
-		switch(fsmState) {
-		case
-		}
-
-	} else {
-		gpsRead_A();
-		bmpRead_A();
-		imuRead_A();
-	}*/
+ui8 loop_A() {
+	return 0;
 }
 
 

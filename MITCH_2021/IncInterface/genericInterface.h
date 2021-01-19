@@ -56,7 +56,7 @@ typedef struct {
 
 } sensors_t;
 
-extern sensors_t sensors;
+sensors_t sensors;
 
 //Prototypes
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);

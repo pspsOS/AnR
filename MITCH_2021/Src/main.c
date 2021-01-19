@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "task.h"
 /* User-defined libraries */
 
 #include <stdbool.h>
@@ -155,8 +155,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  //HAL_ADC_Start(&hadc1);
-
+  setup_A();
+  setup_M();
 
   /* USER CODE END 2 */
 
@@ -680,11 +680,12 @@ static void MX_GPIO_Init(void)
 void startControlLogic(void const * argument)
 {
   /* USER CODE BEGIN 5 */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+
+		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
+	}
   /* USER CODE END 5 */
 }
 
@@ -698,11 +699,22 @@ void startControlLogic(void const * argument)
 void startAcquisition(void const * argument)
 {
   /* USER CODE BEGIN startAcquisition */
+	static TickType_t time_init = 0;
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+		switch(loop_A()) {
+		case 1: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY1);
+				break;
+
+		case 2: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY2);
+				break;
+
+		default:vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY0);
+				break;
+		}
+	}
+
   /* USER CODE END startAcquisition */
 }
 
@@ -716,11 +728,12 @@ void startAcquisition(void const * argument)
 void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+
+		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
+	}
   /* USER CODE END startProcessing */
 }
 
@@ -734,13 +747,12 @@ void startProcessing(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
-	setup_M();
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-	  loop_M();
-	  osDelay(1);
-  }
+	while(1==1) {
+		loop_M();
+		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
+	}
   /* USER CODE END startMonitoring */
 }
 

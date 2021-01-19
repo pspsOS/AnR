@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <math.h>
 
-#define NDEBUG
+#include "main.h" // NDEBUG is now defined in main.h
 
 #ifdef NDEBUG
 #include "cmsis_os.h"

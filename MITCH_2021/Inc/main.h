@@ -127,7 +127,7 @@ void Error_Handler(void);
 #define HOLD_Pin GPIO_PIN_2
 #define HOLD_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
-
+#define NDEBUG
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

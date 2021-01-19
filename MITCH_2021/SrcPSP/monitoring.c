@@ -103,6 +103,9 @@ void loop_M() {
 
 void checkBatteryVoltage_M() {
 	// TODO: Implement battery voltage reading from hardware
+	 HAL_ADC_Start(&hadc1);
+	 HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // TODO: Add appropriate time delay (not HAL_MAX_DELAY)
+	 batteryVoltage = (HAL_ADC_GetValue(&hadc1)) * (ADC_VREF / 4095); // TODO: Add resistor math for total Vbat
 }
 
 /**

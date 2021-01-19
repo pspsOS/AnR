@@ -23,7 +23,8 @@
 #endif
 
 /* User-defined Macros */
-
+#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
+#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 

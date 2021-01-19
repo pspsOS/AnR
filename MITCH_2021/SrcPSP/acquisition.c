@@ -19,6 +19,10 @@
 #define ACQUIRE_IMU_BMP (1)
 #define ACQUIRE_IMU (2)
 
+#define GPS_FREQ (1)   //   1 Hz
+#define BMP_FREQ (10)  //  10 Hz
+#define IMU_FREQ (100) // 100 Hz
+
 /* Global variable declarations */
 
 

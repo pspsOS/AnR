@@ -273,7 +273,7 @@ void bmpRead_A() {
 
 	if(bmpNominal) {
 		while(g_bmpData.lock)
-			retryTakeDelay(0);
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
 
 		g_bmpData.lock = true;
 		g_bmpData.timeStamp = getTimeStamp();
@@ -314,7 +314,7 @@ void imuRead_A() {
 void checkStatus_A() {
 	// Check for daqScaling update
 	while(g_daqScalingData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_daqScalingData.lock = true;
 	if(g_daqScalingData.hasUpdate) {
@@ -373,7 +373,7 @@ void checkStatus_A() {
  */
 void sendUpdate_A() {
 	while(g_daqStatusData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_daqStatusData.lock = true;
 	g_daqStatusData.timeStamp = getTimeStamp();

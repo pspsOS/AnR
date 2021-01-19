@@ -7,6 +7,8 @@
 
 #include "../IncPSP/common.h"
 #include <unistd.h>
+
+
 /* Global variable declarations */
 
 // acquisition
@@ -124,7 +126,7 @@ int insertNewAltitude(float newAltitude) {
 	g_newAltitudeNode = lastNewNode->nextNode;
 
 	while (g_newAltitudeNode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newAltitudeNode->lock = true;
 	g_newAltitudeNode->altitude = newAltitude;
@@ -138,7 +140,7 @@ int insertNewALA(float newALA) {
 	g_newALANode = lastNewNode->nextNode;
 
 	while (g_newALANode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newALANode->lock = true;
 	g_newALANode->gForce = newALA;
@@ -152,7 +154,7 @@ int insertNewStaticOrientation(float newStaticOrientation) {
 	g_newStaticOrientationNode = lastNewNode->nextNode;
 
 	while (g_newStaticOrientationNode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newStaticOrientationNode->lock = true;
 	g_newStaticOrientationNode->staticOrientation = newStaticOrientation;
@@ -212,10 +214,7 @@ ui32 getTimeStamp(void) {
  * @date 12/28/2020
  */
 void retryTakeDelay(int length) {
-#ifndef NDEBUG
-	// Do Nothing
-#else
-	// TODO: Implement retryTakeDelay
-	// Using rtos
+#ifdef NDEBUG
+	vTaskDelay(length);
 #endif
 }

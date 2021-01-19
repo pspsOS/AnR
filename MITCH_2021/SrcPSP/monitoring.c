@@ -27,6 +27,8 @@ bool hardwareDeploymentDisable; // Terminal block disables deployment in hardwar
 // File pointers for Debugging
 #ifndef NDEBUG
 	FILE *_monitoringFile;
+#else
+	extern ADC_HandleTypeDef hadc1;
 #endif
 
 /**
@@ -102,10 +104,12 @@ void loop_M() {
  */
 
 void checkBatteryVoltage_M() {
+	#ifdef NDEBUG
 	// TODO: Implement battery voltage reading from hardware
 	 HAL_ADC_Start(&hadc1);
 	 HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // TODO: Add appropriate time delay (not HAL_MAX_DELAY)
 	 batteryVoltage = (HAL_ADC_GetValue(&hadc1)) * (ADC_VREF / 4095); // TODO: Add resistor math for total Vbat
+	#endif
 }
 
 /**
@@ -178,7 +182,7 @@ void checkHardwareDeploymentDisable_M() {
 
 void sendUpdate_M() {
 	while(g_monitoringData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_monitoringData.lock = true;
 	g_monitoringData.timeStamp = getTimeStamp();

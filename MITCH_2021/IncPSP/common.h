@@ -16,11 +16,13 @@
 #include <assert.h>
 #include <math.h>
 
-//#define NDEBUG
+#define NDEBUG
 
 #ifdef NDEBUG
+#include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
 #endif
+
 
 /* User-defined Macros */
 #define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
@@ -49,6 +51,8 @@
 #define DEFAULT_DAQ_SCALER (10)
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
+
+#define DEFAULT_TAKE_DELAY (50)
 
 #define ALTITUDE_LIST_SIZE (20)
 #define ALA_LIST_SIZE (40)

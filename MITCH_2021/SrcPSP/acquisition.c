@@ -8,7 +8,7 @@
 #include "../IncPSP/acquisition.h"
 
 #ifdef NDEBUG
-	#include "../IncInterface/baro.h"
+	#include <baroInterface.h>
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>

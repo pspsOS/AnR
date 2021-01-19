@@ -5,8 +5,8 @@
  *      Author: Jeff
  */
 
-#ifndef IMU_H_
-#define IMU_H_
+#ifndef IMUINTERFACE_H_
+#define IMUINTERFACE_H_
 
 //Includes
 #include "genericInterface.h"
@@ -25,4 +25,4 @@
 #define GYRO_SENSITIVITY GYRO_FS3
 #define MAG_SENSITIVITY MAG_FS
 
-#endif /* IMU_H_ */
+#endif /* IMUINTERFACE_H_ */

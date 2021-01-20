@@ -16,14 +16,17 @@
 #include <assert.h>
 #include <math.h>
 
-//#define NDEBUG
+#include "main.h" // NDEBUG is now defined in main.h
 
 #ifdef NDEBUG
+#include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
 #endif
 
 /* User-defined Macros */
 
+#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
+#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
 
@@ -54,6 +57,8 @@
 #define STATIC_ORIENTATION_ARRAY_SIZE (40)
 #define IMU_ARRAY_SIZE (40)
 
+#define DEFAULT_TAKE_DELAY (50)
+
 // Nominal mode flow
 #define PRELAUNCH (1)
 #define LAUNCH (2)
@@ -73,6 +78,8 @@
 typedef uint8_t ui8;
 typedef uint16_t ui16;
 typedef uint32_t ui32;
+typedef int16_t i16;
+typedef int32_t i32;
 
 
 /* Typedef structs and types */
@@ -113,8 +120,8 @@ typedef struct gpsData {
 
 typedef struct bmpData {
 	ui32 timeStamp;
-	float pressure;
-	float temperature;
+	i32 pressure;     // MIN: 1000, MAX: 120000, VALUE: 110002 = 1100.02 mbar
+	i32 temperature;  // MIN:-4000, MAX: 8500,   VALUE: 2000 = 20.00 degC
 	bool hasUpdate;
 	bool lock;
 } bmpData_t;
@@ -122,19 +129,18 @@ typedef struct bmpData {
 
 typedef struct imuData {
 	ui32 timeStamp;
-	float accX;
-	float accY;
-	float accZ;
-	float gyrX;
-	float gyrY;
-	float gyrZ;
-	float magX;
-	float magY;
-	float magZ;
+	i16 accel_xout;
+	i16 accel_yout;
+	i16 accel_zout;
+	i16 gyro_xout;
+	i16 gyro_yout;
+	i16 gyro_zout;
+	i16 mag_xout;
+	i16 mag_yout;
+	i16 mag_zout;
 	float alaZ;
 	bool hasUpdate;
 	bool lock;
-
 } imuData_t;
 
 typedef struct processedData {
@@ -223,6 +229,11 @@ extern altitudeNode_t g_altitudeArray[ALTITUDE_ARRAY_SIZE];
 extern alaNode_t g_alaArray[ALA_ARRAY_SIZE];
 extern staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE];
 extern imuNode_t g_imuArray[IMU_ARRAY_SIZE];
+
+extern uint16_t newestAltitudeIndex = 0;
+extern uint16_t newestAlaIndex = 0;
+extern uint16_t newestStaticOrientationIndex = 0;
+extern uint16_t newestImuIndex = 0;
 
 /* Common Function Prototypes */
 

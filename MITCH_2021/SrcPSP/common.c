@@ -22,6 +22,7 @@ volatile transmissionData_t g_transmissionData = {0};
 // modes
 volatile uint8_t g_currentNominalMode = 0;
 volatile uint8_t g_currentContingency = 0;
+extern volatile uint32_t g_launchTime = 0;
 volatile bool g_chuteDisarm = false;
 volatile bool g_chuteDeployable = false;
 // arrays
@@ -42,7 +43,7 @@ int insertNewAltitude(float newAltitude) {
 	}
 
 	while (g_altitudeArray[newestAltitudeIndex]->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_altitudeArray[newestAltitudeIndex]->lock = true;
 	g_altitudeArray[newestAltitudeIndex]->altitude = newAltitude;
@@ -58,7 +59,7 @@ int insertNewALA(float newALA) {
 	}
 
 	while (g_alaArray[newestAlaIndex]->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_alaArray[newestAlaIndex]->lock = true;
 	g_alaArray[newestAlaIndex]->gForce = newALA;
@@ -69,15 +70,15 @@ int insertNewALA(float newALA) {
 
 int insertNewStaticOrientation() {
 	newestStaticOrientationIndex++;
-	if (newestStaticOrientationIndex == STATIC_ORIENTATION_LIST_SIZE) {
+	if (newestStaticOrientationIndex == STATIC_ORIENTATION_ARRAY_SIZE) {
 		newestStaticOrientationIndex = 0;
 	}
 
 	int notPEUCounter = 0;
-	for (int i = 0; i < STATIC_ORIENTATION_LIST_SIZE; i++) {
-		int currentIndex = (i + newestStaticOrientationIndex) % STATIC_ORIENTATION_LIST_SIZE;
+	for (int i = 0; i < STATIC_ORIENTATION_ARRAY_SIZE; i++) {
+		int currentIndex = (i + newestStaticOrientationIndex) % STATIC_ORIENTATION_ARRAY_SIZE;
 		while (g_staticOrientationArray[currentIndex]->lock) {
-			retryTakeDelay(0);
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
 		}
 		g_staticOrientationArray[currentIndex]->lock = true;
 
@@ -93,7 +94,7 @@ int insertNewStaticOrientation() {
 	}
 
 	while (g_staticOrientationArray[newestStaticOrientationIndex]->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_staticOrientationArray[newestStaticOrientationIndex]->lock = true;
 	g_staticOrientationArray[newestStaticOrientationIndex]->staticOrientation = newStatus;
@@ -110,7 +111,7 @@ int insertNewIMUNode() {
 	}
 
 	while (g_imuData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_imuData.lock = true;
 	imuData_t newestData = {0};
@@ -118,7 +119,7 @@ int insertNewIMUNode() {
 	g_imuData.lock = false;
 
 	while (g_imuArray[newestImuIndex]->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_imuArray[newestImuIndex]->lock = true;
 	g_imuArray[newestImuIndex]->accX = newestData.accX;
@@ -166,10 +167,7 @@ ui32 getTimeStamp(void) {
  * @date 12/28/2020
  */
 void retryTakeDelay(int length) {
-#ifndef NDEBUG
-	// Do Nothing
-#else
-	// TODO: Implement retryTakeDelay
-	// Using rtos
-#endif
+	#ifdef NDEBUG
+		vTaskDelay(length);
+	#endif
 }

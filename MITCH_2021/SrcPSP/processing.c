@@ -11,6 +11,8 @@
 #ifndef NDEBUG
 #include <debugSettings.h>
 #include <unistd.h>
+#else
+#include "imuInterface.h"
 #endif
 
 bool bmpDStatus = false;
@@ -51,14 +53,26 @@ float a_trop;
 float time_var; // Local time variable
 float new_time; // Local time variable
 
-float vert_speed; // Vertical Speed
-float new_vert_speed; // Local Vertical Speed variable
+float avg_Z_speed;
+float avg_Z_accl;
+
+float delta_Z_speed;
+float Z_accl;
+float new_Z_accl;
+
+float Vert_vel;
+float tm_apgee;
+
+float apgee;
+
+float Z_speed; // y-axis Speed, e-frame
+float new_Z_speed; // Local y-axis Speed variable, e-frame
 
 float delta_time;
 
-float Horz_vel_SQRD;
+float Horz_vel; // Horizontal velocity relative to accelerometer, g-frame
 
-float Speed_Norm;
+float Speed_Norm; // g-frame
 float Vert_Orientation;
 
 float acclZ_bmp;
@@ -108,17 +122,17 @@ bool getIMUData_P() {
 	accZ = g_imuData.alaZ;
 
 	if (accZ == 0) {
-		accZ = g_imuData.accZ;
+		accZ = g_imuData.accel_zout / ACCEL_SENSITIVITY;
 	}
 
-	accX_imu = g_imuData.accX;
-	accY_imu = g_imuData.accY;
-	gyrX_imu = g_imuData.gyrX;
-	gyrY_imu = g_imuData.gyrY;
-	gyrZ_imu = g_imuData.gyrZ;
-	magX_imu = g_imuData.magX;
-	magY_imu = g_imuData.magY;
-	magZ_imu = g_imuData.magZ;
+	accX_imu = g_imuData.accel_xout / ACCEL_SENSITIVITY;
+	accY_imu = g_imuData.accel_yout / ACCEL_SENSITIVITY;
+	gyrX_imu = g_imuData.gyro_xout / GYRO_SENSITIVITY;
+	gyrY_imu = g_imuData.gyro_yout / GYRO_SENSITIVITY;
+	gyrZ_imu = g_imuData.gyro_zout / GYRO_SENSITIVITY;
+	magX_imu = g_imuData.mag_xout / MAG_SENSITIVITY;
+	magY_imu = g_imuData.mag_yout / MAG_SENSITIVITY;
+	magZ_imu = g_imuData.mag_zout / MAG_SENSITIVITY;
 
 	// Reset Update
 	g_imuData.hasUpdate = false;
@@ -195,7 +209,8 @@ void processData_P() {
 		//}
 
 		Calc_Alt = 0;
-		vert_speed = 0;
+		Z_speed = 0; // e-frame
+		Z_accl = 0;
 		time_var = g_bmpData.timeStamp / pow(10,3);
 	}
 	else {
@@ -242,13 +257,13 @@ void transmitData_P() {
 bool pointyEndUp_P() {
 //	if((accX_imu * accX_imu + accY_imu * accY_imu) == 0) asdfasf = 0.000001;
 
-	return ((accZ*accZ / (accX_imu * accX_imu + accY_imu * accY_imu)) > TAN_THETA_SQUARED) && (accZ < 0);
+	return ((accZ*accZ / (accX_imu * accX_imu + accY_imu * accY_imu)) > TAN_THETA_SQUARED) && (accZ < 0); // g-rame
 }
 
 void CalcAltBMP_P() {
 	a_trop = (temp_trop_p - temp_g)/(trop_p_alt);
-	delta_alt = (new_temp - temp_alt_bmp) / a_trop;
-	Calc_Alt += delta_alt;
+	delta_alt = (new_temp - temp_alt_bmp) / a_trop; // e-frame
+	Calc_Alt += delta_alt; //e-frame
 
 	temp_alt_bmp = new_temp;
 	pres_alt_bmp = new_pres;
@@ -257,21 +272,42 @@ void CalcAltBMP_P() {
 void CalcFlightDataBMP_P() {
 	delta_time = new_time - time_var;
 
-	Horz_vel_SQRD = pow((accX_imu * delta_time), 2) + pow((accY_imu * delta_time), 2);
+	avg_Z_speed = delta_alt/delta_time; // e-frame
 
-	new_vert_speed = delta_alt/delta_time;
+	new_Z_speed = (2 * avg_Z_speed) - Z_speed;
 
-	Speed_Norm = sqrt(Horz_vel_SQRD + pow(new_vert_speed, 2));
-	Vert_Orientation = atan(Horz_vel_SQRD/new_vert_speed);
+	delta_Z_speed = new_Z_speed - Z_speed;
 
+	avg_Z_accl = delta_Z_speed / delta_time;
 
+	new_Z_accl = (2 * avg_Z_accl) - Z_accl;
 
-	acclZ_bmp = (new_vert_speed - vert_speed) / delta_time;
+	if (new_Z_accl != Z_accl) {
+		//change in flight status
+	}
+
+	tm_apgee = new_Z_speed / g;
+
+	if (tm_apgee > 0) {
+		apgee = (new_Z_speed * tm_apgee) - (0.5 * g * pow(tm_apgee, 2));
+	}
+	else {
+		// free fall
+	}
+
+	acclZ_bmp = (new_Z_speed - Z_speed) / delta_time; // e-frame
+
+	Horz_vel = sqrt(pow((accX_imu * delta_time), 2) + pow((accY_imu * delta_time), 2)); // g-frame
+	Vert_vel = accZ * delta_time; // g-frame
+
+	Speed_Norm = sqrt(pow(Horz_vel, 2) + pow(Vert_vel, 2)); // g-frame
+	Vert_Orientation = atan(Horz_vel/Vert_vel);
 
 	//if (abs(acclZ_bmp - accZ) < threshold_check) {
 //
 	//}
 
 
-	vert_speed = new_vert_speed;
+	Z_speed = new_Z_speed; //e-frame
+	Z_accl = new_Z_accl; //e-frame
 }

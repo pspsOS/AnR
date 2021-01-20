@@ -10,11 +10,15 @@
 
 #include "common.h"
 
+#define GPS_FREQ (1)        //   1 Hz
+#define BMP_MULTIPLIER (10) //  10 Hz
+#define IMU_MULTIPLIER (10) // 100 Hz
+
 // Interface Structs
 
 // Parent Functions
 void setup_A();
-void loop_A();
+ui8 loop_A();
 
 
 // Setup
@@ -29,7 +33,7 @@ void bmpRead_A();
 void imuRead_A();
 void checkStatus_A();
 void sendUpdate_A();
-
+void updateLeds_A();
 
 // Private
 void _splitNmea();

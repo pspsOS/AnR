@@ -16,6 +16,11 @@
 #define IMU 2
 #define ALA 3
 
+// Sensor sensitivities 
+#define ACCEL_SENSITIVITY (16) // g
+#define GYRO_SENSITIVITY (2000) // dps
+#define MAG_SENSITIVITY (4900) // uT
+
 // General Settings
 extern bool notifyGeneralSettings;
 

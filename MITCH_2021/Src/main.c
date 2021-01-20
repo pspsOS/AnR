@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "task.h"
 /* User-defined libraries */
 
 #include <stdbool.h>
@@ -46,8 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
-#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
+
 
 /* USER CODE END PD */
 
@@ -57,7 +56,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc3;
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 I2C_HandleTypeDef hi2c3;
 
@@ -92,13 +92,14 @@ osStaticThreadDef_t TransmissionControlBlock;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_ADC3_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART6_UART_Init(void);
 static void MX_USB_OTG_FS_USB_Init(void);
+static void MX_ADC1_Init(void);
 void startControlLogic(void const * argument);
 void startAcquisition(void const * argument);
 void startProcessing(void const * argument);
@@ -143,14 +144,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC3_Init();
+  MX_DMA_Init();
   MX_I2C3_Init();
   MX_SPI1_Init();
   MX_SPI3_Init();
   MX_USART2_UART_Init();
   MX_USART6_UART_Init();
   MX_USB_OTG_FS_USB_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+
+
+  setup_A();
+  setup_M();
 
   /* USER CODE END 2 */
 
@@ -230,10 +236,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
@@ -248,64 +252,64 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
 }
 
 /**
-  * @brief ADC3 Initialization Function
+  * @brief ADC1 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_ADC3_Init(void)
+static void MX_ADC1_Init(void)
 {
 
-  /* USER CODE BEGIN ADC3_Init 0 */
+  /* USER CODE BEGIN ADC1_Init 0 */
 
-  /* USER CODE END ADC3_Init 0 */
+  /* USER CODE END ADC1_Init 0 */
 
   ADC_ChannelConfTypeDef sConfig = {0};
 
-  /* USER CODE BEGIN ADC3_Init 1 */
+  /* USER CODE BEGIN ADC1_Init 1 */
 
-  /* USER CODE END ADC3_Init 1 */
+  /* USER CODE END ADC1_Init 1 */
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
-  hadc3.Instance = ADC3;
-  hadc3.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  hadc3.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc3.Init.ScanConvMode = DISABLE;
-  hadc3.Init.ContinuousConvMode = DISABLE;
-  hadc3.Init.DiscontinuousConvMode = DISABLE;
-  hadc3.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc3.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc3.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc3.Init.NbrOfConversion = 1;
-  hadc3.Init.DMAContinuousRequests = DISABLE;
-  hadc3.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc3) != HAL_OK)
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Channel = ADC_CHANNEL_8;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN ADC3_Init 2 */
+  /* USER CODE BEGIN ADC1_Init 2 */
 
-  /* USER CODE END ADC3_Init 2 */
+  /* USER CODE END ADC1_Init 2 */
 
 }
 
@@ -519,6 +523,22 @@ static void MX_USB_OTG_FS_USB_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -533,13 +553,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, BUZZER_OUT_Pin|STORAGE_ERROR_Pin|ADC_ERROR_Pin|SENSOR_NOMINAL_Pin
-                          |SENSOR_ERROR_GPIO_Pin|U1S_CHECK_Pin|U2S_CHECK_Pin|U3S_CHECK_Pin
+                          |SENSOR_ERROR_Pin|U1S_CHECK_Pin|U2S_CHECK_Pin|U3S_CHECK_Pin
                           |U4S_CHECK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -553,8 +573,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOG, DROGUE_LED_Pin|MAIN_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, US2_ST_Pin|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
-                          |GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, US2_ST_Pin|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
@@ -562,10 +581,10 @@ static void MX_GPIO_Init(void)
                           |HOLD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : BUZZER_OUT_Pin STORAGE_ERROR_Pin ADC_ERROR_Pin SENSOR_NOMINAL_Pin
-                           SENSOR_ERROR_GPIO_Pin U1S_CHECK_Pin U2S_CHECK_Pin U3S_CHECK_Pin
+                           SENSOR_ERROR_Pin U1S_CHECK_Pin U2S_CHECK_Pin U3S_CHECK_Pin
                            U4S_CHECK_Pin */
   GPIO_InitStruct.Pin = BUZZER_OUT_Pin|STORAGE_ERROR_Pin|ADC_ERROR_Pin|SENSOR_NOMINAL_Pin
-                          |SENSOR_ERROR_GPIO_Pin|U1S_CHECK_Pin|U2S_CHECK_Pin|U3S_CHECK_Pin
+                          |SENSOR_ERROR_Pin|U1S_CHECK_Pin|U2S_CHECK_Pin|U3S_CHECK_Pin
                           |U4S_CHECK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -579,6 +598,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SENSE_A_Pin SENSE_B_Pin SENSE_C_Pin SENSE_D_Pin */
+  GPIO_InitStruct.Pin = SENSE_A_Pin|SENSE_B_Pin|SENSE_C_Pin|SENSE_D_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pins : CS1_Pin CS2_Pin */
@@ -595,20 +620,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : US2_ST_Pin PB12 PB13 PB14
-                           PB15 */
-  GPIO_InitStruct.Pin = US2_ST_Pin|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
-                          |GPIO_PIN_15;
+  /*Configure GPIO pins : US2_ST_Pin PB13 PB14 PB15 */
+  GPIO_InitStruct.Pin = US2_ST_Pin|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : US2_STATUS_Pin */
-  GPIO_InitStruct.Pin = US2_STATUS_Pin;
+  /*Configure GPIO pins : US2_STATUS_Pin CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin */
+  GPIO_InitStruct.Pin = US2_STATUS_Pin|CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(US2_STATUS_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PD8 PD9 PD10 PD11
                            PD12 PD13 CS3_Pin WP_Pin
@@ -657,11 +680,12 @@ static void MX_GPIO_Init(void)
 void startControlLogic(void const * argument)
 {
   /* USER CODE BEGIN 5 */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+
+		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
+	}
   /* USER CODE END 5 */
 }
 
@@ -675,11 +699,22 @@ void startControlLogic(void const * argument)
 void startAcquisition(void const * argument)
 {
   /* USER CODE BEGIN startAcquisition */
+	static TickType_t time_init = 0;
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+		switch(loop_A()) {
+		case 1: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY1);
+				break;
+
+		case 2: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY2);
+				break;
+
+		default:vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY0);
+				break;
+		}
+	}
+
   /* USER CODE END startAcquisition */
 }
 
@@ -693,11 +728,12 @@ void startAcquisition(void const * argument)
 void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(1==1) {
+
+		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
+	}
   /* USER CODE END startProcessing */
 }
 
@@ -711,13 +747,12 @@ void startProcessing(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
-	setup_M();
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-	  loop_M();
-	  osDelay(1);
-  }
+	while(1==1) {
+		loop_M();
+		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
+	}
   /* USER CODE END startMonitoring */
 }
 

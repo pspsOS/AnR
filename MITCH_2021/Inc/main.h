@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "common.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -80,6 +80,10 @@ void Error_Handler(void);
 #define CS1_GPIO_Port GPIOC
 #define CS2_Pin GPIO_PIN_5
 #define CS2_GPIO_Port GPIOC
+#define ACCEL_ANALOG_Pin GPIO_PIN_0
+#define ACCEL_ANALOG_GPIO_Port GPIOB
+#define BATT_MEAS_Pin GPIO_PIN_1
+#define BATT_MEAS_GPIO_Port GPIOB
 #define ARMED_LED_Pin GPIO_PIN_13
 #define ARMED_LED_GPIO_Port GPIOF
 #define CENTRAL_NOMINAL_Pin GPIO_PIN_14
@@ -96,8 +100,8 @@ void Error_Handler(void);
 #define ADC_ERROR_GPIO_Port GPIOE
 #define SENSOR_NOMINAL_Pin GPIO_PIN_10
 #define SENSOR_NOMINAL_GPIO_Port GPIOE
-#define SENSOR_ERROR_GPIO_Pin GPIO_PIN_11
-#define SENSOR_ERROR_GPIO_GPIO_Port GPIOE
+#define SENSOR_ERROR_Pin GPIO_PIN_11
+#define SENSOR_ERROR_GPIO_Port GPIOE
 #define U1S_CHECK_Pin GPIO_PIN_12
 #define U1S_CHECK_GPIO_Port GPIOE
 #define U2S_CHECK_Pin GPIO_PIN_13
@@ -110,6 +114,8 @@ void Error_Handler(void);
 #define US2_ST_GPIO_Port GPIOB
 #define US2_STATUS_Pin GPIO_PIN_11
 #define US2_STATUS_GPIO_Port GPIOB
+#define CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin GPIO_PIN_12
+#define CHECK_HARDWARE_DEPLOYMENT_DISABLE_GPIO_Port GPIOB
 #define DISARM_INPUT_Pin GPIO_PIN_4
 #define DISARM_INPUT_GPIO_Port GPIOG
 #define ADC_ALERT_Pin GPIO_PIN_8
@@ -121,6 +127,24 @@ void Error_Handler(void);
 #define HOLD_Pin GPIO_PIN_2
 #define HOLD_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
+#define NDEBUG
+
+// Task Delays
+
+#define ACQUISITION_TASK_RATE0  (GPS_FREQ)
+#define ACQUISITION_TASK_RATE1  (GPS_FREQ * BMP_MULTIPLIER)
+#define ACQUISITION_TASK_RATE2  (GPS_FREQ * BMP_MULTIPLIER * IMU_MULTIPLIER)
+#define CONTROL_LOGIC_TASK_RATE (1)   // TODO: Determine optimal Control Logic Task Rate (currently 1 Hz)
+#define MONITORING_TASK_RATE    (1)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
+#define PROCESSING_TASK_RATE    (125) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
+
+
+#define ACQUISITION_TASK_DELAY0  (1000 / ACQUISITION_TASK_RATE0 / portTICK_RATE_MS)
+#define ACQUISITION_TASK_DELAY1  (1000 / ACQUISITION_TASK_RATE1 / portTICK_RATE_MS)
+#define ACQUISITION_TASK_DELAY2  (1000 / ACQUISITION_TASK_RATE2 / portTICK_RATE_MS)
+#define CONTROL_LOGIC_TASK_DELAY (1000 / CONTROL_LOGIC_TASK_RATE / portTICK_RATE_MS)
+#define MONITORING_TASK_DELAY    (1000 / MONITORING_TASK_RATE / portTICK_RATE_MS)
+#define PROCESSING_TASK_DELAY    (1000 / PROCESSING_TASK_RATE / portTICK_RATE_MS)
 
 /* USER CODE END Private defines */
 

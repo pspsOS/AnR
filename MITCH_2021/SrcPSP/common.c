@@ -24,193 +24,90 @@ volatile uint8_t g_currentNominalMode = 0;
 volatile uint8_t g_currentContingency = 0;
 volatile bool g_chuteDisarm = false;
 volatile bool g_chuteDeployable = false;
-// pointers
-altitudeNode_t *g_newAltitudeNode = NULL;
-alaNode_t *g_newALANode = NULL;
-staticOrientationNode_t *g_newStaticOrientationNode = NULL;
-imuNode_t *g_newIMUNode = NULL;
+// arrays
+altitudeNode_t g_altitudeArray[ALTITUDE_ARRAY_SIZE] = {0};
+alaNode_t g_alaArray[ALA_ARRAY_SIZE] = {0};
+staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE] = {0};
+imuNode_t g_imuArray[IMU_ARRAY_SIZE] = {0};
+uint16_t newestAltitudeIndex = 0;
+uint16_t newestAlaIndex = 0;
+uint16_t newestStaticOrientationIndex = 0;
+uint16_t newestImuIndex = 0;
 
-
-altitudeNode_t *createAltitudeList(uint16_t listSize) {
-	altitudeNode_t *headNode = calloc(sizeof(altitudeNode_t), 1);
-	altitudeNode_t *currentPointer = headNode;
-	for (uint16_t i = 1; i < listSize; i++) {
-		currentPointer->nextNode = calloc(sizeof(altitudeNode_t), 1);
-		currentPointer = currentPointer->nextNode;
-	}
-	currentPointer->nextNode = headNode;
-	return headNode;
-}
-
-alaNode_t *createALAList(uint16_t listSize) {
-	alaNode_t *headNode = calloc(sizeof(alaNode_t), 1);
-	alaNode_t *currentPointer = headNode;
-	for (uint16_t i = 1; i < listSize; i++) {
-		currentPointer->nextNode = calloc(sizeof(alaNode_t), 1);
-		currentPointer = currentPointer->nextNode;
-	}
-	currentPointer->nextNode = headNode;
-	return headNode;
-}
-
-staticOrientationNode_t *createStaticOrientationList(uint16_t listSize) {
-	staticOrientationNode_t *headNode = calloc(sizeof(staticOrientationNode_t), 1);
-	staticOrientationNode_t *currentPointer = headNode;
-	for (uint16_t i = 1; i < listSize; i++) {
-		currentPointer->nextNode = calloc(sizeof(staticOrientationNode_t), 1);
-		currentPointer = currentPointer->nextNode;
-	}
-	currentPointer->nextNode = headNode;
-	return headNode;
-}
-
-imuNode_t *createIMUList(uint16_t listSize) {
-	imuNode_t *headNode = calloc(sizeof(imuNode_t), 1);
-	imuNode_t *currentPointer = headNode;
-	for (uint16_t i = 1; i < listSize; i++) {
-		currentPointer->nextNode = calloc(sizeof(imuNode_t), 1);
-		currentPointer = currentPointer->nextNode;
-	}
-	currentPointer->nextNode = headNode;
-	return headNode;
-}
-
-int setupLinkedLists() {
-	g_newAltitudeNode = createAltitudeList(ALTITUDE_LIST_SIZE);
-	g_newALANode = createALAList(ALA_LIST_SIZE);
-	g_newStaticOrientationNode = createStaticOrientationList(STATIC_ORIENTATION_LIST_SIZE);
-	g_newIMUNode = createIMUList(IMU_LIST_SIZE);
-
-	return SUCCESSFUL_RETURN;
-}
-
-int freeAltitudeList(altitudeNode_t *someAltitudePtr) {
-	altitudeNode_t *nextPtr = NULL;
-
-	while (someAltitudePtr != NULL) {
-		nextPtr = someAltitudePtr->nextNode;
-		free(someAltitudePtr);
-		someAltitudePtr = NULL;
-		someAltitudePtr = nextPtr;
-	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-int freeALAList(alaNode_t *someALAPtr) {
-	alaNode_t *nextPtr = NULL;
-
-	while (someALAPtr != NULL) {
-		nextPtr = someALAPtr->nextNode;
-		free(someALAPtr);
-		someALAPtr = NULL;
-		someALAPtr = nextPtr;
-	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-int freeStaticOrientationList(staticOrientationNode_t *someStaticOrientationPtr) {
-	staticOrientationNode_t *nextPtr = NULL;
-
-	while (someStaticOrientationPtr != NULL) {
-		nextPtr = someStaticOrientationPtr->nextNode;
-		free(someStaticOrientationPtr);
-		someStaticOrientationPtr = NULL;
-		someStaticOrientationPtr = nextPtr;
-	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-int freeIMUList(imuNode_t *someIMUPtr) {
-	imuNode_t *nextPtr = NULL;
-
-	while (someIMUPtr != NULL) {
-		nextPtr = someIMUPtr->nextNode;
-		free(someIMUPtr);
-		someIMUPtr = NULL;
-		someIMUPtr = nextPtr;
-	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-int freeAllLists() {
-	int counter = 0;
-
-	counter += freeAltitudeList(g_newAltitudeNode);
-	counter += freeALAList(g_newALANode);
-	counter += freeStaticOrientationList(g_newStaticOrientationNode);
-	counter += freeIMUList(g_newIMUNode);
-
-	return counter;
-}
 
 int insertNewAltitude(float newAltitude) {
-	altitudeNode_t *lastNewNode = g_newAltitudeNode;
-	g_newAltitudeNode = lastNewNode->nextNode;
+	newestAltitudeIndex++;
+	if (newestAltitudeIndex == ALTITUDE_ARRAY_SIZE) {
+		newestAltitudeIndex = 0;
+	}
 
-	while (g_newAltitudeNode->lock) {
+	while (g_altitudeArray[newestAltitudeIndex]->lock) {
 		retryTakeDelay(0);
 	}
-	g_newAltitudeNode->lock = true;
-	g_newAltitudeNode->altitude = newAltitude;
-	g_newAltitudeNode->lock = false;
+	g_altitudeArray[newestAltitudeIndex]->lock = true;
+	g_altitudeArray[newestAltitudeIndex]->altitude = newAltitude;
+	g_altitudeArray[newestAltitudeIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
 
 int insertNewALA(float newALA) {
-	alaNode_t *lastNewNode = g_newALANode;
-	g_newALANode = lastNewNode->nextNode;
+	newestAlaIndex++;
+	if (newestAlaIndex == ALA_ARRAY_SIZE) {
+		newestAlaIndex = 0;
+	}
 
-	while (g_newALANode->lock) {
+	while (g_alaArray[newestAlaIndex]->lock) {
 		retryTakeDelay(0);
 	}
-	g_newALANode->lock = true;
-	g_newALANode->gForce = newALA;
-	g_newALANode->lock = false;
+	g_alaArray[newestAlaIndex]->lock = true;
+	g_alaArray[newestAlaIndex]->gForce = newALA;
+	g_alaArray[newestAlaIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
 
 int insertNewStaticOrientation() {
-	staticOrientationNode_t *lastNewNode = g_newStaticOrientationNode;
-	g_newStaticOrientationNode = lastNewNode->nextNode;
+	newestStaticOrientationIndex++;
+	if (newestStaticOrientationIndex == STATIC_ORIENTATION_LIST_SIZE) {
+		newestStaticOrientationIndex = 0;
+	}
 
 	int notPEUCounter = 0;
-	staticOrientationNode_t *tempPtr = g_newStaticOrientationNode;
 	for (int i = 0; i < STATIC_ORIENTATION_LIST_SIZE; i++) {
-		while (tempPtr->lock) {
+		int currentIndex = (i + newestStaticOrientationIndex) % STATIC_ORIENTATION_LIST_SIZE;
+		while (g_staticOrientationArray[currentIndex]->lock) {
 			retryTakeDelay(0);
 		}
+		g_staticOrientationArray[currentIndex]->lock = true;
 
-		tempPtr->lock = true;
-		if (!tempPtr->staticOrientation) {
+		if (!(g_staticOrientationArray[currentIndex]->staticOrientation)) {
 			notPEUCounter++;
 		}
-		tempPtr->lock = false;
+		g_staticOrientationArray[currentIndex]->lock = false;
 	}
+
 	bool newStatus = pointyEndUp_P();
 	if (!newStatus) {
 		notPEUCounter++;
 	}
 
-	while (g_newStaticOrientationNode->lock) {
+	while (g_staticOrientationArray[newestStaticOrientationIndex]->lock) {
 		retryTakeDelay(0);
 	}
-	g_newStaticOrientationNode->lock = true;
-	g_newStaticOrientationNode->staticOrientation = newStatus;
-	g_newStaticOrientationNode->numNotOptimal = notPEUCounter;
-	g_newStaticOrientationNode->lock = false;
+	g_staticOrientationArray[newestStaticOrientationIndex]->lock = true;
+	g_staticOrientationArray[newestStaticOrientationIndex]->staticOrientation = newStatus;
+	g_staticOrientationArray[newestStaticOrientationIndex]->numNotOptimal = notPEUCounter;
+	g_staticOrientationArray[newestStaticOrientationIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
 
 int insertNewIMUNode() {
-	imuNode_t *lastNewNode = g_newIMUNode;
-	g_newIMUNode = lastNewNode->nextNode;
+	newestImuIndex++;
+	if (newestImuIndex == IMU_ARRAY_SIZE) {
+		newestImuIndex = 0;
+	}
 
 	while (g_imuData.lock) {
 		retryTakeDelay(0);
@@ -220,45 +117,24 @@ int insertNewIMUNode() {
 	newestData = g_imuData;
 	g_imuData.lock = false;
 
-	while (g_newIMUNode->lock) {
+	while (g_imuArray[newestImuIndex]->lock) {
 		retryTakeDelay(0);
 	}
-	g_newIMUNode->lock = true;
-	g_newIMUNode->accX = newestData.accX;
-	g_newIMUNode->accY = newestData.accY;
-	g_newIMUNode->accZ = newestData.accZ;
-	g_newIMUNode->gyrX = newestData.gyrX;
-	g_newIMUNode->gyrY = newestData.gyrY;
-	g_newIMUNode->gyrZ = newestData.gyrZ;
-	g_newIMUNode->magX = newestData.magX;
-	g_newIMUNode->magY = newestData.magY;
-	g_newIMUNode->magZ = newestData.magZ;
-	g_newIMUNode->alaZ = newestData.alaZ;
-	g_newIMUNode->lock = false;
+	g_imuArray[newestImuIndex]->lock = true;
+	g_imuArray[newestImuIndex]->accX = newestData.accX;
+	g_imuArray[newestImuIndex]->accY = newestData.accY;
+	g_imuArray[newestImuIndex]->accZ = newestData.accZ;
+	g_imuArray[newestImuIndex]->gyrX = newestData.gyrX;
+	g_imuArray[newestImuIndex]->gyrY = newestData.gyrY;
+	g_imuArray[newestImuIndex]->gyrZ = newestData.gyrZ;
+	g_imuArray[newestImuIndex]->magX = newestData.magX;
+	g_imuArray[newestImuIndex]->magY = newestData.magY;
+	g_imuArray[newestImuIndex]->magZ = newestData.magZ;
+	g_imuArray[newestImuIndex]->alaZ = newestData.alaZ;
+	g_imuArray[newestImuIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
-
-float calcAvgAlt() {
-	altitudeNode_t *someAltPtr = g_newAltitudeNode;
-	float avgAlt = 0;
-	int counter = 0;
-
-	for (int i = 0; i < ALTITUDE_LIST_SIZE; i++) {
-		if (!someAltPtr->lock) {
-			someAltPtr->lock = true;
-			avgAlt += someAltPtr->altitude;
-			counter++;
-			someAltPtr->lock = false;
-		}
-
-		someAltPtr = someAltPtr->nextNode;
-	}
-
-	return (avgAlt / counter);
-}
-
-
 
 
 /**

@@ -266,8 +266,10 @@ bool checkPrelaunchTrans_C() {
 
 bool checkLaunchTrans_C() {
 	bool sustainedZForce = false;
+	sustainedZForce = determineSustainedZForce_C();
 
 	bool detectedAscent = false;
+	detectedAscent = determineAscent_C();
 
 	if (sustainedZForce && detectedAscent) {
 		//TODO: Send to Transmission & Storage
@@ -456,5 +458,9 @@ bool determineStillness_C() {
 
 
 bool determineSustainedZForce_C() {
+
+}
+
+bool determineAscent_C() {
 
 }

@@ -49,10 +49,10 @@
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
-#define ALTITUDE_LIST_SIZE (20)
-#define ALA_LIST_SIZE (40)
-#define STATIC_ORIENTATION_LIST_SIZE (40)
-#define IMU_LIST_SIZE (40)
+#define ALTITUDE_ARRRAY_SIZE (20)
+#define ALA_ARRAY_SIZE (40)
+#define STATIC_ORIENTATION_ARRAY_SIZE (40)
+#define IMU_ARRAY_SIZE (40)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -175,20 +175,17 @@ typedef struct transmissionData {
 typedef struct altitudeNode {
 	float altitude;
 	bool lock;
-	altitudeNode_t *nextNode;
 } altitudeNode_t;
 
 typedef struct alaNode {
 	float gForce;
 	bool lock;
-	alaNode_t *nextNode;
 } alaNode_t;
 
 typedef struct staticOrientationNode {
 	bool staticOrientation;
 	int numNotOptimal;
 	bool lock;
-	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
 
 typedef struct imuNode {
@@ -203,7 +200,6 @@ typedef struct imuNode {
 	float magZ;
 	float alaZ;
 	bool lock;
-	imuNode_t *nextNode;
 } imuNode_t;
 
 
@@ -223,33 +219,19 @@ extern volatile uint32_t g_launchTime;
 extern volatile bool g_chuteDisarm;
 extern volatile bool g_chuteDeployable;
 
-extern altitudeNode_t *g_newAltitudeNode;
-extern alaNode_t *g_newALANode;
-extern staticOrientationNode_t *g_newStaticOrientationNode;
-extern imuNode_t *g_newIMUNode;
+extern altitudeNode_t g_altitudeArray[ALTITUDE_ARRAY_SIZE];
+extern alaNode_t g_alaArray[ALA_ARRAY_SIZE];
+extern staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE];
+extern imuNode_t g_imuArray[IMU_ARRAY_SIZE];
 
 /* Common Function Prototypes */
 
 ui32 getTimeStamp(void );
 void retryTakeDelay(int );
 
-altitudeNode_t *createAltitudeList(uint16_t );
-alaNode_t *createALAList(uint16_t );
-staticOrientationNode_t *createStaticOrientationList(uint16_t );
-imuNode_t *createIMUList(uint16_t );
-int setupLinkedLists();
-
-int freeAltitudeList(altitudeNode_t *);
-int freeALAList(alaNode_t *);
-int freeStaticOrientationList(staticOrientationNode_t *);
-int freeIMUList(imuNode_t *);
-int freeAllLists();
-
 int insertNewAltitude(float );
 int insertNewALA(float );
 int insertNewStaticOrientation();
 int insertNewIMUNode();
-
-float calcAvgAlt();
 
 #endif /* COMMON_H_ */

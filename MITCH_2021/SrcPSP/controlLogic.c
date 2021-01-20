@@ -376,28 +376,29 @@ bool determineStillness_C() {
 
 	imuNode_t *tempPtr = g_newIMUNode;
 	imuNode_t newestData = {0};
-	for (int i = 0; i < IMU_LIST_SIZE; i++) {
-		while (tempPtr->lock) {
-			retryTakeDelay(0);
+	for (int i = 0; i < IMU_ARRAY_SIZE; i++) {
+		int currentIndex = (i + newestImuIndex) % IMU_ARRAY_SIZE;
+		while (g_imuArray[currentIndex]->lock) {
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
 		}
 
-		tempPtr->lock = true;
-		newestData.accX = tempPtr->accX;
-		newestData.accY = tempPtr->accY;
-		newestData.accZ = tempPtr->accZ;
-		newestData.alaZ = tempPtr->alaZ;
-		newestData.gyrX = tempPtr->gyrX;
-		newestData.gyrY = tempPtr->gyrY;
-		newestData.gyrZ = tempPtr->gyrZ;
-		tempPtr->lock = false;
+		g_imuArray[currentIndex]->lock = true;
+		newestData.accX = g_imuArray[currentIndex]->accX;
+		newestData.accY = g_imuArray[currentIndex]->accY;
+		newestData.accZ = g_imuArray[currentIndex]->accZ;
+		newestData.alaZ = g_imuArray[currentIndex]->alaZ;
+		newestData.gyrX = g_imuArray[currentIndex]->gyrX;
+		newestData.gyrY = g_imuArray[currentIndex]->gyrY;
+		newestData.gyrZ = g_imuArray[currentIndex]->gyrZ;
+		g_imuArray[currentIndex]->lock = false;
 
-		avgAccX += newestData.accX / IMU_LIST_SIZE;
-		avgAccY += newestData.accY / IMU_LIST_SIZE;
-		avgAccZ += newestData.accZ / IMU_LIST_SIZE;
-		avgAlaZ += newestData.alaZ / IMU_LIST_SIZE;
-		avgGyrX += newestData.gyrX / IMU_LIST_SIZE;
-		avgGyrY += newestData.gyrY / IMU_LIST_SIZE;
-		avgGyrZ += newestData.gyrZ / IMU_LIST_SIZE;
+		avgAccX += newestData.accX / IMU_ARRAY_SIZE;
+		avgAccY += newestData.accY / IMU_ARRAY_SIZE;
+		avgAccZ += newestData.accZ / IMU_ARRAY_SIZE;
+		avgAlaZ += newestData.alaZ / IMU_ARRAY_SIZE;
+		avgGyrX += newestData.gyrX / IMU_ARRAY_SIZE;
+		avgGyrY += newestData.gyrY / IMU_ARRAY_SIZE;
+		avgGyrZ += newestData.gyrZ / IMU_ARRAY_SIZE;
 
 		if (newestData.accX < minAccX) {
 			minAccX = newestData.accX;
@@ -442,7 +443,6 @@ bool determineStillness_C() {
 		if (newestData.gyrZ > maxGyrZ) {
 			maxGyrZ = newestData.gyrZ;
 		}
-		tempPtr = tempPtr->nextNode;
 	}
 
 	bool accSatisfied = ((100.0 * (maxAccX - minAccX) / (avgAccX)) <= ACCEPTABLE_PERCENT_ERROR) &&

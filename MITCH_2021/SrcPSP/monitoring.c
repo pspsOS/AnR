@@ -76,12 +76,12 @@ void loop_M() {
 			return;
 		}
 		fscanf(_monitoringFile, "%f", &batteryVoltage);
-		fscanf(_monitoringFile, "%d", &continuity[0]);
-		fscanf(_monitoringFile, "%d", &continuity[1]);
-		fscanf(_monitoringFile, "%d", &continuity[2]);
-		fscanf(_monitoringFile, "%d", &continuity[3]);
-		fscanf(_monitoringFile, "%d", &buttonState);
-		fscanf(_monitoringFile, "%d", &hardwareDeploymentDisable);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[0]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[1]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[2]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[3]);
+		fscanf(_monitoringFile, "%d", (int*)&buttonState);
+		fscanf(_monitoringFile, "%d", (int*)&hardwareDeploymentDisable);
 	#else
 		checkBatteryVoltage_M();
 		checkContinuity_M();

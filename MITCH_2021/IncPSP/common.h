@@ -89,7 +89,7 @@ typedef struct staticOrientationNode staticOrientationNode_t;
 
 typedef struct daqStatusData {
 	ui32 timeStamp;
-	bool daqScaling;
+	bool daqScalingEnabled;
 	bool gpsNominal;
 	bool bmpNominal;
 	bool imuNominal;

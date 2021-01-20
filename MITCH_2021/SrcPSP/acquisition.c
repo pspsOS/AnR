@@ -24,15 +24,15 @@
 
 /* Local variable declarations */
 char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
-bool daqScaling;        // Enables/Disables DAQ Scaling
+bool daqScalingEnabled; // Enables/Disables DAQ Scaling
 ui8 daqScaler;          // DAQ Scaling number � Sets the ratio
 bool gpsNominal;        // Indicates whether the GPS is nominal
 bool bmpNominal;        // Indicates whether the BMP is nominal
 bool imuNominal;        // Indicates whether the IMU is nominal
 bool alaNominal;        // Indicates whether the ALA is nominal
 bool sendDaqStatus;     // Indicates whether to update the daqStatusData struct
-ui8 gpsCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
+ui8 imuCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
 
 // Used for parsing NMEA data
@@ -63,15 +63,15 @@ ui8 _nmeaAddrEnd;
 void setup_A() {
 
 	// Initialize local variables
-	daqScaling = false;
+	daqScalingEnabled = false;
 	daqScaler = DEFAULT_DAQ_SCALER;
 	gpsNominal = false;
 	bmpNominal = false;
 	imuNominal = false;
 	alaNominal = false;
 	sendDaqStatus = false;
-	gpsCounter = 0;
 	bmpCounter = 0;
+	imuCounter = 0;
 
 
 	// Setup sensors
@@ -88,8 +88,63 @@ void setup_A() {
 	sendUpdate_A();
 }
 
+
+/** loop_A()
+ * @brief Acquisition Loop
+ * This function is the function that is called repeatedly by the Acquisition task.
+ *
+ * @retval ui8 delayVal: value which specifies which delay time to use
+ * TODO: Make delayVal return the constants defined in main
+ *
+ * @author Jeff Kaji
+ * @date 01/19/2021
+ */
 ui8 loop_A() {
-	return 0;
+	ui8 delayVal = 0;
+
+
+	if(daqScalingEnabled) {
+		if(imuNominal || alaNominal) imuRead_A();
+		else prints("--------IMU Skip %d\n", imuCounter);
+
+		if(imuCounter == 0) {
+			if(bmpNominal) bmpRead_A();
+			else prints("----BMP Skip %d\n", bmpCounter);
+
+			if(bmpCounter == 0) {
+				if(gpsNominal) gpsRead_A();
+			}
+		}
+
+		if(imuNominal || alaNominal || imuCounter > 0) {
+			imuCounter += 1;
+			delayVal = 2;
+		} else if(bmpNominal || bmpCounter > 0) {
+			bmpCounter += 1;
+			delayVal = 1;
+		} else {
+			delayVal = 0;
+		}
+
+		if(imuCounter == IMU_MULTIPLIER) {
+			bmpCounter += 1;
+			imuCounter = 0;
+		}
+
+		if(bmpCounter == BMP_MULTIPLIER) {
+			bmpCounter = 0;
+		}
+
+
+	} else {
+		if(gpsNominal) gpsRead_A();
+		if(bmpNominal) bmpRead_A();
+		if(imuNominal || alaNominal) imuRead_A();
+		delayVal = 0;
+	}
+
+	checkStatus_A();
+	return delayVal;
 }
 
 
@@ -189,8 +244,8 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-
 	#ifndef NDEBUG
+		print("GPS Read\n");
 		if(!simulateGps) {
 			if(notifyWhenReadAborted)
 				print("GPS read aborted.\n");
@@ -200,6 +255,9 @@ void gpsRead_A() {
 	#else
 		//TODO: Implement gpsRead w/ hardware
 	#endif
+
+
+	/*
 
 	print("Reading:",);
 
@@ -225,7 +283,7 @@ void gpsRead_A() {
 	g_gpsData.timeStamp = getTimeStamp();
 
 	strncpy((char*)g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
-
+*/
 //	return;
 }
 
@@ -244,8 +302,11 @@ void gpsRead_A() {
 void bmpRead_A() {
 	i32 temperature = 0;
 	i32 pressure = 0;
-	#ifdef NDEBUG
-	barometerRead(&temperature, &pressure);
+	#ifndef NDEBUG
+		prints("    BMP Read %d\n", bmpCounter);
+		// TODO: Implement BMP Simulation
+	#else
+		barometerRead(&temperature, &pressure);
 	#endif
 
 	if(bmpNominal) {
@@ -277,32 +338,43 @@ void bmpRead_A() {
  * @date 12/23/2020
  */
 void imuRead_A() {
-
+	#ifndef NDEBUG
+		prints("        IMU Read %d\n", imuCounter);
+		// TODO: Implement IMU Simulation
+	#else
+		// TODO: Implement imuRead in hardware
+	#endif
 }
 
-/* TODO: Implement checkStatus
- * Checks status of acquisition tasks including:
- *   - Whether sensors are still nominal
- *   - Whether or not to enable/disable daqScaling
+
+/** checkStatus_A()
+ * @brief Check Status of Acquisition Task
+ * Check status of DAQ Scaling and Sensors. Update if necessary.
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @author Jeff Kaji
+ * @date 12/23/2020
  */
 void checkStatus_A() {
-	// Check for daqScaling update
+	// Check for daqScalingEnabled update
 	while(g_daqScalingData.lock) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_daqScalingData.lock = true;
 	if(g_daqScalingData.hasUpdate) {
-		daqScaling = g_daqScalingData.enableDaqScaling;
+		daqScalingEnabled = g_daqScalingData.enableDaqScaling;
 		g_daqScalingData.hasUpdate = false;
 		sendDaqStatus = true;
+		#ifndef NDEBUG
+		prints("-- DAQ Scaling: %s --\n", (daqScalingEnabled) ? _TRUE : _FALSE);
+		#endif
 	}
 	g_daqScalingData.lock = false;
 
 	// GPS handling
 	if(!gpsNominal) {
+#ifndef NDEBUG
+		if(simulateGps)
+#endif
 		gpsSetup_A();
 		if(gpsNominal) {
 			sendDaqStatus = true;
@@ -311,6 +383,9 @@ void checkStatus_A() {
 
 	// BMP Handling
 	if(!bmpNominal) {
+#ifndef NDEBUG
+		if(simulateGps)
+#endif
 		bmpSetup_A();
 		if(bmpNominal) {
 			sendDaqStatus = true;
@@ -319,6 +394,9 @@ void checkStatus_A() {
 
 	// IMU Handling
 	if(!imuNominal) {
+#ifndef NDEBUG
+		if(simulateImu)
+#endif
 		imuSetup_A();
 		if(imuNominal) {
 			sendDaqStatus = true;
@@ -327,6 +405,9 @@ void checkStatus_A() {
 
 	// ALA Handling
 	if(!alaNominal) {
+#ifndef NDEBUG
+		if(simulateAla)
+#endif
 		alaSetup_A();
 		if(alaNominal) {
 			sendDaqStatus = true;
@@ -338,9 +419,12 @@ void checkStatus_A() {
 		sendUpdate_A();
 	}
 }
+
+
 /**
  * @brief Send Update
  * Updates the daqStatusData interface struct.
+ * Is called by the function checkStatus_A().
  *
  * @param None
  * @retval None
@@ -354,7 +438,7 @@ void sendUpdate_A() {
 	}
 	g_daqStatusData.lock = true;
 	g_daqStatusData.timeStamp = getTimeStamp();
-	g_daqStatusData.daqScaling = daqScaling;
+	g_daqStatusData.daqScalingEnabled = daqScalingEnabled;
 	g_daqStatusData.gpsNominal = gpsNominal;
 	g_daqStatusData.bmpNominal = bmpNominal;
 	g_daqStatusData.imuNominal = imuNominal;

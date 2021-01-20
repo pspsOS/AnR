@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "common.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -129,8 +129,12 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 #define NDEBUG
 
-// Task Delays
+// Acquisition Multiplier Settings
+#define GPS_FREQ (1)        //   1 Hz
+#define BMP_MULTIPLIER (10) //  10 Hz
+#define IMU_MULTIPLIER (10) // 100 Hz
 
+// Task Rates
 #define ACQUISITION_TASK_RATE0  (GPS_FREQ)
 #define ACQUISITION_TASK_RATE1  (GPS_FREQ * BMP_MULTIPLIER)
 #define ACQUISITION_TASK_RATE2  (GPS_FREQ * BMP_MULTIPLIER * IMU_MULTIPLIER)
@@ -138,7 +142,7 @@ void Error_Handler(void);
 #define MONITORING_TASK_RATE    (1)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
 #define PROCESSING_TASK_RATE    (125) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
 
-
+// Task Delays are calculated from above rates (DO NOT EDIT)
 #define ACQUISITION_TASK_DELAY0  (1000 / ACQUISITION_TASK_RATE0 / portTICK_RATE_MS)
 #define ACQUISITION_TASK_DELAY1  (1000 / ACQUISITION_TASK_RATE1 / portTICK_RATE_MS)
 #define ACQUISITION_TASK_DELAY2  (1000 / ACQUISITION_TASK_RATE2 / portTICK_RATE_MS)

@@ -122,7 +122,7 @@ bool getIMUData_P() {
 	accZ = g_imuData.alaZ;
 
 	if (accZ == 0) {
-		accZ = g_imuData.accel_zout / ACCEL_SENSITIVITY;
+		accZ = g_imuData.accel_zout / ACCEL_SENSITIVITY; // Set to imu z acceleration if error with analog sensor
 	}
 
 	accX_imu = g_imuData.accel_xout / ACCEL_SENSITIVITY;

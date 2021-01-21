@@ -35,6 +35,8 @@ ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 imuCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
 
+ui8 delayVal = 0;
+
 // Used for parsing NMEA data
 ui8 _nmeaAddrStart;
 ui8 _nmeaAddrEnd;
@@ -100,7 +102,7 @@ void setup_A() {
  * @date 01/19/2021
  */
 ui8 loop_A() {
-	ui8 delayVal = 0;
+
 
 
 	if(daqScalingEnabled) {
@@ -137,9 +139,9 @@ ui8 loop_A() {
 
 
 	} else {
-		if(gpsNominal) gpsRead_A();
-		if(bmpNominal) bmpRead_A();
 		if(imuNominal || alaNominal) imuRead_A();
+		if(bmpNominal) bmpRead_A();
+		if(gpsNominal) gpsRead_A();
 		delayVal = 0;
 	}
 
@@ -265,12 +267,13 @@ void gpsRead_A() {
 	//	Type = GPGGA
 	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
 		print("GGA\n");
-
+		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
 	}
 	//	Type = GPRMC
 	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
 		//puts("RMC");
 		print("RMC\n");
+		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
 	}
 
 	//	Catch Bad Read
@@ -282,7 +285,7 @@ void gpsRead_A() {
 
 	g_gpsData.timeStamp = getTimeStamp();
 
-	strncpy((char*)g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
+
 */
 //	return;
 }

@@ -106,7 +106,8 @@ typedef struct daqScalingData {
 
 typedef struct gpsData {
 	ui32 timeStamp;
-	char NMEA[MAX_NMEA];
+	char nmeaGGA[MAX_NMEA];
+	char nmeaRMC[MAX_NMEA];
 	ui8 fix;
 	float alt;
 	float speed;

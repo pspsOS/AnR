@@ -8,20 +8,13 @@
 #include <debugSettings.h>
 #include <unistd.h>
 
-// Local String Definitions
-#define _GPS "GPS"
-#define _BMP "BMP"
-#define _IMU "IMU"
-#define _ALA "ALA"
 
-#define _TRUE "TRUE"
-#define _FALSE "FALSE"
 
 
 // General Settings
 bool notifyGeneralSettings = true;
 
-bool notifyWhenDisabled = true;
+bool notifyWhenDisabled = false;
 bool notifyWhenReadAborted = false;
 bool assertFileNames = true;
 
@@ -29,10 +22,10 @@ bool assertFileNames = true;
 bool simulateGps = true;
 char gpsFileName[] = "TestData/gpsTestData.txt";
 
-bool simulateBmp = false;
+bool simulateBmp = true;
 char bmpFileName[] = "TestData/bmpTestData.txt";
 
-bool simulateImu = false;
+bool simulateImu = true;
 char imuFileName[] = "TestData/imuTestData.txt";
 
 bool simulateAla = false;

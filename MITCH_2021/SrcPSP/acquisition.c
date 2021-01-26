@@ -402,6 +402,8 @@ void gpsRead_A() {
 
 
 				//relock
+				while(g_gpsData.lock)
+						retryTakeDelay(DEFAULT_TAKE_DELAY);
 				g_gpsData.lock = true;
 
 				_addNmeaData();

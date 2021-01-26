@@ -34,6 +34,9 @@ void updateLeds_A();
 // Private
 void _splitNmea();
 void _findNmeaAddr(int addr);
+void _loadGpsData();
+int _getNmeaType();
+void _addNmeaData();
 
 // Test functions
 void __setNmea(char *nmea);

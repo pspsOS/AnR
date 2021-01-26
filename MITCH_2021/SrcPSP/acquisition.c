@@ -246,11 +246,10 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-	print("welcome  ");
 
 	// local variables
 	int time; //holds value to compare
-	bool firstFlag; // flag signaling function is beeing called the first time
+	bool firstFlag; // flag signaling function is being called the first time
 
 	firstFlag = false;
 
@@ -315,7 +314,7 @@ void gpsRead_A() {
 			{
 				//never recieved rmc
 				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
-
+				_clearNmea((char*)&g_gpsData.nmeaRMC);
 				g_gpsData.speed = 0.0;
 
 			}
@@ -334,6 +333,9 @@ void gpsRead_A() {
 
 			do
 			{
+					#ifndef NDEBUG
+						g_gpsData.hasUpdate = false; // Breaks infinite loop if run in testbed
+					#endif
 				retryTakeDelay(ACQUISITION_TASK_DELAY2 / 4);
 			} while(g_gpsData.hasUpdate || g_gpsData.lock);
 
@@ -388,7 +390,7 @@ void gpsRead_A() {
 	    } else {
 
 			//timestamps are different
-			print("now here");
+
 			//unlocking
 				g_gpsData.hasUpdate = true; // This sets hasUpdate = true
 				g_gpsData.lock = false;

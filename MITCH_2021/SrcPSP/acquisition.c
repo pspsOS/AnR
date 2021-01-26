@@ -246,7 +246,8 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-	print("welcome");
+	print("welcome  ");
+
 	// local variables
 	int time; //holds value to compare
 	bool firstFlag; // flag signaling function is beeing called the first time
@@ -261,13 +262,13 @@ void gpsRead_A() {
 
 	//lock structure
 	while(g_gpsData.lock)
-				retryTakeDelay(DEFAULT_TAKE_DELAY);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	g_gpsData.lock = true;
 
 
 
 	// first time loading in
-	if((!strcmp(g_gpsData.nmeaGGA, "") && !strcmp(g_gpsData.nmeaRMC, "")))
+	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
 	{
 		_addNmeaData();
 
@@ -280,7 +281,7 @@ void gpsRead_A() {
 	}
 
 	//if no unsent data
-	if((strcmp(g_gpsData.nmeaGGA, "") && strcmp(g_gpsData.nmeaRMC, "")) && !firstFlag)
+	if((strcmp((char*)g_gpsData.nmeaGGA, "") && strcmp((char*)g_gpsData.nmeaRMC, "")) && !firstFlag)
 	{
 		_addNmeaData();
 		//load next packet
@@ -313,14 +314,16 @@ void gpsRead_A() {
 			if(!_getNmeaType())
 			{
 				//never recieved rmc
-				strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+
 				g_gpsData.speed = 0.0;
 
 			}
 			else
 			{
 				//never recieved gga
-				strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaGGA);
 				g_gpsData.alt = 0.0;
 			}
 
@@ -345,14 +348,16 @@ void gpsRead_A() {
 			{
 
 				//never recieved gga
-				strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaGGA);
 				g_gpsData.alt = 0.0;
 
 			}
 			else
 			{
 				//never recieved rmc
-				strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaRMC);
 				g_gpsData.speed = 0.0;
 
 			}
@@ -363,17 +368,14 @@ void gpsRead_A() {
 
 
 		}
-	}else
-	{
-
+	} else {
 
 		// unsent data in struct
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		if(time == g_gpsData.timeStamp )
-		{
+		if(time == g_gpsData.timeStamp ) {
 			// if time stamps are equal
 			_addNmeaData();
 
@@ -383,19 +385,21 @@ void gpsRead_A() {
 			g_gpsData.lock = false;
 
 
-	    }
-		else
-		{
+	    } else {
+
 			//timestamps are different
 			print("now here");
 			//unlocking
-				g_gpsData.hasUpdate = true;
+				g_gpsData.hasUpdate = true; // This sets hasUpdate = true
 				g_gpsData.lock = false;
 
-				do
-				{
-					retryTakeDelay(ACQUISITION_TASK_DELAY2 / 4);
-				} while(g_gpsData.hasUpdate || g_gpsData.lock);
+				do {
+					retryTakeDelay(ACQUISITION_TASK_DELAY2);
+					#ifndef NDEBUG
+						g_gpsData.hasUpdate = false; // Breaks infinite loop if run in testbed
+					#endif
+				} while(g_gpsData.hasUpdate || g_gpsData.lock); // Only breaks if hasUpdate = false
+
 
 				//relock
 				g_gpsData.lock = true;
@@ -408,14 +412,16 @@ void gpsRead_A() {
 				{
 
 					//never recieved gga
-					strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+					//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+					_clearNmea((char*)&g_gpsData.nmeaGGA);
 					g_gpsData.alt = 0.0;
 
 				}
 				else
 				{
 					//never recieved rmc
-					strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+					//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+					_clearNmea((char*)&g_gpsData.nmeaRMC);
 					g_gpsData.speed = 0.0;
 
 				}
@@ -814,6 +820,11 @@ void _findNmeaAddr(int addr) {
             _nmeaAddrStart = i+1;
         }
     }
+}
+
+void _clearNmea(char *nmea) {
+	for(int i = 0; i < MAX_NMEA; i++)
+		nmea[i] = 0;
 }
 
 // Test Functions

@@ -246,6 +246,7 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
+	//print("GPS READ CALLED\n");
 
 	// local variables
 	int time; //holds value to compare
@@ -269,6 +270,7 @@ void gpsRead_A() {
 	// first time loading in
 	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
 	{
+		//print("first time loading in\n");
 		_addNmeaData();
 
 		//load next packet
@@ -282,6 +284,7 @@ void gpsRead_A() {
 	//if no unsent data
 	if((strcmp((char*)g_gpsData.nmeaGGA, "") && strcmp((char*)g_gpsData.nmeaRMC, "")) && !firstFlag)
 	{
+		//print("both of the last packets were recieved\n");
 		_addNmeaData();
 		//load next packet
 		_loadGpsData();
@@ -293,6 +296,7 @@ void gpsRead_A() {
 
 		if(time == g_gpsData.timeStamp )
 		{
+			//print("both of the new are recieved together\n");
 
 			// if time stamps are equal
 			_addNmeaData();
@@ -306,11 +310,12 @@ void gpsRead_A() {
 		}
 		else
 		{
+			//print("next packet doesn't match recieved packet\n");
 
 			// time stamps are different
 
 			// setting unreciveced data to zero
-			if(!_getNmeaType())
+			if((strcmp((char*)g_gpsData.nmeaGGA, "")))
 			{
 				//never recieved rmc
 				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
@@ -371,13 +376,14 @@ void gpsRead_A() {
 
 		}
 	} else {
-
+		//print("last packet didn't match\n");
 		// unsent data in struct
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
 		if(time == g_gpsData.timeStamp ) {
+			print("next one did tho\n");
 			// if time stamps are equal
 			_addNmeaData();
 
@@ -388,7 +394,7 @@ void gpsRead_A() {
 
 
 	    } else {
-
+	    	//print("next one didnt either\n");
 			//timestamps are different
 
 			//unlocking
@@ -415,18 +421,22 @@ void gpsRead_A() {
 				if(!_getNmeaType())
 				{
 
-					//never recieved gga
-					//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
-					_clearNmea((char*)&g_gpsData.nmeaGGA);
-					g_gpsData.alt = 0.0;
-
-				}
-				else
-				{
+					//print("erased rmc\n");
 					//never recieved rmc
 					//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
 					_clearNmea((char*)&g_gpsData.nmeaRMC);
 					g_gpsData.speed = 0.0;
+
+				}
+				else
+				{
+
+					//print("erased gga\n");
+
+					//never recieved gga
+					//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+					_clearNmea((char*)&g_gpsData.nmeaGGA);
+					g_gpsData.alt = 0.0;
 
 				}
 

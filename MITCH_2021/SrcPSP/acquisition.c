@@ -398,7 +398,7 @@ void gpsRead_A() {
 					#ifndef NDEBUG
 						g_gpsData.hasUpdate = false; // Breaks infinite loop if run in testbed
 					#endif
-				} while(g_gpsData.hasUpdate || g_gpsData.lock); // Only breaks if hasUpdate = false
+				} while(g_gpsData.hasUpdate || g_gpsData.lock); // Only breaks if hasUpdate = false or locked
 
 
 				//relock

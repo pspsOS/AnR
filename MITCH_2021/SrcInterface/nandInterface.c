@@ -17,7 +17,7 @@
  */
 
 void nandBufferLoad(int32_t rowAddr){
-#if (NAND_CS_Pin != FAKE_GPIO)
+#if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
@@ -46,7 +46,7 @@ void nandBufferLoad(int32_t rowAddr){
 #endif
 }
 void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
-#if (NAND_CS_Pin != FAKE_GPIO)
+#if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[3];       // Command sent to device
 
@@ -54,7 +54,7 @@ void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
 	cmd[0] = R_BUFFER;
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
-	if (recieveSPI(&cmd[0], 3, (uint8_t*) data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
+	if (recieveSPI(&cmd[0], 3, (uint8_t*) data, size, CS3_GPIO_Port, CS3_Pin, STORAGE_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;

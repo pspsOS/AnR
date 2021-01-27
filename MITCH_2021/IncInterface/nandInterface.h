@@ -3,7 +3,7 @@
 
 //Includes
 #include "genericInterface.h"
-
+#include "../IncPSP/gpio.h"
 //Command Defines
 #define R_CELL_ARRAY 	0x13
 #define R_BUFFER 		0x03
@@ -22,8 +22,8 @@
 #define MAX_COLUMN		4224
 
 //GPIO Defines
-#define NAND_CS_GPIO_Port CS3_GPIO_Port
-#define NAND_CS_Pin CS3_Pin
+
+
 
 //Prototypes
 

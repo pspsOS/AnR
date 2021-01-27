@@ -3,6 +3,7 @@
 
 //Includes
 #include "main.h"
+#include "../IncPSP/gpio.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_uart.h"
 
@@ -10,7 +11,7 @@
 #include "cmsis_os.h"
 #include <stdbool.h>
 
-#if defined(CS1_Pin) || defined(CS2_Pin) || defined(CS3_Pin)
+#if CS1_PIN != FAKE_PIN || CS2_PIN != FAKE_PIN || CS3_PIN != FAKE_PIN
 	#include "stm32f4xx_hal_spi.h"
 	#define _SPI_CONFIGURED
 #endif

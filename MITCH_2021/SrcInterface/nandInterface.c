@@ -1,6 +1,9 @@
 #include <nandInterface.h>
-#include <common.h>
-
+//#include <common.h>
+#ifndef getBit
+#define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
+#define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
+#endif
 /**
  * @brief Load data into the buffer from the cell array
  *
@@ -14,6 +17,7 @@
  */
 
 void nandBufferLoad(int32_t rowAddr){
+#if (NAND_CS_Pin != FAKE_GPIO)
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
@@ -39,9 +43,10 @@ void nandBufferLoad(int32_t rowAddr){
 		}
 		oip = getBit(feature, 0);
 	}while(oip);
-
+#endif
 }
 void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
+#if (NAND_CS_Pin != FAKE_GPIO)
 	// Variables
 	uint8_t cmd[3];       // Command sent to device
 
@@ -49,11 +54,12 @@ void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
 	cmd[0] = R_BUFFER;
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
-	if (recieveSPI(&cmd[0], 3, data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
+	if (recieveSPI(&cmd[0], 3, (uint8_t*) data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
 	}
+#endif
 }
 
 //void nandBufferWrite(int16_t colAddr, int8_t data[], int8_t size); //Loads data from the data array to the buffer

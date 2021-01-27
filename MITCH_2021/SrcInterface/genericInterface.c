@@ -7,7 +7,7 @@
 #include "genericInterface.h"
 
 
-
+#ifdef _SPI_CONFIGURED
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus)
 {
 	HAL_StatusTypeDef state;
@@ -29,7 +29,7 @@ HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int data
 
 	return state;
 }
-
+#endif
 void handleHalError(uint8_t SENSOR)
 {
 	//Basically just to let us know that we ran into an issue during transmission

@@ -150,6 +150,12 @@ void Error_Handler(void);
 #define MONITORING_TASK_DELAY    (1000 / MONITORING_TASK_RATE / portTICK_RATE_MS)
 #define PROCESSING_TASK_DELAY    (1000 / PROCESSING_TASK_RATE / portTICK_RATE_MS)
 
+
+#define ENABLE_CONTROL_LOGIC (1)
+#define ENABLE_ACQUISITION (1)
+#define ENABLE_MONITORING (1)
+#define ENABLE_PROCESSING (1)
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

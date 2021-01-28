@@ -39,6 +39,8 @@ int _getNmeaType();
 void _addNmeaData();
 void _clearNmea(char*);
 // Test functions
+void __printGpsData();
+
 void __setNmea(char *nmea);
 void __printNmea();
 

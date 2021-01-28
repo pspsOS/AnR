@@ -24,6 +24,7 @@
 
 /* Local variable declarations */
 char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
+char unsplitGpsNmea[MAX_NMEA]; // Buffer that holds GPS String and is not split
 bool daqScalingEnabled; // Enables/Disables DAQ Scaling
 ui8 daqScaler;          // DAQ Scaling number � Sets the ratio
 bool gpsNominal;        // Indicates whether the GPS is nominal
@@ -260,9 +261,7 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-	printf("GPS Read\r\n");
-	return;
-	//printf("GPS READ CALLED\n");
+
 
 	// local variables
 	int time; //holds value to compare
@@ -273,7 +272,11 @@ void gpsRead_A() {
 
 	// loads in data
 	_loadGpsData();
+	strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
 	_splitNmea();
+
+
+
 
 
 	//lock structure
@@ -286,11 +289,12 @@ void gpsRead_A() {
 	// first time loading in
 	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
 	{
-		//printf("first time loading in\n");
+
 		_addNmeaData();
 
 		//load next packet
 		_loadGpsData();
+		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
 		_splitNmea();
 
 		firstFlag = true;
@@ -300,10 +304,12 @@ void gpsRead_A() {
 	//if no unsent data
 	if((strcmp((char*)g_gpsData.nmeaGGA, "") && strcmp((char*)g_gpsData.nmeaRMC, "")) && !firstFlag)
 	{
-		//printf("both of the last packets were recieved\n");
+
+
 		_addNmeaData();
 		//load next packet
 		_loadGpsData();
+		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
 		_splitNmea();
 
 		time = 0;
@@ -312,7 +318,6 @@ void gpsRead_A() {
 
 		if(time == g_gpsData.timeStamp )
 		{
-			//printf("both of the new are recieved together\n");
 
 			// if time stamps are equal
 			_addNmeaData();
@@ -322,11 +327,11 @@ void gpsRead_A() {
 			//unlocking
 			g_gpsData.lock = false;
 
+			__printGpsData();
 
 		}
 		else
 		{
-			//printf("next packet doesn't match recieved packet\n");
 
 			// time stamps are different
 
@@ -345,13 +350,15 @@ void gpsRead_A() {
 				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
 				_clearNmea((char*)&g_gpsData.nmeaGGA);
 				g_gpsData.alt = 0.0;
+				g_gpsData.fix = 0;
+
 			}
 
 
 			//unlocking
 			g_gpsData.hasUpdate = true;
 			g_gpsData.lock = false;
-
+			__printGpsData();
 			do
 			{
 					#ifndef NDEBUG
@@ -361,6 +368,8 @@ void gpsRead_A() {
 			} while(g_gpsData.hasUpdate || g_gpsData.lock);
 
 			//relock
+			while(g_gpsData.lock)
+				retryTakeDelay(DEFAULT_TAKE_DELAY);
 			g_gpsData.lock = true;
 
 			_addNmeaData();
@@ -374,6 +383,7 @@ void gpsRead_A() {
 				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
 				_clearNmea((char*)&g_gpsData.nmeaGGA);
 				g_gpsData.alt = 0.0;
+				g_gpsData.fix = 0;
 
 			}
 			else
@@ -392,14 +402,14 @@ void gpsRead_A() {
 
 		}
 	} else {
-		//printf("last packet didn't match\n");
+
 		// unsent data in struct
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
 		if(time == g_gpsData.timeStamp ) {
-			printf("next one did tho\n");
+
 			// if time stamps are equal
 			_addNmeaData();
 
@@ -407,16 +417,17 @@ void gpsRead_A() {
 
 			//unlocking
 			g_gpsData.lock = false;
+			__printGpsData();
 
 
 	    } else {
-	    	//printf("next one didnt either\n");
+
 			//timestamps are different
 
 			//unlocking
 				g_gpsData.hasUpdate = true; // This sets hasUpdate = true
 				g_gpsData.lock = false;
-
+				__printGpsData();
 				do {
 					retryTakeDelay(ACQUISITION_TASK_DELAY2);
 					#ifndef NDEBUG
@@ -437,7 +448,6 @@ void gpsRead_A() {
 				if(!_getNmeaType())
 				{
 
-					//printf("erased rmc\n");
 					//never recieved rmc
 					//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
 					_clearNmea((char*)&g_gpsData.nmeaRMC);
@@ -447,12 +457,11 @@ void gpsRead_A() {
 				else
 				{
 
-					//printf("erased gga\n");
-
 					//never recieved gga
 					//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
 					_clearNmea((char*)&g_gpsData.nmeaGGA);
 					g_gpsData.alt = 0.0;
+					g_gpsData.fix = 0;
 
 				}
 
@@ -714,13 +723,13 @@ void _addNmeaData()
 	int time; //holds value until copied into struct
 	float altitude;  //holds value until copied into struct
 	float speed; //holds value until copied into struct
+	int fix; //holds value until copied into struct
 
 	if(!_getNmeaType())
 			{
-		//Type GCA
-
+		//Type GGA
 		//adds GCA to struct
-		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
+		strncpy((char*)g_gpsData.nmeaGGA, unsplitGpsNmea, strlen(unsplitGpsNmea));
 
 		//adds time to stuct
 		time = 0;
@@ -733,15 +742,21 @@ void _addNmeaData()
 
 		//adds altitude to struct
 		altitude = 0;
-		_findNmeaAddr(7);
+		_findNmeaAddr(9);
 		altitude = atof(&gpsNmea[_nmeaAddrStart]);
 		g_gpsData.alt = altitude;
+
+		//adds fix to struct
+		fix = 0;
+		_findNmeaAddr(6);
+		fix = atof(&gpsNmea[_nmeaAddrStart]);
+		g_gpsData.fix = fix;
 
 	}
 	else
 	{
 		//Type RMC
-		strncpy((char*)g_gpsData.nmeaRMC, gpsNmea, strlen(gpsNmea));
+		strncpy((char*)g_gpsData.nmeaRMC, unsplitGpsNmea, strlen(unsplitGpsNmea));
 
 		//adds time to stuct
 		time = 0;
@@ -868,6 +883,26 @@ void _clearNmea(char *nmea) {
 }
 
 // Test Functions
+
+
+/**
+ * @brief Prints Gps Data
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jack Wiley
+ * @date 1/26/2020
+ */
+void __printGpsData()
+{
+	printf("Time: %d\n",g_gpsData.timeStamp);
+	//prints("GGA: %s\n",g_gpsData.nmeaGGA);
+	//prints("RMC: %s\n",g_gpsData.nmeaRMC);
+	printf("Fix: %d\n",g_gpsData.fix);
+	printf("Alt: %f\n",g_gpsData.alt)	;
+	printf("Speed: %f\n",g_gpsData.speed);
+}
 
 /**
  * @brief Set Local NMEA String

@@ -116,6 +116,7 @@ ui8 loop_A() {
 
 			if(bmpCounter == 0) {
 				if(gpsNominal) gpsRead_A();
+				else printf("GPS Skip\r\n");
 			}
 		}
 

@@ -228,5 +228,8 @@ float calcAvgAlt();
 
 void _test();
 
+#ifdef LD2_Pin
+void toggleLed();
+#endif
 
 #endif /* COMMON_H_ */

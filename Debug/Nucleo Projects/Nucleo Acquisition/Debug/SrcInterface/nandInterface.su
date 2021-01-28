@@ -1,0 +1,3 @@
+nandInterface.c:19:6:nandBufferLoad	16	static
+nandInterface.c:48:6:nandBufferRead	16	static
+nandInterface.c:68:6:nandRead	24	static

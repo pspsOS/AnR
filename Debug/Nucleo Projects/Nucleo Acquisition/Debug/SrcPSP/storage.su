@@ -1,0 +1,2 @@
+storage.c:18:6:storageSetup	4	static
+storage.c:31:6:storageWrite	4	static

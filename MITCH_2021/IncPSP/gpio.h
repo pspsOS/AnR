@@ -11,7 +11,7 @@
 // GPIO Setup
 #ifdef NDEBUG
 // GPIO Simulation Constants
-	#define FAKE_GPIO (-1)
+	#define FAKE_GPIO ((uint16_t)-1)
 
 	#ifndef SENSE_A_Pin
 		#define SENSE_A_Pin (FAKE_GPIO)

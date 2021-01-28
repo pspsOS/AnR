@@ -65,12 +65,12 @@ ui8 _nmeaAddrEnd;
 void setup_A() {
 
 	// Initialize local variables
-	daqScalingEnabled = false;
+	daqScalingEnabled = true;
 	daqScaler = DEFAULT_DAQ_SCALER;
-	gpsNominal = false;
-	bmpNominal = false;
-	imuNominal = false;
-	alaNominal = false;
+	gpsNominal = true;
+	bmpNominal = true;
+	imuNominal = true;
+	alaNominal = true;
 	sendDaqStatus = false;
 	bmpCounter = 0;
 	imuCounter = 0;
@@ -88,6 +88,7 @@ void setup_A() {
 
 	// Send update
 	sendUpdate_A();
+	updateLeds_A();
 }
 
 
@@ -107,11 +108,11 @@ ui8 loop_A() {
 
 	if(daqScalingEnabled) {
 		if(imuNominal || alaNominal) imuRead_A();
-		else printf("--------IMU Skip %d\n", imuCounter);
+		else printf("########IMU Skip %d\r\n", imuCounter);
 
 		if(imuCounter == 0) {
 			if(bmpNominal) bmpRead_A();
-			else printf("----BMP Skip %d\n", bmpCounter);
+			else printf("####BMP Skip %d\r\n", bmpCounter);
 
 			if(bmpCounter == 0) {
 				if(gpsNominal) gpsRead_A();
@@ -166,6 +167,9 @@ void gpsSetup_A() {
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
+		#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition GPS Setup: %s\r\n", gpsNominal ? "True" : "False");
+		#endif
 	#endif
 }
 
@@ -186,6 +190,9 @@ void bmpSetup_A() {
 		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
 		barometerInit(&bmpNominal);
+#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition BMP Setup: %s\r\n", bmpNominal ? "True" : "False");
+		#endif
 	#endif
 }
 
@@ -206,6 +213,9 @@ void imuSetup_A() {
 		_imuFile = setupSensorFile_DS(IMU, &imuNominal);
 	#else
 		// TODO: Implement imuSetup
+#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition IMU Setup: %s\r\n", imuNominal ? "True" : "False");
+		#endif
 	#endif
 }
 
@@ -226,6 +236,9 @@ void alaSetup_A() {
 		_alaFile = setupSensorFile_DS(ALA, &alaNominal);
 	#else
 		// TODO: Implement alaSetup
+#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition ALA Setup: %s\r\n", alaNominal ? "True" : "False");
+		#endif
 	#endif
 }
 
@@ -246,6 +259,8 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
+	printf("GPS Read\r\n");
+	return;
 	//printf("GPS READ CALLED\n");
 
 	// local variables
@@ -497,10 +512,12 @@ void gpsRead_A() {
  * @date 12/23/2020
  */
 void bmpRead_A() {
+	printf("    BMP Read %d\r\n", bmpCounter);
+	return;
 	i32 temperature = 0;
 	i32 pressure = 0;
 	#ifndef NDEBUG
-		printf("    BMP Read %d\n", bmpCounter);
+
 		// TODO: Implement BMP Simulation
 	#else
 		barometerRead(&temperature, &pressure);
@@ -535,8 +552,9 @@ void bmpRead_A() {
  * @date 12/23/2020
  */
 void imuRead_A() {
+	printf("        IMU Read %d\r\n", imuCounter);
 	#ifndef NDEBUG
-		printf("        IMU Read %d\n", imuCounter);
+
 		// TODO: Implement IMU Simulation
 	#else
 		// TODO: Implement imuRead in hardware
@@ -614,6 +632,7 @@ void checkStatus_A() {
 	// Send update if needed
 	if(sendDaqStatus) {
 		sendUpdate_A();
+		updateLeds_A();
 	}
 }
 
@@ -643,7 +662,9 @@ void sendUpdate_A() {
 	g_daqStatusData.hasUpdate = true;
 	g_daqStatusData.lock = false;
 
-	updateLeds_A();
+	#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition DAQ Status Data sent\r\n");
+	#endif
 }
 
 
@@ -655,18 +676,22 @@ void sendUpdate_A() {
  */
 void updateLeds_A() {
 #ifdef NDEBUG
-	PSP_GPIO_WritePin(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin, imuNominal);
-	PSP_GPIO_WritePin(U2S_CHECK_GPIO_Port, U2S_CHECK_Pin, alaNominal);
-	PSP_GPIO_WritePin(U3S_CHECK_GPIO_Port, U3S_CHECK_Pin, bmpNominal);
-	PSP_GPIO_WritePin(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin, gpsNominal);
+	PSP_GPIO_WritePin(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin, imuNominal, "U1S_CHECK");
+	PSP_GPIO_WritePin(U2S_CHECK_GPIO_Port, U2S_CHECK_Pin, alaNominal, "U2S_CHECK");
+	PSP_GPIO_WritePin(U3S_CHECK_GPIO_Port, U3S_CHECK_Pin, bmpNominal, "U3S_CHECK");
+	PSP_GPIO_WritePin(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin, gpsNominal, "U4S_CHECK");
+
 
 	if(gpsNominal && bmpNominal && imuNominal && alaNominal) {
-		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_SET);
-		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_RESET);
+		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_SET, "SENSOR_NOMINAL");
+		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_RESET, "SENSOR_ERROR");
 	} else {
-		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET);
-		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET);
+		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET, "SENSOR_NOMINAL");
+		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET, "SENSOR_ERROR");
 	}
+	#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition LEDs Updated\r\n");
+	#endif
 #endif
 }
 

@@ -207,7 +207,7 @@ void retryTakeDelay(int );
 
 #ifdef NDEBUG
 GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name);
 #endif
 
 altitudeNode_t *createAltitudeList(ui8 );

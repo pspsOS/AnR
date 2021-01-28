@@ -229,11 +229,13 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
 	if(GPIO_Pin != FAKE_GPIO) HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);
 }
 
+
+#ifdef LD2_Pin
 void toggleLed() {
 	static int j = 1;
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, j);
 	j = !j;
 }
-
+#endif
 
 #endif

@@ -229,25 +229,11 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
 	if(GPIO_Pin != FAKE_GPIO) HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);
 }
 
-
-#ifdef PRINT_TO_UART
 void toggleLed() {
 	static int j = 1;
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, j);
 	j = !j;
 }
 
-void _test() {
 
-	printf("ddd");
-	return;
-
-
-	uint8_t buf[100];
-	strcpy((char*)buf, "Hello\r\n");
-	HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
-
-}
-
-#endif
 #endif

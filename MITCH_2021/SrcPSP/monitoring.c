@@ -72,7 +72,7 @@ void loop_M() {
 	#ifndef NDEBUG
 		if(!simulateMonitoring) {
 			if(notifyWhenReadAborted)
-				print("Monitoring read aborted.\n");
+				printf("Monitoring read aborted.\n");
 			return;
 		}
 		fscanf(_monitoringFile, "%f", &batteryVoltage);

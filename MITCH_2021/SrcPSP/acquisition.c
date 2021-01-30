@@ -261,8 +261,8 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-	printf("GPS Read \r\n");
-	return;
+	//printf("GPS Read \r\n");
+	//return;
 
 	// local variables
 	int time; //holds value to compare

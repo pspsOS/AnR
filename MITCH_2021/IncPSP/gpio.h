@@ -8,6 +8,13 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
+
+
+#ifdef LD2_Pin
+void toggleLed();
+#endif
+
+
 // GPIO Setup
 #ifdef NDEBUG
 // GPIO Simulation Constants

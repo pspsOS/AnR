@@ -100,12 +100,12 @@ void Error_Handler(void);
 #define ENABLE_CONTROL_LOGIC (1)
 #define ENABLE_ACQUISITION (1)
 #define ENABLE_MONITORING (0)
-#define ENABLE_PROCESSING (1)
+#define ENABLE_PROCESSING (0)
 
 
 // #define SUPRESS_TASK_UPDATES
 // #define SUPRESS_SETUP_WARNING
- #define SUPRESS_ALL
+// #define SUPRESS_ALL
 
 /* USER CODE END Private defines */
 

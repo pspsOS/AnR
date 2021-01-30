@@ -14,10 +14,6 @@
 	#include <unistd.h>
 #endif
 
-// Acquisition Finite States
-#define ACQUIRE_IMU_BMP_GPS (0)
-#define ACQUIRE_IMU_BMP (1)
-#define ACQUIRE_IMU (2)
 
 /* Global variable declarations */
 
@@ -169,9 +165,7 @@ void gpsSetup_A() {
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
-		#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
-		printf("    Task Update: Acquisition GPS Setup: %s\r\n", gpsNominal ? "True" : "False");
-		#endif
+		notify(TASK_UPDATE, GPS);
 	#endif
 }
 
@@ -192,9 +186,7 @@ void bmpSetup_A() {
 		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
 		barometerInit(&bmpNominal);
-#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
-		printf("    Task Update: Acquisition BMP Setup: %s\r\n", bmpNominal ? "True" : "False");
-		#endif
+		notify(TASK_UPDATE, BMP);
 	#endif
 }
 
@@ -215,9 +207,7 @@ void imuSetup_A() {
 		_imuFile = setupSensorFile_DS(IMU, &imuNominal);
 	#else
 		// TODO: Implement imuSetup
-#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
-		printf("    Task Update: Acquisition IMU Setup: %s\r\n", imuNominal ? "True" : "False");
-		#endif
+		notify(TASK_UPDATE, IMU);
 	#endif
 }
 
@@ -238,9 +228,7 @@ void alaSetup_A() {
 		_alaFile = setupSensorFile_DS(ALA, &alaNominal);
 	#else
 		// TODO: Implement alaSetup
-#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
-		printf("    Task Update: Acquisition ALA Setup: %s\r\n", alaNominal ? "True" : "False");
-		#endif
+		notify(TASK_UPDATE, ALA);
 	#endif
 }
 

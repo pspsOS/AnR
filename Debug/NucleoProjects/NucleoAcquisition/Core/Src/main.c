@@ -294,7 +294,8 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-bool printDiv = true;
+//bool printDiv = true;
+bool printDiv = false;
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_startControlLogic */
@@ -316,7 +317,7 @@ void startControlLogic(void const * argument)
 
 		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
 	}
-
+	vTaskDelete(NULL);
   /* USER CODE END 5 */
 }
 
@@ -349,7 +350,7 @@ void startAcquisition(void const * argument)
 		if(time_init > 4000) break;
 	}
 	//printf("%d\n\r",time_init);
-	printDiv = false;
+	if(ENABLE_ACQUISITION) printDiv = false;
 	vTaskDelete(NULL);
 
   /* USER CODE END startAcquisition */

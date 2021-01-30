@@ -219,17 +219,81 @@ void retryTakeDelay(int length) {
 #endif
 }
 
-#ifdef NDEBUG
 
 
+void notify(Message_ID message, Device_ID device) {
+#ifdef SUPRESS_ALL
+	return;
+#endif
+#ifdef SUPRESS_TASK_UPDATES
+	if(message == TASK_UPDATE) return;
+#endif
+#ifdef SUPRESS_SETUP_WARNING
+	if(message == SETUP_WARNING) return;
+#endif
 
-#ifdef LD2_Pin
-void toggleLed() {
-	static int j = 1;
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, j);
-	j = !j;
-	HAL_GPIO_WritePin(SENSE_A_GPIO_Port, SENSE_A_Pin, j);
+	extern bool imuNominal;
+	extern bool alaNominal;
+	extern bool bmpNominal;
+	extern bool gpsNominal;
+	extern bool nandNominal;
+
+	switch(message) {
+	case TASK_UPDATE:
+		printf("    Task Update: ");
+		break;
+	case SETUP_WARNING:
+		printf("! Setup Warning: ");
+		break;
+	}
+
+	switch(device) {
+	case SYSTEM:
+		printf("System: ");
+		break;
+	case GPS:
+		printf("   GPS: ");
+		break;
+	case BMP:
+		printf("   BMP: ");
+		break;
+	case IMU:
+		printf("   IMU: ");
+		break;
+	case ALA:
+		printf("   ALA: ");
+		break;
+	case NAND:
+		printf("  NAND: ");
+		break;
+	}
+
+	switch(message) {
+	case TASK_UPDATE:
+		switch(device) {
+		case GPS:
+			printf("Nominal Status: %s\r\n", gpsNominal ? "True" : "False");
+			break;
+		case BMP:
+			printf("Nominal Status: %s\r\n", bmpNominal ? "True" : "False");
+			break;
+		case IMU:
+			printf("Nominal Status: %s\r\n", imuNominal ? "True" : "False");
+			break;
+		case ALA:
+			printf("Nominal Status: %s\r\n", alaNominal ? "True" : "False");
+			break;
+		case NAND:
+			printf("Nominal Status: %s\r\n", nandNominal ? "True" : "False");
+			break;
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+
+
 }
-#endif
 
-#endif
+

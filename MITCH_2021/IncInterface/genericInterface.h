@@ -10,6 +10,8 @@
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 #include <stdbool.h>
+#include <stdio.h>
+#include "common.h"
 
 #if CS1_PIN != FAKE_PIN || CS2_PIN != FAKE_PIN || CS3_PIN != FAKE_PIN
 	#include "stm32f4xx_hal_spi.h"
@@ -29,11 +31,6 @@
 #define STORAGE_SPI_BUS					&hspi3
 #define ADC_VREF				3.3
 
-// Sensor Defines
-#define GPS 0
-#define BMP 1
-#define IMU 2
-#define ALA 3
 
 
 //Structs
@@ -65,6 +62,13 @@ typedef struct {
 } sensors_t;
 
 sensors_t sensors;
+
+typedef struct ledBank {
+	ui8 state;
+	GPIO_TypeDef* GPIOx;
+	uint16_t GPIO_Pin;
+} ledBank_t;
+
 
 //Prototypes
 #ifdef _SPI_CONFIGURED

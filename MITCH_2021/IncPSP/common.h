@@ -55,6 +55,24 @@
 #define TOUCHDOWN (6)
 #define PROGRAM_END (7)
 
+
+// Sensor Defines
+
+typedef enum {
+	SYSTEM = 0,
+	GPS = 1,
+	BMP = 2,
+	IMU = 3,
+	ALA = 4,
+	NAND = 5,
+
+} Device_ID;
+
+typedef enum {
+	TASK_UPDATE = 0,
+	SETUP_WARNING = 1
+} Message_ID;
+
 // Function returns
 #define SUCCESSFUL_RETURN (0)
 
@@ -225,10 +243,9 @@ int insertNewStaticOrientation(float );
 
 float calcAvgAlt();
 
-void _test();
+void notify(Message_ID message, Device_ID device);
 
-#ifdef LD2_Pin
-void toggleLed();
-#endif
+
+
 
 #endif /* COMMON_H_ */

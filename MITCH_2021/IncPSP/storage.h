@@ -13,5 +13,12 @@
 bool storageSetup();
 void storageWrite();
 
+void storeDaqStatus();
+void storeDaqScaling();
+void storeGpsData();
+void storeBmpData();
+void storeImuData();
+void storeProcessedData();
+void storeMonitoringData();
 
 #endif /* INC_STORAGE_H_ */

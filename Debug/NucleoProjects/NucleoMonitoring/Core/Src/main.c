@@ -276,7 +276,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|SENSE_A_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -284,12 +284,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : LD2_Pin SENSE_A_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin|SENSE_A_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
@@ -366,20 +366,16 @@ void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
   /* Infinite loop */
-	static TickType_t time_init = 0;
 	static GPIO_PinState pressed = GPIO_PIN_SET;
-	extern bool imuNominal;
-	extern bool alaNominal;
-	extern bool bmpNominal;
-	extern bool gpsNominal;
+	static int counter = 0;
+
+	static TickType_t time_init = 0;
   /* Infinite loop */
 	while(ENABLE_PROCESSING) {
 		if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
 			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
-			//gpsNominal = false;
-			//bmpNominal = false;
-			imuNominal = false;
-			alaNominal = false;
+			if(!pressed) printf("PRESSED  %d\r\n", ++counter);
+			else printf("RELEASED %d\r\n", counter);
 		}
 		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
 	}
@@ -397,19 +393,23 @@ void startProcessing(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
-	static GPIO_PinState pressed = GPIO_PIN_SET;
-	static int counter = 0;
 	static TickType_t time_init = 0;
+
+	extern bool continuity[4];
+
+	printf("Monitoring Start\r\n");
+
+	setup_M();
+
+
   /* Infinite loop */
 	while(ENABLE_MONITORING) {
 		//loop_M();
-		if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
-			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
-			if(!pressed) printf("PRESSED  %d\r\n", ++counter);
-			else printf("RELEASED %d\r\n", counter);
-		}
 
-
+		checkContinuity_M();
+		printf("Continuity: ");
+		for(int i = 0; i < 4; i++) printf("%d ", continuity[i]);
+		printf("\r\n");
 		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
 	}
 

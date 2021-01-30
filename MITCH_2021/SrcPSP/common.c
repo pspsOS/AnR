@@ -241,6 +241,7 @@ void toggleLed() {
 	static int j = 1;
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, j);
 	j = !j;
+	HAL_GPIO_WritePin(SENSE_A_GPIO_Port, SENSE_A_Pin, j);
 }
 #endif
 

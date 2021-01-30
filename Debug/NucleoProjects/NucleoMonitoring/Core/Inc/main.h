@@ -66,6 +66,8 @@ void Error_Handler(void);
 #define USART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define SENSE_A_Pin GPIO_PIN_6
+#define SENSE_A_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
@@ -74,10 +76,11 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define NDEBUG
+#define BYPASS_GPS
 
 // Acquisition Multiplier Settings
 #define GPS_FREQ (1)        //   1 Hz
-#define BMP_MULTIPLIER (2) //  10 Hz
+#define BMP_MULTIPLIER (10) //  10 Hz
 #define IMU_MULTIPLIER (10) // 100 Hz
 
 // Task Rates
@@ -98,9 +101,9 @@ void Error_Handler(void);
 
 
 #define ENABLE_CONTROL_LOGIC (1)
-#define ENABLE_ACQUISITION (1)
+#define ENABLE_ACQUISITION (0)
 #define ENABLE_MONITORING (0)
-#define ENABLE_PROCESSING (1)
+#define ENABLE_PROCESSING (0)
 
 
 // #define SUPRESS_TASK_UPDATES

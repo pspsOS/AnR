@@ -261,9 +261,10 @@ void alaSetup_A() {
  * @date 12/23/2020
  */
 void gpsRead_A() {
-	//printf("GPS Read \r\n");
-	//return;
-
+#ifdef BYPASS_GPS
+	printf("GPS Read \r\n");
+	return;
+#endif
 	// local variables
 	int time; //holds value to compare
 	bool firstFlag; // flag signaling function is being called the first time

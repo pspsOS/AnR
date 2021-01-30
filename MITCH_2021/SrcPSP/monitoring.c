@@ -49,10 +49,11 @@ void setup_M() {
 	#else
 		// TODO: Implement Monitoring Setup
 	#endif
-	batteryVoltage = 7.4;
-	for (ui8 i = 0; i < 4; i++) {
-		continuity[i] = true;
-	}
+	batteryVoltage = 0;
+	continuity[0] = false;
+	continuity[1] = false;
+	continuity[2] = false;
+	continuity[3] = false;
 	buttonState = false;
 	hardwareDeploymentDisable = false;
 }
@@ -126,10 +127,10 @@ void checkBatteryVoltage_M() {
 
 void checkContinuity_M() {
 	#ifdef NDEBUG
-		continuity[1] = PSP_GPIO_ReadPin(SENSE_A_GPIO_Port, SENSE_A_Pin);
-		continuity[2] = PSP_GPIO_ReadPin(SENSE_B_GPIO_Port, SENSE_B_Pin);
-		continuity[3] = PSP_GPIO_ReadPin(SENSE_C_GPIO_Port, SENSE_C_Pin);
-		continuity[4] = PSP_GPIO_ReadPin(SENSE_D_GPIO_Port, SENSE_D_Pin);
+		continuity[0] = PSP_GPIO_ReadPin(SENSE_A_GPIO_Port, SENSE_A_Pin);
+		continuity[1] = PSP_GPIO_ReadPin(SENSE_B_GPIO_Port, SENSE_B_Pin);
+		continuity[2] = PSP_GPIO_ReadPin(SENSE_C_GPIO_Port, SENSE_C_Pin);
+		continuity[3] = PSP_GPIO_ReadPin(SENSE_D_GPIO_Port, SENSE_D_Pin);
 	#endif
 }
 
@@ -147,7 +148,7 @@ void checkContinuity_M() {
 
 void checkButtonState_M() {
 	#ifdef NDEBUG
-		buttonState = HAL_GPIO_ReadPin(DISARM_INPUT_GPIO_Port, DISARM_INPUT_Pin);
+		buttonState = PSP_GPIO_ReadPin(DISARM_INPUT_GPIO_Port, DISARM_INPUT_Pin);
 	#endif
 }
 

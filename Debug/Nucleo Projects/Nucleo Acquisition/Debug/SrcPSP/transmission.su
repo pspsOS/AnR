@@ -1,3 +1,0 @@
-transmission.c:24:6:getData_T	8	static
-transmission.c:55:6:compressData_T	4	static
-transmission.c:69:6:transmitData_T	4	static

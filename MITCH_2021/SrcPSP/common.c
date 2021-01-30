@@ -218,3 +218,31 @@ void retryTakeDelay(int length) {
 	vTaskDelay(length);
 #endif
 }
+
+#ifdef NDEBUG
+GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
+	if(GPIO_Pin == FAKE_GPIO) return 0;
+	else return HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
+}
+
+void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name) {
+	if(GPIO_Pin != FAKE_GPIO) {
+		HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);
+
+	}
+#if !defined(SUPRESS_SETUP_WARNING) && !defined(SUPRESS_ALL)
+	else printf("! Setup Warning: %s not setup on this device.\r\n", name);
+#endif
+}
+
+
+#ifdef LD2_Pin
+void toggleLed() {
+	static int j = 1;
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, j);
+	j = !j;
+	HAL_GPIO_WritePin(SENSE_A_GPIO_Port, SENSE_A_Pin, j);
+}
+#endif
+
+#endif

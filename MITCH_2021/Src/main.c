@@ -63,6 +63,7 @@ I2C_HandleTypeDef hi2c3;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi3;
+DMA_HandleTypeDef hdma_spi1_rx;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
@@ -79,12 +80,6 @@ osStaticThreadDef_t ProcessingControlBlock;
 osThreadId MonitoringHandle;
 uint32_t MonitoringBuffer[ 128 ];
 osStaticThreadDef_t MonitoringControlBlock;
-osThreadId StorageHandle;
-uint32_t StorageBuffer[ 128 ];
-osStaticThreadDef_t StorageControlBlock;
-osThreadId TransmissionHandle;
-uint32_t TransmissionBuffer[ 128 ];
-osStaticThreadDef_t TransmissionControlBlock;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -104,8 +99,6 @@ void startControlLogic(void const * argument);
 void startAcquisition(void const * argument);
 void startProcessing(void const * argument);
 void startMonitoring(void const * argument);
-void startStorage(void const * argument);
-void startTransmission(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -193,14 +186,6 @@ int main(void)
   osThreadStaticDef(Monitoring, startMonitoring, osPriorityLow, 0, 128, MonitoringBuffer, &MonitoringControlBlock);
   MonitoringHandle = osThreadCreate(osThread(Monitoring), NULL);
 
-  /* definition and creation of Storage */
-  osThreadStaticDef(Storage, startStorage, osPriorityHigh, 0, 128, StorageBuffer, &StorageControlBlock);
-  StorageHandle = osThreadCreate(osThread(Storage), NULL);
-
-  /* definition and creation of Transmission */
-  osThreadStaticDef(Transmission, startTransmission, osPriorityHigh, 0, 128, TransmissionBuffer, &TransmissionControlBlock);
-  TransmissionHandle = osThreadCreate(osThread(Transmission), NULL);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -236,8 +221,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
@@ -252,12 +239,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }
@@ -535,6 +522,9 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 
 }
 
@@ -682,7 +672,7 @@ void startControlLogic(void const * argument)
   /* USER CODE BEGIN 5 */
 	static TickType_t time_init = 0;
   /* Infinite loop */
-	while(1==1) {
+	while(ENABLE_CONTROL_LOGIC) {
 
 		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
 	}
@@ -702,7 +692,7 @@ void startAcquisition(void const * argument)
 	static TickType_t time_init = 0;
 
   /* Infinite loop */
-	while(1==1) {
+	while(ENABLE_ACQUISITION) {
 		switch(loop_A()) {
 		case 1: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY1);
 				break;
@@ -730,7 +720,7 @@ void startProcessing(void const * argument)
   /* USER CODE BEGIN startProcessing */
 	static TickType_t time_init = 0;
   /* Infinite loop */
-	while(1==1) {
+	while(ENABLE_PROCESSING) {
 
 		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
 	}
@@ -749,47 +739,11 @@ void startMonitoring(void const * argument)
   /* USER CODE BEGIN startMonitoring */
 	static TickType_t time_init = 0;
   /* Infinite loop */
-	while(1==1) {
+	while(ENABLE_MONITORING) {
 		loop_M();
 		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
 	}
   /* USER CODE END startMonitoring */
-}
-
-/* USER CODE BEGIN Header_startStorage */
-/**
-* @brief Function implementing the Storage thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_startStorage */
-void startStorage(void const * argument)
-{
-  /* USER CODE BEGIN startStorage */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END startStorage */
-}
-
-/* USER CODE BEGIN Header_startTransmission */
-/**
-* @brief Function implementing the Transmission thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_startTransmission */
-void startTransmission(void const * argument)
-{
-  /* USER CODE BEGIN startTransmission */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END startTransmission */
 }
 
  /**

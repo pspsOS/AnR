@@ -21,6 +21,8 @@
 #ifdef NDEBUG
 #include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
+#include "gpio.h"
+#include "retarget.h"
 #endif
 
 
@@ -29,20 +31,6 @@
 #define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
-
-#ifndef NDEBUG
-#define ENABLE_PRINT 1
-#else
-#define ENABLE_PRINT 0
-#endif
-
-#define print(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stdout, fmt); } while (0)
-
-#define prints(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
-#define printe(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
 
 /* User-defined Constants*/
@@ -217,6 +205,11 @@ extern staticOrientationNode_t *g_newStaticOrientationNode;
 ui32 getTimeStamp(void );
 void retryTakeDelay(int );
 
+#ifdef NDEBUG
+GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name);
+#endif
+
 altitudeNode_t *createAltitudeList(ui8 );
 alaNode_t *createALAList(ui8 );
 staticOrientationNode_t *createStaticOrientationList(ui8 );
@@ -232,5 +225,11 @@ int insertNewALA(float );
 int insertNewStaticOrientation(float );
 
 float calcAvgAlt();
+
+void _test();
+
+#ifdef LD2_Pin
+void toggleLed();
+#endif
 
 #endif /* COMMON_H_ */

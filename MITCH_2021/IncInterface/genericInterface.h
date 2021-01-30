@@ -3,16 +3,24 @@
 
 //Includes
 #include "main.h"
+#include "../IncPSP/gpio.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_uart.h"
-#include "stm32f4xx_hal_spi.h"
+
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 #include <stdbool.h>
 
+#if CS1_PIN != FAKE_PIN || CS2_PIN != FAKE_PIN || CS3_PIN != FAKE_PIN
+	#include "stm32f4xx_hal_spi.h"
+	#define _SPI_CONFIGURED
+#endif
+
 //Variables
-extern SPI_HandleTypeDef  hspi1;
-extern SPI_HandleTypeDef  hspi3;
+#ifdef _SPI_CONFIGURED
+	extern SPI_HandleTypeDef  hspi1;
+	extern SPI_HandleTypeDef  hspi3;
+#endif
 
 //Generic Defines
 #define	GREAT					1
@@ -59,8 +67,10 @@ typedef struct {
 sensors_t sensors;
 
 //Prototypes
+#ifdef _SPI_CONFIGURED
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
+#endif
 void handleHalError(uint8_t SENSOR);
 #endif
 

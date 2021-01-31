@@ -52,6 +52,7 @@
 #define MAX_TRANSMISSION_SIZE (100)
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
+// Circular Buffer Sizes
 #define ALTITUDE_ARRRAY_SIZE (20)
 #define ALA_ARRAY_SIZE (40)
 #define STATIC_ORIENTATION_ARRAY_SIZE (40)
@@ -179,12 +180,14 @@ typedef struct transmissionData {
 /* Node structures */
 
 typedef struct altitudeNode {
-	float altitude;
+	float currentAltitude;
+	float runningAltitude;
 	bool lock;
 } altitudeNode_t;
 
 typedef struct alaNode {
-	float gForce;
+	int16_t currentForce;
+	float runningForce;
 	bool lock;
 } alaNode_t;
 
@@ -195,16 +198,16 @@ typedef struct staticOrientationNode {
 } staticOrientationNode_t;
 
 typedef struct imuNode {
-	float accX;
-	float accY;
-	float accZ;
-	float gyrX;
-	float gyrY;
-	float gyrZ;
-	float magX;
-	float magY;
-	float magZ;
-	float alaZ;
+	int16_t accX;
+	int16_t accY;
+	int16_t accZ;
+	int16_t gyrX;
+	int16_t gyrY;
+	int16_t gyrZ;
+	int16_t magX;
+	int16_t magY;
+	int16_t magZ;
+	int16_t alaZ;
 	bool lock;
 } imuNode_t;
 
@@ -244,5 +247,7 @@ int insertNewAltitude(float );
 int insertNewALA(float );
 int insertNewStaticOrientation();
 int insertNewIMUNode();
+
+uint8_t convertToVLQ(uint32_t );
 
 #endif /* COMMON_H_ */

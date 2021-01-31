@@ -22,7 +22,7 @@ volatile transmissionData_t g_transmissionData = {0};
 // modes
 volatile uint8_t g_currentNominalMode = 0;
 volatile uint8_t g_currentContingency = 0;
-extern volatile uint32_t g_launchTime = 0;
+volatile uint32_t g_launchTime = 0;
 volatile bool g_chuteDisarm = false;
 volatile bool g_chuteDeployable = false;
 // arrays
@@ -30,6 +30,7 @@ altitudeNode_t g_altitudeArray[ALTITUDE_ARRAY_SIZE] = {0};
 alaNode_t g_alaArray[ALA_ARRAY_SIZE] = {0};
 staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE] = {0};
 imuNode_t g_imuArray[IMU_ARRAY_SIZE] = {0};
+// circular buffer indices
 uint16_t newestAltitudeIndex = 0;
 uint16_t newestAlaIndex = 0;
 uint16_t newestStaticOrientationIndex = 0;
@@ -46,7 +47,8 @@ int insertNewAltitude(float newAltitude) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_altitudeArray[newestAltitudeIndex]->lock = true;
-	g_altitudeArray[newestAltitudeIndex]->altitude = newAltitude;
+	g_altitudeArray[newestAltitudeIndex]->currentAltitude = newAltitude;
+	g_altitudeArray[newestAltitudeIndex]->runningAltitude += newAltitude * 2.0 / ((float) ALTITUDE_ARRAY_SIZE);
 	g_altitudeArray[newestAltitudeIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;
@@ -62,7 +64,8 @@ int insertNewALA(float newALA) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_alaArray[newestAlaIndex]->lock = true;
-	g_alaArray[newestAlaIndex]->gForce = newALA;
+	g_alaArray[newestAlaIndex]->currentForce = newALA;
+	g_alaArray[newestAlaIndex]->runningForce += newALA * 2.0 / ((float) ALA_ARRAY_SIZE);
 	g_alaArray[newestAlaIndex]->lock = false;
 
 	return SUCCESSFUL_RETURN;

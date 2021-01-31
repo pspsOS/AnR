@@ -20,10 +20,10 @@ extern sensors_t sensors;
  * @date 01/11/2021
  */
 void barometerRead(int32_t *temperature, int32_t *pressure) {
+	#ifdef _SPI_CONFIGURED
 	// Variables
 	uint8_t dataIn[2]; // Buffer to load data received
 	uint8_t cmd;       // Command sent to device
-
 	//Get values from sensor
 	cmd = D1_1024; //This value will define conversion time, accuracy, and current draw
 	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
@@ -69,10 +69,16 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 	//P = D1 * SENS - OFF = (D1 * SENS / 2 ^ 21 - OFF) / 2 ^ 15
 	sensors.pressure = (sensors.digitalPres * sensors.sens / 2097152 - sensors.off) / 32768; //This is the magic number in mbar
 
+#else
+	sensors.temp = 0;
+	sensors.pressure = 0;
+#endif
+
 	if(*sensors.bmpNomPtr) {
 		*temperature = sensors.temp;
 		*pressure = sensors.pressure;
 	}
+
 }
 
 
@@ -88,6 +94,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
  * @date 01/11/2021
  */
 void barometerInit(bool *bmpNomPtr) {
+	#ifdef _SPI_CONFIGURED
 	// Variables
 	uint8_t dataIn[2]; // Buffer to load data received
 	uint8_t cmd;       // Command sent to device
@@ -157,6 +164,9 @@ void barometerInit(bool *bmpNomPtr) {
 		return;
 	}
 	sensors.tempsens = (dataIn[0] << 8) | dataIn[1];
+#else
+	handleHalError(BMP);
+#endif
 }
 
 

@@ -3,15 +3,15 @@
   <FileVersion>3.0</FileVersion>
   <Workspace>
     <WorkspaceType>Single-project</WorkspaceType>
-    <WorkspacePath>C:\Users\Jeff\Documents\GitHub\AnR\MITCH_2021\</WorkspacePath>
+    <WorkspacePath>C:\Users\Mark\Documents\GitHub\AnR\Debug\NucleoProjects\NucleoMonitoring\</WorkspacePath>
     <underRoot>true</underRoot>
     <TrustZone>0</TrustZone>
-    <HAL_Driver>C:\Users\Jeff\STM32Cube\Repository\STM32Cube_FW_F4_V1.25.2\</HAL_Driver>
+    <HAL_Driver>C:\Users\Mark\STM32Cube\Repository\STM32Cube_FW_F4_V1.25.2\</HAL_Driver>
     <CMSIS>Drivers/CMSIS</CMSIS>
     <Toolchain>STM32CubeIDE</Toolchain>
-    <IocFile>MITCH_2021.ioc</IocFile>
+    <IocFile>Nucleo.ioc</IocFile>
     <Project>
-      <ProjectName>MITCH_2021</ProjectName>
+      <ProjectName>Nucleo</ProjectName>
       <ProjectNature>C</ProjectNature>
       <Secure />
       <filestoremove />
@@ -20,26 +20,25 @@
       </sourceEntriesToRemove>
       <configs>
         <config>
-          <name>MITCH_2021</name>
-          <mainSourceRepo>Src</mainSourceRepo>
-          <sourceStructure>Basic</sourceStructure>
-          <device>STM32F429ZITx</device>
+          <name>Nucleo</name>
+          <mainSourceRepo>Core</mainSourceRepo>
+          <sourceStructure>Advanced</sourceStructure>
+          <device>STM32F411RETx</device>
           <cpucore>Arm Cortex-M4</cpucore>
           <fpu>SP</fpu>
           <memories>
-            <memory access="xrw" name="RAM" size="192" start="0x20000000" />
-            <memory access="xrw" name="CCMRAM" size="64" start="0x10000000" />
-            <memory access="rx" name="FLASH" size="2048" start="0x8000000" />
+            <memory access="xrw" name="RAM" size="128" start="0x20000000" />
+            <memory access="rx" name="FLASH" size="512" start="0x8000000" />
           </memories>
-          <startup>C:\Users\Jeff\STM32Cube\Repository\STM32Cube_FW_F4_V1.25.2\Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\gcc\startup_stm32f429xx.s</startup>
+          <startup>C:\Users\Mark\STM32Cube\Repository\STM32Cube_FW_F4_V1.25.2\Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\gcc\startup_stm32f411xe.s</startup>
           <LinkSettings>
             <icfloc />
             <LinkAdditionalLibs />
           </LinkSettings>
           <heapSize>0x200</heapSize>
           <stackSize>0x400</stackSize>
-          <board>custom</board>
-          <debugprobe />
+          <board>NUCLEO-F411RE</board>
+          <debugprobe>swd</debugprobe>
           <optimization />
           <Aincludes>
             <include />
@@ -47,11 +46,11 @@
           <Adefines />
           <Cdefines>
             <define>USE_HAL_DRIVER</define>
-            <define>STM32F429xx</define>
+            <define>STM32F411xE</define>
           </Cdefines>
           <Ldefines />
           <Cincludes>
-            <include>Inc</include>
+            <include>Core\Inc</include>
             <include>Drivers\STM32F4xx_HAL_Driver\Inc</include>
             <include>Drivers\STM32F4xx_HAL_Driver\Inc\Legacy</include>
             <include>Middlewares\Third_Party\FreeRTOS\Source\include</include>
@@ -80,7 +79,7 @@
       <copyAsReference>false</copyAsReference>
       <sourceEntries>
         <sourceEntry>
-          <name>Src</name>
+          <name>Core</name>
         </sourceEntry>
         <sourceEntry>
           <name>Drivers</name>

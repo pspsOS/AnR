@@ -47,13 +47,13 @@ char monitoringFileName[] = "TestData/monitoringTestData.txt";
  */
 void notifyGeneralSettings_DS() {
 	if(notifyGeneralSettings) {
-		print("=================================\n");
-		print("DEBUG SETTINGS\n");
-		//print("=================================\n");
-		prints("notifyWhenDisabled = %s\n", (notifyWhenDisabled) ? _TRUE : _FALSE);
-		prints("notifyWhenReadAborted = %s\n", (notifyWhenReadAborted) ? _TRUE : _FALSE);
-		prints("assertFileNames = %s\n", (assertFileNames) ? _TRUE : _FALSE);
-		print("=================================\n\n");
+		printf("=================================\n");
+		printf("DEBUG SETTINGS\n");
+		//printf("=================================\n");
+		printf("notifyWhenDisabled = %s\n", (notifyWhenDisabled) ? _TRUE : _FALSE);
+		printf("notifyWhenReadAborted = %s\n", (notifyWhenReadAborted) ? _TRUE : _FALSE);
+		printf("assertFileNames = %s\n", (assertFileNames) ? _TRUE : _FALSE);
+		printf("=================================\n\n");
 	}
 }
 
@@ -98,17 +98,17 @@ FILE *setupSensorFile_DS(ui8 sensor, bool *nominal) {
 
 	if(!simulate) {
 		if(notifyWhenDisabled)
-			prints("%s simulation disabled\n", strName);
+			printf("%s simulation disabled\n", strName);
 		*nominal = false;
 		return NULL;
 	}
 	if( access(gpsFileName, F_OK ) == 0 ) {
-		prints("%s File: \"%s\"\n", strName, fileName);
+		printf("%s File: \"%s\"\n", strName, fileName);
 		*nominal = true;
 		return fopen(fileName, "r");
 
 	} else {
-		printe("%s File: \"%s\" NOT FOUND\n", strName, fileName);
+		printf("%s File: \"%s\" NOT FOUND\n", strName, fileName);
 		*nominal = false;
 		if(assertFileNames) assert(!assertFileNames);
 		return NULL;
@@ -128,16 +128,16 @@ FILE *setupSensorFile_DS(ui8 sensor, bool *nominal) {
 FILE *setupMonitoringFile_DS() {
 	if (!simulateMonitoring) {
 		if (notifyWhenDisabled) {
-			print("Monitoring simulation disabled\n");
+			printf("Monitoring simulation disabled\n");
 		}
 		return NULL;
 	}
 	if( access(monitoringFileName, F_OK) == 0 ) {
-		prints("Monitoring File: \"%s\"\n", monitoringFileName);
+		printf("Monitoring File: \"%s\"\n", monitoringFileName);
 		return fopen(monitoringFileName, "r");
 
 	} else {
-		printe("Monitoring File: \"%s\" NOT FOUND\n", monitoringFileName);
+		printf("Monitoring File: \"%s\" NOT FOUND\n", monitoringFileName);
 		if(assertFileNames) assert(!assertFileNames);
 		return NULL;
 	}

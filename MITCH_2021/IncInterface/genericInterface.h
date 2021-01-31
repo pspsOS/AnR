@@ -3,16 +3,26 @@
 
 //Includes
 #include "main.h"
+#include "../IncPSP/gpio.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_uart.h"
-#include "stm32f4xx_hal_spi.h"
+
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 #include <stdbool.h>
+#include <stdio.h>
+#include "common.h"
+
+#if CS1_PIN != FAKE_PIN || CS2_PIN != FAKE_PIN || CS3_PIN != FAKE_PIN
+	#include "stm32f4xx_hal_spi.h"
+	#define _SPI_CONFIGURED
+#endif
 
 //Variables
-extern SPI_HandleTypeDef  hspi1;
-extern SPI_HandleTypeDef  hspi3;
+#ifdef _SPI_CONFIGURED
+	extern SPI_HandleTypeDef  hspi1;
+	extern SPI_HandleTypeDef  hspi3;
+#endif
 
 //Generic Defines
 #define	GREAT					1
@@ -21,11 +31,6 @@ extern SPI_HandleTypeDef  hspi3;
 #define STORAGE_SPI_BUS					&hspi3
 #define ADC_VREF				3.3
 
-// Sensor Defines
-#define GPS 0
-#define BMP 1
-#define IMU 2
-#define ALA 3
 
 
 //Structs
@@ -58,11 +63,23 @@ typedef struct {
 
 sensors_t sensors;
 
+typedef struct ledBank {
+	ui8 state;
+	GPIO_TypeDef* GPIOx;
+	uint16_t GPIO_Pin;
+} ledBank_t;
+
+
 //Prototypes
+#ifdef _SPI_CONFIGURED
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
+#endif
 void handleHalError(uint8_t SENSOR);
 #endif
+
+GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name);
 
 /*
  * Notes:

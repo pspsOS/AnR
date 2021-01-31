@@ -4,3 +4,13 @@ MITCH_2021/.settings/
 "MITCH_2021/.settings/*"
 MITCH_2021/Debug/*
 MITCH_2021/Release/*
+Debug/NucleoProjects/NucleoAcquisition/Debug/*
+Debug/NucleoProjects/NucleoMonitoring/Debug/*
+Debug/NucleoProjects/NucleoAcquisition/IncPSP
+Debug/NucleoProjects/NucleoAcquisition/SrcPSP
+Debug/NucleoProjects/NucleoAcquisition/IncInterface
+Debug/NucleoProjects/NucleoAcquisition/SrcInterface
+Debug/NucleoProjects/NucleoMonitoring/IncPSP
+Debug/NucleoProjects/NucleoMonitoring/SrcPSP
+Debug/NucleoProjects/NucleoMonitoring/IncInterface
+Debug/NucleoProjects/NucleoMonitoring/SrcInterface

@@ -21,6 +21,8 @@
 #ifdef NDEBUG
 #include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
+#include "gpio.h"
+#include "retarget.h"
 #endif
 
 
@@ -29,20 +31,6 @@
 #define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
 #define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
-
-#ifndef NDEBUG
-#define ENABLE_PRINT 1
-#else
-#define ENABLE_PRINT 0
-#endif
-
-#define print(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stdout, fmt); } while (0)
-
-#define prints(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stdout, fmt, __VA_ARGS__); } while (0)
-#define printe(fmt, ...) \
-            do { if (ENABLE_PRINT) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
 
 /* User-defined Constants*/
@@ -66,6 +54,24 @@
 #define DESCENT_MAIN (5)
 #define TOUCHDOWN (6)
 #define PROGRAM_END (7)
+
+
+// Sensor Defines
+
+typedef enum {
+	SYSTEM = 0,
+	GPS = 1,
+	BMP = 2,
+	IMU = 3,
+	ALA = 4,
+	NAND = 5,
+
+} Device_ID;
+
+typedef enum {
+	TASK_UPDATE = 0,
+	SETUP_WARNING = 1
+} Message_ID;
 
 // Function returns
 #define SUCCESSFUL_RETURN (0)
@@ -217,6 +223,10 @@ extern staticOrientationNode_t *g_newStaticOrientationNode;
 ui32 getTimeStamp(void );
 void retryTakeDelay(int );
 
+#ifdef NDEBUG
+
+#endif
+
 altitudeNode_t *createAltitudeList(ui8 );
 alaNode_t *createALAList(ui8 );
 staticOrientationNode_t *createStaticOrientationList(ui8 );
@@ -232,5 +242,10 @@ int insertNewALA(float );
 int insertNewStaticOrientation(float );
 
 float calcAvgAlt();
+
+void notify(Message_ID message, Device_ID device);
+
+
+
 
 #endif /* COMMON_H_ */

@@ -9,6 +9,8 @@
 
 // Setup
 
+bool nandNominal = false;
+
 /* TODO: Implement storageSetup
  * Established connection with storage device.
  *

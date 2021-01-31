@@ -94,6 +94,15 @@ void toggleLed();
 		#define CS3_Pin (FAKE_GPIO)
 		#define CS3_GPIO_Port (0)
 	#endif
+
+#ifndef NAND_CS_Pin
+#define NAND_CS_Pin (FAKE_GPIO)
+#define NAND_CS_GPIO_Port (0)
+#endif
+
+
+
+
 #endif
 
 

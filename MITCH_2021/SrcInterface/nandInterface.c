@@ -1,9 +1,6 @@
 #include <nandInterface.h>
-//#include <common.h>
-#ifndef getBit
-#define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
-#define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
-#endif
+#include <common.h>
+
 /**
  * @brief Load data into the buffer from the cell array
  *
@@ -12,6 +9,7 @@
  * @author Mark Batistich
  * @date 01/21/2021
  */
+
 
 void nandBufferLoad(int32_t rowAddr){
 #if CS3_PIN != FAKE_PIN
@@ -34,7 +32,7 @@ void nandBufferLoad(int32_t rowAddr){
 		feature = getFeature(OP_FEATURE_ADDR);
 		oip = getBit(feature, 0);
 	}while(oip);
-#endif
+
 }
 
 /**
@@ -47,6 +45,7 @@ void nandBufferLoad(int32_t rowAddr){
  * @author Mark Batistich
  * @date 01/24/2021
  */
+
 void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
 #if CS3_PIN != FAKE_PIN
 	// Variables
@@ -56,12 +55,11 @@ void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
 	cmd[0] = R_BUFFER;
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
-	if (recieveSPI(&cmd[0], 3, (uint8_t*) data, size, CS3_GPIO_Port, CS3_Pin, STORAGE_SPI_BUS))
+	if (recieveSPI(&cmd[0], 3, data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
 	}
-#endif
 }
 
 /**

@@ -9,6 +9,8 @@
 
 #define REQUIRED_TIME_FROM_STARTUP (1200000)
 #define ACCEPTABLE_PERCENT_ERROR (5)
+#define LAUNCH_FORCE_DETECT_FACTOR (3)
+#define LAUNCH_ALTITUDE_DIFFERENCE_DETECT (ROCKET_HEIGHT * 3)
 
 
 volatile uint32_t g_launchTime = 0;
@@ -27,6 +29,7 @@ void loop_C() {
 
 	//TODO: Send info to storage and transition
 }
+
 
 /**
  * @brief Encapsulates logic functions
@@ -243,6 +246,7 @@ bool checkPrelaunchTrans_C() {
 
 		g_chuteDeployable = true;
 		g_daqStatusData.daqScaling = true;
+		g_daqStatusData.hasUpdate = true;
 
 		return true;
 	}
@@ -273,6 +277,9 @@ bool checkLaunchTrans_C() {
 
 	if (sustainedZForce && detectedAscent) {
 		//TODO: Send to Transmission & Storage
+
+
+		g_launchTime = getTimeStamp();
 
 		return true;
 	}
@@ -351,6 +358,7 @@ bool checkProgramEnd_C() {
 
 
 bool determineStillness_C() {
+	//TODO: Change min and max to int16_t data types
 	float minAccX = FLT_MAX;
 	float maxAccX = FLT_MIN;
 	float avgAccX = 0;
@@ -458,9 +466,21 @@ bool determineStillness_C() {
 
 
 bool determineSustainedZForce_C() {
-
+	if (g_alaArray[newestAlaIndex].runningForce >= abs(LAUNCH_FORCE_DETECT_FACTOR *
+			g_alaArray[(newestAlaIndex + 1) % ALA_ARRAY_SIZE].runningForce)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool determineAscent_C() {
-
+	if (g_altitudeArray[newestAltitudeIndex].runningAltitude >= LAUNCH_ALTITUDE_DIFFERENCE_DETECT +
+			g_altitudeArray[(newestAltitudeIndex + 1) % ALTITUDE_ARRAY_SIZE].runningAltitude) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }

@@ -212,6 +212,20 @@ typedef struct imuNode {
 } imuNode_t;
 
 
+/* VLQ Struct */
+
+typedef struct VLQ {
+	uint8_t quantityLength;
+	union {
+		uint8_t oneByteVLQ[1];
+		uint8_t twoByteVLQ[2];
+		uint8_t threeByteVLQ[3];
+		uint8_t fourByteVLQ[4];
+		uint8_t fiveByteVLQ[5];
+	};
+} VLQ_t;
+
+
 /* Extern variable definitions */
 
 extern volatile daqStatusData_t g_daqStatusData;
@@ -248,6 +262,6 @@ int insertNewALA(float );
 int insertNewStaticOrientation();
 int insertNewIMUNode();
 
-uint8_t convertToVLQ(uint32_t );
+VLQ_t convertToVLQ(uint32_t );
 
 #endif /* COMMON_H_ */

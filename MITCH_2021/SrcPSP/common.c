@@ -174,3 +174,42 @@ void retryTakeDelay(int length) {
 		vTaskDelay(length);
 	#endif
 }
+
+
+VLQ_t convertToVLQ(uint32_t originalNum) {
+	uint8_t newNumArray[sizeof(originalNum) + 1] = {0};
+	uint8_t buffer = 0;
+	int length = 0;
+	do {
+		buffer = (originalNum & 0x7F);
+		if (length != 0) {
+			buffer |= 0x80;
+		}
+		newNumArray[length] = buffer;
+		length++;
+	} while ( originalNum >>= 7 );
+
+	VLQ_t newNum = {0};
+	newNum.quantityLength = length;
+	for (int i = 0; i < length; i++) {
+		switch (length) {
+			case 1:
+				newNum.oneByteVLQ[i] = newNumArray[length - i - 1];
+				break;
+			case 2:
+				newNum.twoByteVLQ[i] = newNumArray[length - i - 1];
+				break;
+			case 3:
+				newNum.threeByteVLQ[i] = newNumArray[length - i - 1];
+				break;
+			case 4:
+				newNum.fourByteVLQ[i] = newNumArray[length - i - 1];
+				break;
+			case 5:
+				newNum.fiveByteVLQ[i] = newNumArray[length - i - 1];
+				break;
+		}
+	}
+
+	return newNum;
+}

@@ -6,7 +6,7 @@
 #include "../IncPSP/gpio.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_uart.h"
-
+#include "stm32f4xx_hal_def.h"
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 #include <stdbool.h>
@@ -27,8 +27,7 @@
 //Generic Defines
 #define	GREAT					1
 #define PSP						GREAT //RRaP is better (just saying)
-#define SENSORS_SPI_BUS					&hspi1
-#define STORAGE_SPI_BUS					&hspi3
+
 #define ADC_VREF				3.3
 
 
@@ -72,9 +71,16 @@ typedef struct ledBank {
 
 //Prototypes
 #ifdef _SPI_CONFIGURED
+#define SENSORS_SPI_BUS					&hspi1
+#define STORAGE_SPI_BUS					&hspi3
+#else
+#define SENSORS_SPI_BUS					0
+#define STORAGE_SPI_BUS					0
+#endif
+
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
-#endif
+
 void handleHalError(uint8_t SENSOR);
 #endif
 

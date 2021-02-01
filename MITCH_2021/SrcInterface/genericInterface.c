@@ -22,29 +22,31 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
 }
 
 
-#ifdef _SPI_CONFIGURED
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus)
 {
-	HAL_StatusTypeDef state;
+	HAL_StatusTypeDef state = HAL_ERROR;
+#ifdef _SPI_CONFIGURED
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, len, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
-
+#endif
 	return state;
 }
 
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin,  SPI_HandleTypeDef *bus)
 {
+
 	//Note: dataLen should be number of bytes in the register group being read
-	HAL_StatusTypeDef state;
+	HAL_StatusTypeDef state = HAL_ERROR;
+#ifdef _SPI_CONFIGURED
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, cmdLen, HAL_MAX_DELAY);
 	HAL_SPI_Receive(bus, data, dataLen, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
-
+#endif
 	return state;
 }
-#endif
+
 void handleHalError(Device_ID device)
 {
 	//Basically just to let us know that we ran into an issue during transmission

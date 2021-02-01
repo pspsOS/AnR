@@ -11,7 +11,7 @@
  */
 
 
-void nandBufferLoad(int32_t rowAddr){
+void nandBufferLoad(uint32_t rowAddr){
 #if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
@@ -32,7 +32,7 @@ void nandBufferLoad(int32_t rowAddr){
 		feature = getFeature(OP_FEATURE_ADDR);
 		oip = getBit(feature, 0);
 	}while(oip);
-
+#endif
 }
 
 /**
@@ -46,7 +46,7 @@ void nandBufferLoad(int32_t rowAddr){
  * @date 01/24/2021
  */
 
-void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
+void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size){
 #if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[3];       // Command sent to device
@@ -60,6 +60,7 @@ void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
 		handleHalError(BMP);
 		return;
 	}
+#endif
 }
 
 /**

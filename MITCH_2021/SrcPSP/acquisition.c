@@ -886,7 +886,7 @@ void _clearNmea(char *nmea) {
  */
 void __printGpsData()
 {
-	printf("Time: %d\n",g_gpsData.timeStamp);
+	printf("Time: %d\n",(int)g_gpsData.timeStamp);
 	//prints("GGA: %s\n",g_gpsData.nmeaGGA);
 	//prints("RMC: %s\n",g_gpsData.nmeaRMC);
 	printf("Fix: %d\n",g_gpsData.fix);

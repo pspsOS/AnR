@@ -263,9 +263,16 @@ void gpsRead_A() {
 	// loads in data
 	_loadGpsData();
 	strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
+
 	_splitNmea();
 
-
+	//recieving no new data
+	if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+	{
+		g_gpsData.hasUpdate = false;
+		// leave function
+		return;
+	}
 
 
 
@@ -279,7 +286,6 @@ void gpsRead_A() {
 	// first time loading in
 	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
 	{
-
 		_addNmeaData();
 
 		//load next packet
@@ -302,13 +308,22 @@ void gpsRead_A() {
 		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
 		_splitNmea();
 
+		//recieving no new data
+		if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+		{
+			g_gpsData.hasUpdate = false;
+			// leave function
+			return;
+		}
+
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
+		//printf("%d\n",g_gpsData.timeStamp);
 		if(time == g_gpsData.timeStamp )
 		{
-
+			//printf("here\n");
 			// if time stamps are equal
 			_addNmeaData();
 
@@ -886,12 +901,13 @@ void _clearNmea(char *nmea) {
  */
 void __printGpsData()
 {
-	printf("Time: %d\n",(int)g_gpsData.timeStamp);
-	//prints("GGA: %s\n",g_gpsData.nmeaGGA);
-	//prints("RMC: %s\n",g_gpsData.nmeaRMC);
+
+	printf("Time: %d\n",g_gpsData.timeStamp);
+	printf("GGA: %s\n",g_gpsData.nmeaGGA);
+	printf("RMC: %s\n",g_gpsData.nmeaRMC);
 	printf("Fix: %d\n",g_gpsData.fix);
 	printf("Alt: %f\n",g_gpsData.alt)	;
-	printf("Speed: %f\n",g_gpsData.speed);
+	printf("Speed: %f\n\n",g_gpsData.speed);
 }
 
 /**

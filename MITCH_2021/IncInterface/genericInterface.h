@@ -6,7 +6,6 @@
 #include "../IncPSP/gpio.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_uart.h"
-#include "stm32f4xx_hal_spi.h"
 #include "stm32f4xx_hal_def.h"
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
@@ -23,6 +22,8 @@
 #ifdef _SPI_CONFIGURED
 	extern SPI_HandleTypeDef  hspi1;
 	extern SPI_HandleTypeDef  hspi3;
+#elif !defined(STM32F4xx_HAL_SPI_H)
+	typedef void SPI_HandleTypeDef;
 #endif
 
 //Generic Defines

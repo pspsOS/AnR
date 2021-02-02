@@ -156,7 +156,7 @@ void Error_Handler(void);
 #define ENABLE_MONITORING (1)
 #define ENABLE_PROCESSING (1)
 
-
+#define _SPI_CONFIGURED
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

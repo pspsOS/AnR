@@ -8,7 +8,8 @@
 #include "../IncPSP/acquisition.h"
 
 #ifdef NDEBUG
-	#include <baroInterface.h>
+	#include "gpsInterface.h"
+	#include "baroInterface.h"
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
@@ -165,6 +166,7 @@ void gpsSetup_A() {
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
+		gpsInit(&gpsNominal);
 		notify(TASK_UPDATE, GPS);
 	#endif
 }
@@ -245,8 +247,8 @@ void alaSetup_A() {
  * @param None
  * @retval None
  *
- * @author Jeff Kaji
- * @date 12/23/2020
+ * @author Jack Wiley
+ * @date 02/01/2021
  */
 void gpsRead_A() {
 #ifdef BYPASS_GPS
@@ -320,8 +322,8 @@ void gpsRead_A() {
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		//printf("%d\n",g_gpsData.timeStamp);
-		if(time == g_gpsData.timeStamp )
+		//printf("%d\n",g_gpsData.utc);
+		if(time == g_gpsData.utc )
 		{
 			//printf("here\n");
 			// if time stamps are equal
@@ -413,7 +415,7 @@ void gpsRead_A() {
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		if(time == g_gpsData.timeStamp ) {
+		if(time == g_gpsData.utc ) {
 
 			// if time stamps are equal
 			_addNmeaData();
@@ -474,44 +476,8 @@ void gpsRead_A() {
 				g_gpsData.hasUpdate = false;
 				g_gpsData.lock = false;
 
-
 		}
-
-
 	}
-
-
-
-
-	/*
-
-	printf("Reading:",);
-
-// Parse each GPS packet type
-	//	Type = GPGGA
-	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
-		printf("GGA\n");
-		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
-	}
-	//	Type = GPRMC
-	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
-		//puts("RMC");
-		printf("RMC\n");
-		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
-	}
-
-	//	Catch Bad Read
-	else {
-		gpsNominal = false;
-
-
-	}
-
-	g_gpsData.timeStamp = getTimeStamp();
-
-
-*/
-//	return;
 }
 
 
@@ -741,8 +707,8 @@ void _addNmeaData()
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		g_gpsData.timeStamp = time;
-
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
 
 
 		//adds altitude to struct
@@ -767,7 +733,8 @@ void _addNmeaData()
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
-		g_gpsData.timeStamp = time;
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
 
 		//adds speed to struct
 		speed = 0;
@@ -902,7 +869,7 @@ void _clearNmea(char *nmea) {
 void __printGpsData()
 {
 
-	printf("Time: %d\n",g_gpsData.timeStamp);
+	printf("Time: %d\n",g_gpsData.utc);
 	printf("GGA: %s\n",g_gpsData.nmeaGGA);
 	printf("RMC: %s\n",g_gpsData.nmeaRMC);
 	printf("Fix: %d\n",g_gpsData.fix);

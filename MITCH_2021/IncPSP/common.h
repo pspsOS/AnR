@@ -117,6 +117,7 @@ typedef struct gpsData {
 	ui8 fix;
 	float alt;
 	float speed;
+	int utc;
 	bool hasUpdate;
 	bool lock;
 } gpsData_t;

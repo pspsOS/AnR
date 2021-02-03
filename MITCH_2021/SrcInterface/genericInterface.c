@@ -62,3 +62,28 @@ void handleHalError(Device_ID device)
 		break;
 	}
 }
+
+srBank_t newSrBank(GPIO_TypeDef* GPIOx, uint16_T GPIO_Pin) {
+	srBank_t bank = {0, 0, GPIOx, GPIO_Pin, 0};
+	return bank;
+}
+
+led_t newPinLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
+	led_t led = {PIN_LED, GPIOx, GPIO_Pin, 0, 0};
+	return led;
+}
+led_t newBankLED(srBank_t* bank, uint16_t GPIO_Pin) {
+	led_t led = {BANK_LED, 0, GPIO_Pin, bank, 0};
+	if(GPIO_Pin < 16)
+		bank->registered = setBit(bank->registered, GPIO_Pin, 1);
+	return led;
+}
+led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin) {
+	led_t led = {BANK_MIXED, 0, GPIO_Pin, bank, 0};
+	if(GPIO_Pin < 16) {
+		bank->registered = setBit(bank->registered, GPIO_Pin, 1);
+		bank->types = setBit(bank->types, GPIO_Pin, 1);
+	}
+	return led;
+}
+

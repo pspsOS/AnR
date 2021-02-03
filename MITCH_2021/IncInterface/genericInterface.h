@@ -64,12 +64,34 @@ typedef struct {
 
 sensors_t sensors;
 
-typedef struct ledBank {
-	ui8 state;
+typedef struct srBank {
+	uint16_t registered;
+	uint16_t types;
 	GPIO_TypeDef* GPIOx;
 	uint16_t GPIO_Pin;
-} ledBank_t;
 
+	uint16_t state;
+} srBank_t;
+
+
+typedef enum {
+	PIN_LED = 0,
+	BANK_LED = 1,
+	BANK_MIXED = 2
+} LED_Type;
+
+typedef struct led {
+	LED_Type type;
+	GPIO_TypeDef* GPIOx;
+	uint16_t GPIO_Pin;
+	srBank_t* bank;
+
+	uint8_t state;
+} led_t;
+
+led_t newPinLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+led_t newBankLED(srBank_t* bank, uint16_t GPIO_Pin);
+led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin);
 
 //Prototypes
 #ifdef _SPI_CONFIGURED

@@ -1,0 +1,2 @@
+gpsInterface.c:10:6:gpsInit	16	static
+gpsInterface.c:14:6:gpsLoadString	16	static

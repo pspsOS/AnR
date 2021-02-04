@@ -834,6 +834,8 @@ void _loadGpsData()
 		fscanf(_gpsFile, "%s", gpsNmea);
 	#else
 		//TODO: Implement gpsRead w/ hardware
+		gpsLoadString(gpsNmea);
+
 	#endif
 }
 

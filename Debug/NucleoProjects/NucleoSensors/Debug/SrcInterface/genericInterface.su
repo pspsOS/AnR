@@ -1,0 +1,5 @@
+genericInterface.c:9:15:PSP_GPIO_ReadPin	16	static
+genericInterface.c:14:6:PSP_GPIO_WritePin	24	static
+genericInterface.c:25:19:sendSPI	32	static
+genericInterface.c:36:19:recieveSPI	32	static
+genericInterface.c:50:6:handleHalError	16	static

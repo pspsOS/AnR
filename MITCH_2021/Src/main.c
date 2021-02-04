@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "task.h"
 /* User-defined libraries */
 
 #include <stdbool.h>
@@ -46,8 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
-#define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
+
 
 /* USER CODE END PD */
 
@@ -64,6 +63,7 @@ I2C_HandleTypeDef hi2c3;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi3;
+DMA_HandleTypeDef hdma_spi1_rx;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
@@ -80,14 +80,14 @@ osStaticThreadDef_t ProcessingControlBlock;
 osThreadId MonitoringHandle;
 uint32_t MonitoringBuffer[ 128 ];
 osStaticThreadDef_t MonitoringControlBlock;
-osThreadId StorageHandle;
-uint32_t StorageBuffer[ 128 ];
-osStaticThreadDef_t StorageControlBlock;
-osThreadId TransmissionHandle;
-uint32_t TransmissionBuffer[ 128 ];
-osStaticThreadDef_t TransmissionControlBlock;
 /* USER CODE BEGIN PV */
+led_t U1S_CHECK_Led;
+led_t U2S_CHECK_Led;
+led_t U3S_CHECK_Led;
+led_t U4S_CHECK_Led;
 
+led_t SENSOR_NOMINAL_Led;
+led_t SENSOR_ERROR_Led;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,8 +105,6 @@ void startControlLogic(void const * argument);
 void startAcquisition(void const * argument);
 void startProcessing(void const * argument);
 void startMonitoring(void const * argument);
-void startStorage(void const * argument);
-void startTransmission(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -124,7 +122,13 @@ void startTransmission(void const * argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	U1S_CHECK_Led = newPinLed(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin);
+	U2S_CHECK_Led = newPinLed(U2S_CHECK_GPIO_Port, U1S_CHECK_Pin);
+	U3S_CHECK_Led = newPinLed(U3S_CHECK_GPIO_Port, U1S_CHECK_Pin);
+	U4S_CHECK_Led = newPinLed(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin);
 
+	SENSOR_NOMINAL_Led = newPinLed(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin);
+	SENSOR_ERROR_Led = newPinLed(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -156,8 +160,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  //HAL_ADC_Start(&hadc1);
-
+  setup_A();
+  setup_M();
 
   /* USER CODE END 2 */
 
@@ -193,14 +197,6 @@ int main(void)
   /* definition and creation of Monitoring */
   osThreadStaticDef(Monitoring, startMonitoring, osPriorityLow, 0, 128, MonitoringBuffer, &MonitoringControlBlock);
   MonitoringHandle = osThreadCreate(osThread(Monitoring), NULL);
-
-  /* definition and creation of Storage */
-  osThreadStaticDef(Storage, startStorage, osPriorityHigh, 0, 128, StorageBuffer, &StorageControlBlock);
-  StorageHandle = osThreadCreate(osThread(Storage), NULL);
-
-  /* definition and creation of Transmission */
-  osThreadStaticDef(Transmission, startTransmission, osPriorityHigh, 0, 128, TransmissionBuffer, &TransmissionControlBlock);
-  TransmissionHandle = osThreadCreate(osThread(Transmission), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -538,6 +534,9 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 
 }
 
@@ -683,11 +682,12 @@ static void MX_GPIO_Init(void)
 void startControlLogic(void const * argument)
 {
   /* USER CODE BEGIN 5 */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(ENABLE_CONTROL_LOGIC) {
+
+		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
+	}
   /* USER CODE END 5 */
 }
 
@@ -701,11 +701,22 @@ void startControlLogic(void const * argument)
 void startAcquisition(void const * argument)
 {
   /* USER CODE BEGIN startAcquisition */
+	static TickType_t time_init = 0;
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(ENABLE_ACQUISITION) {
+		switch(loop_A()) {
+		case 1: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY1);
+				break;
+
+		case 2: vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY2);
+				break;
+
+		default:vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY0);
+				break;
+		}
+	}
+
   /* USER CODE END startAcquisition */
 }
 
@@ -719,11 +730,12 @@ void startAcquisition(void const * argument)
 void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	while(ENABLE_PROCESSING) {
+
+		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
+	}
   /* USER CODE END startProcessing */
 }
 
@@ -737,50 +749,13 @@ void startProcessing(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
-	setup_M();
+	static TickType_t time_init = 0;
   /* Infinite loop */
-  for(;;)
-  {
-	  loop_M();
-	  osDelay(1);
-  }
+	while(ENABLE_MONITORING) {
+		loop_M();
+		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
+	}
   /* USER CODE END startMonitoring */
-}
-
-/* USER CODE BEGIN Header_startStorage */
-/**
-* @brief Function implementing the Storage thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_startStorage */
-void startStorage(void const * argument)
-{
-  /* USER CODE BEGIN startStorage */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END startStorage */
-}
-
-/* USER CODE BEGIN Header_startTransmission */
-/**
-* @brief Function implementing the Transmission thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_startTransmission */
-void startTransmission(void const * argument)
-{
-  /* USER CODE BEGIN startTransmission */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END startTransmission */
 }
 
  /**

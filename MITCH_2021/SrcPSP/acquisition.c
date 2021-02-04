@@ -8,32 +8,32 @@
 #include "../IncPSP/acquisition.h"
 
 #ifdef NDEBUG
-	#include "../IncInterface/baro.h"
+	#include "gpsInterface.h"
+	#include "baroInterface.h"
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
 #endif
 
-// Acquisition Finite States
-#define ACQUIRE_IMU_BMP_GPS (0)
-#define ACQUIRE_IMU_BMP (1)
-#define ACQUIRE_IMU (2)
 
 /* Global variable declarations */
 
 
 /* Local variable declarations */
 char gpsNmea[MAX_NMEA]; // Buffer that holds GPS String
-bool daqScaling;        // Enables/Disables DAQ Scaling
+char unsplitGpsNmea[MAX_NMEA]; // Buffer that holds GPS String and is not split
+bool daqScalingEnabled; // Enables/Disables DAQ Scaling
 ui8 daqScaler;          // DAQ Scaling number � Sets the ratio
 bool gpsNominal;        // Indicates whether the GPS is nominal
 bool bmpNominal;        // Indicates whether the BMP is nominal
 bool imuNominal;        // Indicates whether the IMU is nominal
 bool alaNominal;        // Indicates whether the ALA is nominal
 bool sendDaqStatus;     // Indicates whether to update the daqStatusData struct
-ui8 gpsCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
+ui8 imuCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
+
+ui8 delayVal = 0;
 
 // Used for parsing NMEA data
 ui8 _nmeaAddrStart;
@@ -47,7 +47,28 @@ ui8 _nmeaAddrEnd;
 	FILE *_alaFile;
 #endif
 
+#if defined(NDEBUG) && !defined(BYPASS_ACQUISITION_LEDS)
+	#ifdef ACQUISITION_LEDS_BANKED
+		extern srBank_t ACQUISITION_LED_Bank;
+	#endif
+	extern led_t U1S_CHECK_Led;
+	extern led_t U2S_CHECK_Led;
+	extern led_t U3S_CHECK_Led;
+	extern led_t U4S_CHECK_Led;
 
+	extern led_t SENSOR_NOMINAL_Led;
+	extern led_t SENSOR_ERROR_Led;
+
+#else
+	srBank_t ACQUISITION_LED_Bank;
+	led_t U1S_CHECK_Led;
+	led_t U2S_CHECK_Led;
+	led_t U3S_CHECK_Led;
+	led_t U4S_CHECK_Led;
+
+	led_t SENSOR_NOMINAL_Led;
+	led_t SENSOR_ERROR_Led;
+#endif
 
 
 /** setup_A()
@@ -63,16 +84,27 @@ ui8 _nmeaAddrEnd;
 void setup_A() {
 
 	// Initialize local variables
-	daqScaling = false;
+	daqScalingEnabled = true;
 	daqScaler = DEFAULT_DAQ_SCALER;
-	gpsNominal = false;
-	bmpNominal = false;
-	imuNominal = false;
-	alaNominal = false;
+	gpsNominal = true;
+	bmpNominal = true;
+	imuNominal = true;
+	alaNominal = true;
 	sendDaqStatus = false;
-	gpsCounter = 0;
 	bmpCounter = 0;
-	fsmState = ACQUIRE_IMU_BMP_GPS;
+	imuCounter = 0;
+
+#if defined(NDEBUG) && defined(BYPASS_ACQUISITION_LEDS)
+	ACQUISITION_LED_Bank = newSrBank(0, FAKE_GPIO);
+
+	U1S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U2S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U3S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U4S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+
+	SENSOR_NOMINAL_Led = newPinLed(0, FAKE_GPIO);
+	SENSOR_ERROR_Led = newPinLed(0, FAKE_GPIO);
+#endif
 
 	// Setup sensors
 	gpsSetup_A();
@@ -86,29 +118,69 @@ void setup_A() {
 
 	// Send update
 	sendUpdate_A();
+	updateLeds_A();
+
+
 }
 
-void loop_A() {
-	switch(fsmState) {
-	case ACQUIRE_IMU_BMP_GPS:
-		gpsRead_A();
-	case ACQUIRE_IMU_BMP:
-		bmpRead_A();
-	case ACQUIRE_IMU:
-		imuRead_A();
-		break;
-	}
 
-/*	if(daqScaling) {
-		switch(fsmState) {
-		case
+/** loop_A()
+ * @brief Acquisition Loop
+ * This function is the function that is called repeatedly by the Acquisition task.
+ *
+ * @retval ui8 delayVal: value which specifies which delay time to use
+ * TODO: Make delayVal return the constants defined in main
+ *
+ * @author Jeff Kaji
+ * @date 01/19/2021
+ */
+ui8 loop_A() {
+
+
+
+	if(daqScalingEnabled) {
+		if(imuNominal || alaNominal) imuRead_A();
+		else printf("########IMU Skip %d\r\n", imuCounter);
+
+		if(imuCounter == 0) {
+			if(bmpNominal) bmpRead_A();
+			else printf("####BMP Skip %d\r\n", bmpCounter);
+
+			if(bmpCounter == 0) {
+				if(gpsNominal) gpsRead_A();
+				else printf("GPS Skip\r\n");
+			}
 		}
 
+		if(imuNominal || alaNominal || imuCounter > 0) {
+			imuCounter += 1;
+			delayVal = 2;
+		} else if(bmpNominal || bmpCounter > 0) {
+			bmpCounter += 1;
+			delayVal = 1;
+		} else {
+			delayVal = 0;
+		}
+
+		if(imuCounter == IMU_MULTIPLIER) {
+			bmpCounter += 1;
+			imuCounter = 0;
+		}
+
+		if(bmpCounter == BMP_MULTIPLIER) {
+			bmpCounter = 0;
+		}
+
+
 	} else {
-		gpsRead_A();
-		bmpRead_A();
-		imuRead_A();
-	}*/
+		if(imuNominal || alaNominal) imuRead_A();
+		if(bmpNominal) bmpRead_A();
+		if(gpsNominal) gpsRead_A();
+		delayVal = 0;
+	}
+
+	checkStatus_A();
+	return delayVal;
 }
 
 
@@ -128,6 +200,8 @@ void gpsSetup_A() {
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
+		gpsInit(&gpsNominal);
+		//notify(TASK_UPDATE, GPS);
 	#endif
 }
 
@@ -148,6 +222,7 @@ void bmpSetup_A() {
 		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
 		barometerInit(&bmpNominal);
+		//notify(TASK_UPDATE, BMP);
 	#endif
 }
 
@@ -168,6 +243,7 @@ void imuSetup_A() {
 		_imuFile = setupSensorFile_DS(IMU, &imuNominal);
 	#else
 		// TODO: Implement imuSetup
+		//notify(TASK_UPDATE, IMU);
 	#endif
 }
 
@@ -188,6 +264,7 @@ void alaSetup_A() {
 		_alaFile = setupSensorFile_DS(ALA, &alaNominal);
 	#else
 		// TODO: Implement alaSetup
+		//notify(TASK_UPDATE, ALA);
 	#endif
 }
 
@@ -204,48 +281,237 @@ void alaSetup_A() {
  * @param None
  * @retval None
  *
- * @author Jeff Kaji
- * @date 12/23/2020
+ * @author Jack Wiley
+ * @date 02/01/2021
  */
 void gpsRead_A() {
+#ifdef BYPASS_GPS
+	printf("GPS Read \r\n");
+	return;
+#endif
+	// local variables
+	int time; //holds value to compare
+	bool firstFlag; // flag signaling function is being called the first time
 
-	#ifndef NDEBUG
-		if(!simulateGps) {
-			if(notifyWhenReadAborted)
-				print("GPS read aborted.\n");
+	firstFlag = false;
+
+
+	// loads in data
+	_loadGpsData();
+	strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
+
+	_splitNmea();
+
+	//recieving no new data
+	if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+	{
+		g_gpsData.hasUpdate = false;
+		// leave function
+		return;
+	}
+
+
+
+	//lock structure
+	while(g_gpsData.lock)
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	g_gpsData.lock = true;
+
+
+
+	// first time loading in
+	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
+	{
+		_addNmeaData();
+
+		//load next packet
+		_loadGpsData();
+		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
+		_splitNmea();
+
+		firstFlag = true;
+
+	}
+
+	//if no unsent data
+	if((strcmp((char*)g_gpsData.nmeaGGA, "") && strcmp((char*)g_gpsData.nmeaRMC, "")) && !firstFlag)
+	{
+
+
+		_addNmeaData();
+		//load next packet
+		_loadGpsData();
+		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
+		_splitNmea();
+
+		//recieving no new data
+		if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+		{
+			g_gpsData.hasUpdate = false;
+			// leave function
 			return;
 		}
-		fscanf(_gpsFile, "%s", gpsNmea);
-	#else
-		//TODO: Implement gpsRead w/ hardware
-	#endif
 
-	print("Reading:",);
+		time = 0;
+		_findNmeaAddr(1);
+		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-// Parse each GPS packet type
-	//	Type = GPGGA
-	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
-		print("GGA\n");
+		//printf("%d\n",g_gpsData.utc);
+		if(time == g_gpsData.utc )
+		{
+			//printf("here\n");
+			// if time stamps are equal
+			_addNmeaData();
 
+			g_gpsData.hasUpdate = true;
+
+			//unlocking
+			g_gpsData.lock = false;
+
+			__printGpsData();
+
+		}
+		else
+		{
+
+			// time stamps are different
+
+			// setting unreciveced data to zero
+			if((strcmp((char*)g_gpsData.nmeaGGA, "")))
+			{
+				//never recieved rmc
+				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaRMC);
+				g_gpsData.speed = 0.0;
+
+			}
+			else
+			{
+				//never recieved gga
+				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaGGA);
+				g_gpsData.alt = 0.0;
+				g_gpsData.fix = 0;
+
+			}
+
+
+			//unlocking
+			g_gpsData.hasUpdate = true;
+			g_gpsData.lock = false;
+			__printGpsData();
+			do
+			{
+					#ifndef NDEBUG
+						g_gpsData.hasUpdate = false; // Breaks infinite loop if run in testbed
+					#endif
+				retryTakeDelay(ACQUISITION_TASK_DELAY2 / 4);
+			} while(g_gpsData.hasUpdate || g_gpsData.lock);
+
+			//relock
+			while(g_gpsData.lock)
+				retryTakeDelay(DEFAULT_TAKE_DELAY);
+			g_gpsData.lock = true;
+
+			_addNmeaData();
+
+
+			// setting unreciveced data to zero
+			if(!_getNmeaType())
+			{
+
+				//never recieved gga
+				//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaGGA);
+				g_gpsData.alt = 0.0;
+				g_gpsData.fix = 0;
+
+			}
+			else
+			{
+				//never recieved rmc
+				//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+				_clearNmea((char*)&g_gpsData.nmeaRMC);
+				g_gpsData.speed = 0.0;
+
+			}
+
+			//unlock
+			g_gpsData.hasUpdate = false;
+			g_gpsData.lock = false;
+
+
+		}
+	} else {
+
+		// unsent data in struct
+		time = 0;
+		_findNmeaAddr(1);
+		time = atoi(&gpsNmea[_nmeaAddrStart]);
+
+		if(time == g_gpsData.utc ) {
+
+			// if time stamps are equal
+			_addNmeaData();
+
+			g_gpsData.hasUpdate = true;
+
+			//unlocking
+			g_gpsData.lock = false;
+			__printGpsData();
+
+
+	    } else {
+
+			//timestamps are different
+
+			//unlocking
+				g_gpsData.hasUpdate = true; // This sets hasUpdate = true
+				g_gpsData.lock = false;
+				__printGpsData();
+				do {
+					retryTakeDelay(ACQUISITION_TASK_DELAY2);
+					#ifndef NDEBUG
+						g_gpsData.hasUpdate = false; // Breaks infinite loop if run in testbed
+					#endif
+				} while(g_gpsData.hasUpdate || g_gpsData.lock); // Only breaks if hasUpdate = false or locked
+
+
+				//relock
+				while(g_gpsData.lock)
+						retryTakeDelay(DEFAULT_TAKE_DELAY);
+				g_gpsData.lock = true;
+
+				_addNmeaData();
+
+
+				// setting unreciveced data to zero
+				if(!_getNmeaType())
+				{
+
+					//never recieved rmc
+					//strncpy((char*)g_gpsData.nmeaRMC, "", 0);
+					_clearNmea((char*)&g_gpsData.nmeaRMC);
+					g_gpsData.speed = 0.0;
+
+				}
+				else
+				{
+
+					//never recieved gga
+					//strncpy((char*)g_gpsData.nmeaGGA, "", 0);
+					_clearNmea((char*)&g_gpsData.nmeaGGA);
+					g_gpsData.alt = 0.0;
+					g_gpsData.fix = 0;
+
+				}
+
+				//unlock
+				g_gpsData.hasUpdate = false;
+				g_gpsData.lock = false;
+
+		}
 	}
-	//	Type = GPRMC
-	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
-		//puts("RMC");
-		print("RMC\n");
-	}
-
-	//	Catch Bad Read
-	else {
-		gpsNominal = false;
-
-
-	}
-
-	g_gpsData.timeStamp = getTimeStamp();
-
-	strncpy((char*)g_gpsData.NMEA, gpsNmea, strlen(gpsNmea));
-
-//	return;
 }
 
 
@@ -261,15 +527,20 @@ void gpsRead_A() {
  * @date 12/23/2020
  */
 void bmpRead_A() {
+	printf("    BMP Read %d\r\n", bmpCounter);
+	return;
 	i32 temperature = 0;
 	i32 pressure = 0;
-	#ifdef NDEBUG
-	barometerRead(&temperature, &pressure);
+	#ifndef NDEBUG
+
+		// TODO: Implement BMP Simulation
+	#else
+		barometerRead(&temperature, &pressure);
 	#endif
 
 	if(bmpNominal) {
 		while(g_bmpData.lock)
-			retryTakeDelay(0);
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
 
 		g_bmpData.lock = true;
 		g_bmpData.timeStamp = getTimeStamp();
@@ -296,32 +567,44 @@ void bmpRead_A() {
  * @date 12/23/2020
  */
 void imuRead_A() {
+	printf("        IMU Read %d\r\n", imuCounter);
+	#ifndef NDEBUG
 
+		// TODO: Implement IMU Simulation
+	#else
+		// TODO: Implement imuRead in hardware
+	#endif
 }
 
-/* TODO: Implement checkStatus
- * Checks status of acquisition tasks including:
- *   - Whether sensors are still nominal
- *   - Whether or not to enable/disable daqScaling
+
+/** checkStatus_A()
+ * @brief Check Status of Acquisition Task
+ * Check status of DAQ Scaling and Sensors. Update if necessary.
  *
- * Author: Jeff Kaji
- * Date: 12/23/2020
+ * @author Jeff Kaji
+ * @date 12/23/2020
  */
 void checkStatus_A() {
-	// Check for daqScaling update
+	// Check for daqScalingEnabled update
 	while(g_daqScalingData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_daqScalingData.lock = true;
 	if(g_daqScalingData.hasUpdate) {
-		daqScaling = g_daqScalingData.enableDaqScaling;
+		daqScalingEnabled = g_daqScalingData.enableDaqScaling;
 		g_daqScalingData.hasUpdate = false;
 		sendDaqStatus = true;
+		#ifndef NDEBUG
+		printf("-- DAQ Scaling: %s --\n", (daqScalingEnabled) ? _TRUE : _FALSE);
+		#endif
 	}
 	g_daqScalingData.lock = false;
 
 	// GPS handling
 	if(!gpsNominal) {
+#ifndef NDEBUG
+		if(simulateGps)
+#endif
 		gpsSetup_A();
 		if(gpsNominal) {
 			sendDaqStatus = true;
@@ -330,6 +613,9 @@ void checkStatus_A() {
 
 	// BMP Handling
 	if(!bmpNominal) {
+#ifndef NDEBUG
+		if(simulateGps)
+#endif
 		bmpSetup_A();
 		if(bmpNominal) {
 			sendDaqStatus = true;
@@ -338,6 +624,9 @@ void checkStatus_A() {
 
 	// IMU Handling
 	if(!imuNominal) {
+#ifndef NDEBUG
+		if(simulateImu)
+#endif
 		imuSetup_A();
 		if(imuNominal) {
 			sendDaqStatus = true;
@@ -346,6 +635,9 @@ void checkStatus_A() {
 
 	// ALA Handling
 	if(!alaNominal) {
+#ifndef NDEBUG
+		if(simulateAla)
+#endif
 		alaSetup_A();
 		if(alaNominal) {
 			sendDaqStatus = true;
@@ -355,11 +647,15 @@ void checkStatus_A() {
 	// Send update if needed
 	if(sendDaqStatus) {
 		sendUpdate_A();
+		updateLeds_A();
 	}
 }
+
+
 /**
  * @brief Send Update
  * Updates the daqStatusData interface struct.
+ * Is called by the function checkStatus_A().
  *
  * @param None
  * @retval None
@@ -369,11 +665,11 @@ void checkStatus_A() {
  */
 void sendUpdate_A() {
 	while(g_daqStatusData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_daqStatusData.lock = true;
 	g_daqStatusData.timeStamp = getTimeStamp();
-	g_daqStatusData.daqScaling = daqScaling;
+	g_daqStatusData.daqScalingEnabled = daqScalingEnabled;
 	g_daqStatusData.gpsNominal = gpsNominal;
 	g_daqStatusData.bmpNominal = bmpNominal;
 	g_daqStatusData.imuNominal = imuNominal;
@@ -381,7 +677,9 @@ void sendUpdate_A() {
 	g_daqStatusData.hasUpdate = true;
 	g_daqStatusData.lock = false;
 
-	updateLeds_A();
+	#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition DAQ Status Data sent\r\n");
+	#endif
 }
 
 
@@ -393,20 +691,152 @@ void sendUpdate_A() {
  */
 void updateLeds_A() {
 #ifdef NDEBUG
-	HAL_GPIO_WritePin(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin, imuNominal);
-	HAL_GPIO_WritePin(U2S_CHECK_GPIO_Port, U2S_CHECK_Pin, alaNominal);
-	HAL_GPIO_WritePin(U3S_CHECK_GPIO_Port, U3S_CHECK_Pin, bmpNominal);
-	HAL_GPIO_WritePin(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin, gpsNominal);
+	setLed(&U1S_CHECK_Led, imuNominal);
+	setLed(&U2S_CHECK_Led, alaNominal);
+	setLed(&U3S_CHECK_Led, bmpNominal);
+	setLed(&U4S_CHECK_Led, gpsNominal);
 
 	if(gpsNominal && bmpNominal && imuNominal && alaNominal) {
-		HAL_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_RESET);
+		setLed(&SENSOR_NOMINAL_Led, GPIO_PIN_SET);
+		setLed(&SENSOR_ERROR_Led, GPIO_PIN_RESET);
 	} else {
-		HAL_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET);
+		setLed(&SENSOR_NOMINAL_Led, GPIO_PIN_RESET);
+		setLed(&SENSOR_ERROR_Led, GPIO_PIN_SET);
 	}
+
+#ifdef ACQUISITION_LEDS_BANKED
+	setSrBank(&ACQUISITION_LED_Bank);
+#endif
+
+	#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
+		printf("    Task Update: Acquisition LEDs Updated\r\n");
+	#endif
 #endif
 }
+
+
+/**
+ * @brief adds Nmea data to struct
+ * gets nmea varaibles from the string and adds variables to struct depending on Nmea type
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jack Wiley
+ * @date 1/25/2020
+ */
+
+void _addNmeaData()
+{
+	// local variables
+	int time; //holds value until copied into struct
+	float altitude;  //holds value until copied into struct
+	float speed; //holds value until copied into struct
+	int fix; //holds value until copied into struct
+
+	if(!_getNmeaType())
+			{
+		//Type GGA
+		//adds GCA to struct
+		strncpy((char*)g_gpsData.nmeaGGA, unsplitGpsNmea, strlen(unsplitGpsNmea));
+
+		//adds time to stuct
+		time = 0;
+		_findNmeaAddr(1);
+		time = atoi(&gpsNmea[_nmeaAddrStart]);
+
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
+
+
+		//adds altitude to struct
+		altitude = 0;
+		_findNmeaAddr(9);
+		altitude = atof(&gpsNmea[_nmeaAddrStart]);
+		g_gpsData.alt = altitude;
+
+		//adds fix to struct
+		fix = 0;
+		_findNmeaAddr(6);
+		fix = atof(&gpsNmea[_nmeaAddrStart]);
+		g_gpsData.fix = fix;
+
+	}
+	else
+	{
+		//Type RMC
+		strncpy((char*)g_gpsData.nmeaRMC, unsplitGpsNmea, strlen(unsplitGpsNmea));
+
+		//adds time to stuct
+		time = 0;
+		_findNmeaAddr(1);
+		time = atoi(&gpsNmea[_nmeaAddrStart]);
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
+
+		//adds speed to struct
+		speed = 0;
+		_findNmeaAddr(7);
+		speed = atof(&gpsNmea[_nmeaAddrStart]);
+		g_gpsData.speed = speed;
+
+
+
+	}
+
+
+}
+
+
+/**
+ * @brief gets the Nmea type
+ * returns 0 if the Nmea is GCC, and 1 if the Nmea is RMC
+ *
+ * @param None
+ * @retval type, 1 or 0 depending on description above
+ *
+ * @author Jack Wiley
+ * @date 1/25/2020
+ */
+int _getNmeaType()
+{
+
+	//	Type = GPGGA
+	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
+		return 0;
+	}
+		//	Type = GPRMC
+	else
+	{
+		return 1;
+	}
+
+}
+
+/**
+ * @brief Loads Gps Data
+ * Takes data from either hardware or text file depending on if debuging
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jack Wiley
+ * @date 1/25/2020
+ */
+void _loadGpsData()
+{
+#ifndef NDEBUG
+		if(!simulateGps) {
+			if(notifyWhenReadAborted)
+				printf("GPS read aborted.\n");
+			return;
+		}
+		fscanf(_gpsFile, "%s", gpsNmea);
+	#else
+		//TODO: Implement gpsRead w/ hardware
+	#endif
+}
+
 /**
  * @brief Split NMEA String
  * Takes raw NMEA string and replaces ',' with 0, splitting each substring
@@ -457,7 +887,33 @@ void _findNmeaAddr(int addr) {
     }
 }
 
+void _clearNmea(char *nmea) {
+	for(int i = 0; i < MAX_NMEA; i++)
+		nmea[i] = 0;
+}
+
 // Test Functions
+
+
+/**
+ * @brief Prints Gps Data
+ *
+ * @param None
+ * @retval None
+ *
+ * @author Jack Wiley
+ * @date 1/26/2020
+ */
+void __printGpsData()
+{
+
+	printf("Time: %d\n",g_gpsData.utc);
+	printf("GGA: %s\n",g_gpsData.nmeaGGA);
+	printf("RMC: %s\n",g_gpsData.nmeaRMC);
+	printf("Fix: %d\n",g_gpsData.fix);
+	printf("Alt: %f\n",g_gpsData.alt)	;
+	printf("Speed: %f\n\n",g_gpsData.speed);
+}
 
 /**
  * @brief Set Local NMEA String
@@ -475,8 +931,8 @@ void __setNmea(char *nmea) {
 }
 
 /**
- * @brief Print NMEA string
- * Prints NMEA string to console. Used for debugging.
+ * @brief Prints NMEA string
+ * printf NMEA string to console. Used for debugging.
  *
  * @param None
  * @retval None
@@ -485,7 +941,7 @@ void __setNmea(char *nmea) {
  * @date 12/26/2020
  */
 void __printNmea() {
-	prints("\n%s", gpsNmea);
+	printf("\n%s", gpsNmea);
 }
 
 /**
@@ -499,11 +955,11 @@ void __printNmea() {
  */
 float __getFloat(int addr) {
 	_findNmeaAddr(addr);
-	prints("Start: %d\n", _nmeaAddrStart);
-	prints("End:   %d\n", _nmeaAddrEnd);
-	prints("%s\n", &gpsNmea[_nmeaAddrStart]);
+	printf("Start: %d\n", _nmeaAddrStart);
+	printf("End:   %d\n", _nmeaAddrEnd);
+	printf("%s\n", &gpsNmea[_nmeaAddrStart]);
 	return atof(&gpsNmea[_nmeaAddrStart]);
 }
 void __debug() {
-	prints("%s",&gpsNmea[_nmeaAddrEnd + 1]);
+	printf("%s",&gpsNmea[_nmeaAddrEnd + 1]);
 }

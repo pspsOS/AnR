@@ -24,7 +24,7 @@ char transmissionString[MAX_TRANSMISSION_SIZE] = {0};
 void getData_T(){
 	// Wait for unlock
 	while(g_transmissionData.lock) {
-			retryTakeDelay(0);
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
 		}
 
 	// Lock

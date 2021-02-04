@@ -7,6 +7,8 @@
 
 #include "../IncPSP/common.h"
 #include <unistd.h>
+
+
 /* Global variable declarations */
 
 // acquisition
@@ -124,7 +126,7 @@ int insertNewAltitude(float newAltitude) {
 	g_newAltitudeNode = lastNewNode->nextNode;
 
 	while (g_newAltitudeNode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newAltitudeNode->lock = true;
 	g_newAltitudeNode->altitude = newAltitude;
@@ -138,7 +140,7 @@ int insertNewALA(float newALA) {
 	g_newALANode = lastNewNode->nextNode;
 
 	while (g_newALANode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newALANode->lock = true;
 	g_newALANode->gForce = newALA;
@@ -152,7 +154,7 @@ int insertNewStaticOrientation(float newStaticOrientation) {
 	g_newStaticOrientationNode = lastNewNode->nextNode;
 
 	while (g_newStaticOrientationNode->lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_newStaticOrientationNode->lock = true;
 	g_newStaticOrientationNode->staticOrientation = newStaticOrientation;
@@ -212,10 +214,86 @@ ui32 getTimeStamp(void) {
  * @date 12/28/2020
  */
 void retryTakeDelay(int length) {
-#ifndef NDEBUG
-	// Do Nothing
-#else
-	// TODO: Implement retryTakeDelay
-	// Using rtos
+#ifdef NDEBUG
+	vTaskDelay(length);
 #endif
 }
+
+
+/*
+void notify(Message_ID message, Device_ID device) {
+#ifdef SUPRESS_ALL
+	return;
+#endif
+#ifdef SUPRESS_TASK_UPDATES
+	if(message == TASK_UPDATE) return;
+#endif
+#ifdef SUPRESS_SETUP_WARNING
+	if(message == SETUP_WARNING) return;
+#endif
+
+	extern bool imuNominal;
+	extern bool alaNominal;
+	extern bool bmpNominal;
+	extern bool gpsNominal;
+	extern bool nandNominal;
+
+	switch(message) {
+	case TASK_UPDATE:
+		printf("    Task Update: ");
+		break;
+	case SETUP_WARNING:
+		printf("! Setup Warning: ");
+		break;
+	}
+
+	switch(device) {
+	case SYSTEM:
+		printf("System: ");
+		break;
+	case GPS:
+		printf("   GPS: ");
+		break;
+	case BMP:
+		printf("   BMP: ");
+		break;
+	case IMU:
+		printf("   IMU: ");
+		break;
+	case ALA:
+		printf("   ALA: ");
+		break;
+	case NAND:
+		printf("  NAND: ");
+		break;
+	}
+
+	switch(message) {
+	case TASK_UPDATE:
+		switch(device) {
+		case GPS:
+			printf("Nominal Status: %s\r\n", gpsNominal ? "True" : "False");
+			break;
+		case BMP:
+			printf("Nominal Status: %s\r\n", bmpNominal ? "True" : "False");
+			break;
+		case IMU:
+			printf("Nominal Status: %s\r\n", imuNominal ? "True" : "False");
+			break;
+		case ALA:
+			printf("Nominal Status: %s\r\n", alaNominal ? "True" : "False");
+			break;
+		case NAND:
+			printf("Nominal Status: %s\r\n", nandNominal ? "True" : "False");
+			break;
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+
+
+}
+*/
+

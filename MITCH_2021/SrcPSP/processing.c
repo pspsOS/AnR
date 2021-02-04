@@ -12,7 +12,7 @@
 #include <debugSettings.h>
 #include <unistd.h>
 #else
-#include "imu.h"
+#include "imuInterface.h"
 #endif
 
 bool bmpDStatus = false;

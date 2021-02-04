@@ -27,6 +27,8 @@ bool hardwareDeploymentDisable; // Terminal block disables deployment in hardwar
 // File pointers for Debugging
 #ifndef NDEBUG
 	FILE *_monitoringFile;
+#elif defined(__STM32F4xx_ADC_H)
+	extern ADC_HandleTypeDef hadc1;
 #endif
 
 /**
@@ -47,10 +49,11 @@ void setup_M() {
 	#else
 		// TODO: Implement Monitoring Setup
 	#endif
-	batteryVoltage = 7.4;
-	for (ui8 i = 0; i < 4; i++) {
-		continuity[i] = true;
-	}
+	batteryVoltage = 0;
+	continuity[0] = false;
+	continuity[1] = false;
+	continuity[2] = false;
+	continuity[3] = false;
 	buttonState = false;
 	hardwareDeploymentDisable = false;
 }
@@ -70,16 +73,16 @@ void loop_M() {
 	#ifndef NDEBUG
 		if(!simulateMonitoring) {
 			if(notifyWhenReadAborted)
-				print("Monitoring read aborted.\n");
+				printf("Monitoring read aborted.\n");
 			return;
 		}
 		fscanf(_monitoringFile, "%f", &batteryVoltage);
-		fscanf(_monitoringFile, "%d", &continuity[0]);
-		fscanf(_monitoringFile, "%d", &continuity[1]);
-		fscanf(_monitoringFile, "%d", &continuity[2]);
-		fscanf(_monitoringFile, "%d", &continuity[3]);
-		fscanf(_monitoringFile, "%d", &buttonState);
-		fscanf(_monitoringFile, "%d", &hardwareDeploymentDisable);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[0]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[1]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[2]);
+		fscanf(_monitoringFile, "%d", (int*)&continuity[3]);
+		fscanf(_monitoringFile, "%d", (int*)&buttonState);
+		fscanf(_monitoringFile, "%d", (int*)&hardwareDeploymentDisable);
 	#else
 		checkBatteryVoltage_M();
 		checkContinuity_M();
@@ -102,7 +105,12 @@ void loop_M() {
  */
 
 void checkBatteryVoltage_M() {
+	#if defined(NDEBUG) && defined(__STM32F4xx_ADC_H)
 	// TODO: Implement battery voltage reading from hardware
+	 HAL_ADC_Start(&hadc1);
+	 HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // TODO: Add appropriate time delay (not HAL_MAX_DELAY)
+	 batteryVoltage = (HAL_ADC_GetValue(&hadc1)) * (ADC_VREF / 4095); // TODO: Add resistor math for total Vbat
+	#endif
 }
 
 /**
@@ -119,10 +127,10 @@ void checkBatteryVoltage_M() {
 
 void checkContinuity_M() {
 	#ifdef NDEBUG
-		continuity[1] = HAL_GPIO_ReadPin(GPIOC, SENSE_A_Pin);
-		continuity[2] = HAL_GPIO_ReadPin(GPIOC, SENSE_B_Pin);
-		continuity[3] = HAL_GPIO_ReadPin(GPIOC, SENSE_C_Pin);
-		continuity[4] = HAL_GPIO_ReadPin(GPIOC, SENSE_D_Pin);
+		continuity[0] = PSP_GPIO_ReadPin(SENSE_A_GPIO_Port, SENSE_A_Pin);
+		continuity[1] = PSP_GPIO_ReadPin(SENSE_B_GPIO_Port, SENSE_B_Pin);
+		continuity[2] = PSP_GPIO_ReadPin(SENSE_C_GPIO_Port, SENSE_C_Pin);
+		continuity[3] = PSP_GPIO_ReadPin(SENSE_D_GPIO_Port, SENSE_D_Pin);
 	#endif
 }
 
@@ -140,7 +148,7 @@ void checkContinuity_M() {
 
 void checkButtonState_M() {
 	#ifdef NDEBUG
-		buttonState = HAL_GPIO_ReadPin(GPIOC, DISARM_INPUT_Pin);
+		buttonState = PSP_GPIO_ReadPin(DISARM_INPUT_GPIO_Port, DISARM_INPUT_Pin);
 	#endif
 }
 
@@ -158,7 +166,7 @@ void checkButtonState_M() {
 
 void checkHardwareDeploymentDisable_M() {
 	#ifdef NDEBUG
-		hardwareDeploymentDisable = HAL_GPIO_ReadPin(GPIOC, CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin);
+		hardwareDeploymentDisable = PSP_GPIO_ReadPin(CHECK_HARDWARE_DEPLOYMENT_DISABLE_GPIO_Port, CHECK_HARDWARE_DEPLOYMENT_DISABLE_Pin);
 	#endif
 }
 
@@ -175,7 +183,7 @@ void checkHardwareDeploymentDisable_M() {
 
 void sendUpdate_M() {
 	while(g_monitoringData.lock) {
-		retryTakeDelay(0);
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
 	g_monitoringData.lock = true;
 	g_monitoringData.timeStamp = getTimeStamp();

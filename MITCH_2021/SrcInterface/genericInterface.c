@@ -11,9 +11,9 @@ GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
 	else return HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
 }
 
-void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name) {
+void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState pinState, char* name) {
 	if(GPIO_Pin != FAKE_GPIO) {
-		HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);
+		HAL_GPIO_WritePin(GPIOx, GPIO_Pin, pinState);
 
 	}
 #if !defined(SUPRESS_SETUP_WARNING) && !defined(SUPRESS_ALL)
@@ -54,32 +54,28 @@ void handleHalError(Device_ID device)
 	//I don't know what you guys need, but this is for you to fill out
 	// TODO: Implement handleHalError
 
-	switch(device) {
-	case BMP:
-		*(sensors.bmpNomPtr) = false;
-		break;
-	default:
-		break;
-	}
+	nomPtr[device] = false;
 }
 
-srBank_t newSrBank(GPIO_TypeDef* GPIOx, uint16_T GPIO_Pin) {
-	srBank_t bank = {0, 0, GPIOx, GPIO_Pin, 0};
+srBank_t newSrBank(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
+	srBank_t bank = {0, 0, GPIOx, GPIO_Pin, 0, 0, false};
 	return bank;
 }
 
-led_t newPinLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
-	led_t led = {PIN_LED, GPIOx, GPIO_Pin, 0, 0};
+led_t newPinLed(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
+	led_t led = {PIN_LED, GPIOx, GPIO_Pin, 0};
 	return led;
 }
-led_t newBankLED(srBank_t* bank, uint16_t GPIO_Pin) {
-	led_t led = {BANK_LED, 0, GPIO_Pin, bank, 0};
+
+led_t newBankLed(srBank_t* bank, uint16_t GPIO_Pin) {
+	led_t led = {BANK_LED, 0, GPIO_Pin, bank};
 	if(GPIO_Pin < 16)
 		bank->registered = setBit(bank->registered, GPIO_Pin, 1);
 	return led;
 }
+
 led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin) {
-	led_t led = {BANK_MIXED, 0, GPIO_Pin, bank, 0};
+	led_t led = {BANK_MIXED, 0, GPIO_Pin, bank};
 	if(GPIO_Pin < 16) {
 		bank->registered = setBit(bank->registered, GPIO_Pin, 1);
 		bank->types = setBit(bank->types, GPIO_Pin, 1);
@@ -87,3 +83,23 @@ led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin) {
 	return led;
 }
 
+void setLed(led_t* led, GPIO_PinState pinState) {
+	uint16_t oldState = 0;
+
+	switch(led->type) {
+	case PIN_LED:
+		if(led->GPIO_Pin != FAKE_GPIO) HAL_GPIO_WritePin(led->GPIOx, led->GPIO_Pin, pinState);
+		break;
+	case BANK_LED:
+	case BANK_MIXED:
+		oldState = led->bank->state;
+		led->bank->state = (led->bank->state | led->GPIO_Pin);
+		if(pinState == GPIO_PIN_RESET) led->bank->state -= led->GPIO_Pin;
+		if(oldState != led->bank->state) led->bank->hasUpdate = true;
+		break;
+	}
+}
+
+void setSrBank(srBank_t bank) {
+
+}

@@ -30,7 +30,7 @@
 #define MIN(A, B) ( ((A)<(B)) ? (A) : (B))
 #define MAX(A, B) ( ((A)>(B)) ? (A) : (B))
 #define getBit(A, X) ((((A >> X) & 0x01) == 0x01) ? (0x01) : (0x00))
-#define setBit(A, X, V) (A & ~(0x01 << X) | (V << X))
+#define setBit(A, X, V) (A & ~((0x01 << X) | (V << X)))
 
 
 /* User-defined Constants*/
@@ -58,15 +58,7 @@
 
 // Sensor Defines
 
-typedef enum {
-	SYSTEM = 0,
-	GPS = 1,
-	BMP = 2,
-	IMU = 3,
-	ALA = 4,
-	NAND = 5,
 
-} Device_ID;
 
 typedef enum {
 	TASK_UPDATE = 0,
@@ -244,7 +236,7 @@ int insertNewStaticOrientation(float );
 
 float calcAvgAlt();
 
-void notify(Message_ID message, Device_ID device);
+//void notify(Message_ID message, Device_ID device);
 
 
 

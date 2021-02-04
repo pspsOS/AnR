@@ -7,13 +7,11 @@
 
 #ifndef GPIO_H_
 #define GPIO_H_
-
-
+#include "genericInterface.h"
 
 #ifdef LD2_Pin
 void toggleLed();
 #endif
-
 
 // GPIO Setup
 #ifdef NDEBUG
@@ -104,6 +102,7 @@ void toggleLed();
 
 
 #endif
+
 
 
 #endif /* GPIO_H_ */

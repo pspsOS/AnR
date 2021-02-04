@@ -3,18 +3,12 @@
 
 //Includes
 #include "main.h"
-#include "../IncPSP/gpio.h"
-#include "stm32f4xx_hal_gpio.h"
-#include "stm32f4xx_hal_uart.h"
-#include "stm32f4xx_hal_def.h"
-#include "stm32f4xx_hal.h"
-#include "cmsis_os.h"
 #include <stdbool.h>
 #include <stdio.h>
-#include "common.h"
+//#include "common.h"
+#include "gpio.h"
 
-#if CS1_PIN != FAKE_PIN || CS2_PIN != FAKE_PIN || CS3_PIN != FAKE_PIN
-	#include "stm32f4xx_hal_spi.h"
+#ifdef STM32F4xx_HAL_SPI_H
 	#define _SPI_CONFIGURED
 #endif
 
@@ -32,28 +26,21 @@
 
 #define ADC_VREF				3.3
 
+#define NUM_DEVICES (5)
+typedef enum {
+	GPS = 0,
+	BMP = 1,
+	IMU = 2,
+	ALA = 3,
+	NAND = 4,
+} Device_ID;
 
+bool* nomPtr[NUM_DEVICES];
 
 //Structs
 typedef struct {
 	//GPS Data
 	char * gpsString;       //Use this if you like
-
-	//Baro Data
-	uint16_t senst1;		//C1 on datasheet
-	uint16_t offt1; 		//C2 on datasheet
-	uint16_t tcs;			//C3 on datasheet
-	uint16_t tco;			//C4 on datasheet
-	uint16_t tref;			//C5 on datasheet
-	uint16_t tempsens;		//C6 on datasheet
-	uint32_t digitalPres;	//D1 on datasheet (Only 24 bits will be filled)
-	uint32_t digitalTemp;	//D2 on datasheet (Only 24 bits will be filled)
-	int32_t	deltaT;			//dT on datasheet (This is a calculated value)
-	int32_t temp;			//TEMP on datasheet
-	int64_t off;			//OFF on datasheet (This is a calculated value)
-	int64_t sens;			//SENS on datasheet (This is a calculated value)
-	int32_t pressure;		//P on datasheet (This is a calculated value)
-	bool *bmpNomPtr;
 
 	//Linear Accel Data
 	int16_t accel;
@@ -69,8 +56,9 @@ typedef struct srBank {
 	uint16_t types;
 	GPIO_TypeDef* GPIOx;
 	uint16_t GPIO_Pin;
-
 	uint16_t state;
+	uint16_t read;
+	bool hasUpdate;
 } srBank_t;
 
 
@@ -85,13 +73,14 @@ typedef struct led {
 	GPIO_TypeDef* GPIOx;
 	uint16_t GPIO_Pin;
 	srBank_t* bank;
-
-	uint8_t state;
 } led_t;
 
-led_t newPinLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-led_t newBankLED(srBank_t* bank, uint16_t GPIO_Pin);
+srBank_t newSrBank(GPIO_TypeDef* GPIOx, uint16_t);
+led_t newPinLed(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+led_t newBankLed(srBank_t* bank, uint16_t GPIO_Pin);
 led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin);
+void setLed(led_t* led, GPIO_PinState pinState);
+void setSrBank(srBank_t bank);
 
 //Prototypes
 #ifdef _SPI_CONFIGURED
@@ -106,7 +95,7 @@ HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t 
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 
 void handleHalError(uint8_t SENSOR);
-#endif
+
 
 GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState, char* name);
@@ -119,3 +108,4 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
  * one overall data structure.
  *
  */
+#endif

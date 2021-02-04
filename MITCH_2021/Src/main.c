@@ -81,13 +81,23 @@ osThreadId MonitoringHandle;
 uint32_t MonitoringBuffer[ 128 ];
 osStaticThreadDef_t MonitoringControlBlock;
 /* USER CODE BEGIN PV */
+
+// Acquisition LEDs
 led_t U1S_CHECK_Led;
 led_t U2S_CHECK_Led;
 led_t U3S_CHECK_Led;
 led_t U4S_CHECK_Led;
-
 led_t SENSOR_NOMINAL_Led;
 led_t SENSOR_ERROR_Led;
+
+// Central LEDs
+led_t ARMED_Led;
+led_t CENTRAL_NOMINAL_Led;
+led_t CENTRAL_ERROR_Led;
+led_t DROGUE_Led;
+led_t MAIN_Led;
+led_t STORAGE_ERROR_Led;
+led_t ADC_ERROR_Led;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,13 +132,24 @@ void startMonitoring(void const * argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	// Acquisition LEDs
 	U1S_CHECK_Led = newPinLed(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin);
 	U2S_CHECK_Led = newPinLed(U2S_CHECK_GPIO_Port, U1S_CHECK_Pin);
 	U3S_CHECK_Led = newPinLed(U3S_CHECK_GPIO_Port, U1S_CHECK_Pin);
 	U4S_CHECK_Led = newPinLed(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin);
-
 	SENSOR_NOMINAL_Led = newPinLed(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin);
 	SENSOR_ERROR_Led = newPinLed(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin);
+
+	// Central LEDs
+	ARMED_Led = newPinLed(ARMED_LED_GPIO_Port, ARMED_LED_Pin);
+	CENTRAL_NOMINAL_Led = newPinLed(CENTRAL_NOMINAL_GPIO_Port, CENTRAL_NOMINAL_Pin);
+	CENTRAL_ERROR_Led = newPinLed(CENTRAL_ERROR_GPIO_Port, CENTRAL_ERROR_Pin);
+	DROGUE_Led = newPinLed(DROGUE_LED_GPIO_Port, DROGUE_LED_Pin);
+	MAIN_Led = newPinLed(MAIN_LED_GPIO_Port, MAIN_LED_Pin);
+	STORAGE_ERROR_Led = newPinLed(STORAGE_ERROR_GPIO_Port, STORAGE_ERROR_Pin);
+	ADC_ERROR_Led = newPinLed(ADC_ERROR_GPIO_Port, ADC_ERROR_Pin);
+
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

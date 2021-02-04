@@ -14,7 +14,7 @@
 #define W_LOAD_RAND		0x84
 #define W_EXECUTE		0x10
 
-#define GET_FEATURE		0x0F
+#define GET_FEATURE 0x0F
 #define OP_FEATURE_ADDR	0xC0
 
 //Generic Defines

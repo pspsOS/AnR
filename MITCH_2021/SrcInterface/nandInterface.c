@@ -11,8 +11,8 @@
  */
 
 
-void nandBufferLoad(int32_t rowAddr){
-#if CS3_PIN != FAKE_PIN
+void nandBufferLoad(uint32_t rowAddr){
+//#if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
@@ -46,8 +46,8 @@ void nandBufferLoad(int32_t rowAddr){
  * @date 01/24/2021
  */
 
-void nandBufferRead(int16_t colAddr, int8_t data[], int8_t size){
-#if CS3_PIN != FAKE_PIN
+void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size){
+//#if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[3];       // Command sent to device
 

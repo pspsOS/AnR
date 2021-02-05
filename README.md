@@ -1,5 +1,6 @@
 # AnR: PSPS Avionics and Recovery GitHub
 This document was last edited by Jeffrey Kaji on *2 Jan 2021*. <br/>
+View our license [here](LICENSE)
 
 ## MITCH_2021
 **Multi-Instrument Telemetry Computer Hardware** for PSPS 2021 Rocket<br> 

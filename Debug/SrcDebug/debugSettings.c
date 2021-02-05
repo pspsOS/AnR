@@ -20,7 +20,7 @@ bool assertFileNames = true;
 
 // Acquisition Settings
 bool simulateGps = true;
-char gpsFileName[] = "TestData/gpsTestData.txt";
+char gpsFileName[] = "TestData/Gps_Real_RMCGGA_DATA.txt";
 
 bool simulateBmp = true;
 char bmpFileName[] = "TestData/bmpTestData.txt";

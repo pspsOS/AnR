@@ -294,8 +294,9 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-//bool printDiv = true;
-bool printDiv = false;
+bool printDiv = true;
+//bool printDiv = false;
+int tog = 0;
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_startControlLogic */
@@ -312,8 +313,8 @@ void startControlLogic(void const * argument)
   /* Infinite loop */
 	while(ENABLE_CONTROL_LOGIC) {
 
-		if(printDiv) printf("-------------\r\n");
-		toggleLed();
+		if(printDiv) printf("%d\r\n",(int) GPIO_PIN_SET);
+
 
 		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
 	}
@@ -375,6 +376,8 @@ void startProcessing(void const * argument)
 	extern bool gpsNominal;
   /* Infinite loop */
 	while(ENABLE_PROCESSING) {
+		toggleLed();
+		//printf
 		if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
 			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
 			//gpsNominal = false;

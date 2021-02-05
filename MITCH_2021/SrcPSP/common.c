@@ -220,7 +220,7 @@ void retryTakeDelay(int length) {
 }
 
 
-
+/*
 void notify(Message_ID message, Device_ID device) {
 #ifdef SUPRESS_ALL
 	return;
@@ -295,5 +295,5 @@ void notify(Message_ID message, Device_ID device) {
 
 
 }
-
+*/
 

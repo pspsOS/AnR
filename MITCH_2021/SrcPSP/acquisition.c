@@ -8,7 +8,8 @@
 #include "../IncPSP/acquisition.h"
 
 #ifdef NDEBUG
-	#include <baroInterface.h>
+	#include "gpsInterface.h"
+	#include "baroInterface.h"
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
@@ -46,7 +47,28 @@ ui8 _nmeaAddrEnd;
 	FILE *_alaFile;
 #endif
 
+#if defined(NDEBUG) && !defined(BYPASS_ACQUISITION_LEDS)
+	#ifdef ACQUISITION_LEDS_BANKED
+		extern srBank_t ACQUISITION_LED_Bank;
+	#endif
+	extern led_t U1S_CHECK_Led;
+	extern led_t U2S_CHECK_Led;
+	extern led_t U3S_CHECK_Led;
+	extern led_t U4S_CHECK_Led;
 
+	extern led_t SENSOR_NOMINAL_Led;
+	extern led_t SENSOR_ERROR_Led;
+
+#elif defined(NDEBUG)
+	srBank_t ACQUISITION_LED_Bank;
+	led_t U1S_CHECK_Led;
+	led_t U2S_CHECK_Led;
+	led_t U3S_CHECK_Led;
+	led_t U4S_CHECK_Led;
+
+	led_t SENSOR_NOMINAL_Led;
+	led_t SENSOR_ERROR_Led;
+#endif
 
 
 /** setup_A()
@@ -72,6 +94,17 @@ void setup_A() {
 	bmpCounter = 0;
 	imuCounter = 0;
 
+#if defined(NDEBUG) && defined(BYPASS_ACQUISITION_LEDS)
+	ACQUISITION_LED_Bank = newSrBank(0, FAKE_GPIO);
+
+	U1S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U2S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U3S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+	U4S_CHECK_Led = newPinLed(0, FAKE_GPIO);
+
+	SENSOR_NOMINAL_Led = newPinLed(0, FAKE_GPIO);
+	SENSOR_ERROR_Led = newPinLed(0, FAKE_GPIO);
+#endif
 
 	// Setup sensors
 	gpsSetup_A();
@@ -86,6 +119,8 @@ void setup_A() {
 	// Send update
 	sendUpdate_A();
 	updateLeds_A();
+
+
 }
 
 
@@ -165,7 +200,8 @@ void gpsSetup_A() {
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else
 		// TODO: Implement gpsSetup
-		notify(TASK_UPDATE, GPS);
+		gpsInit(&gpsNominal);
+		//notify(TASK_UPDATE, GPS);
 	#endif
 }
 
@@ -186,7 +222,7 @@ void bmpSetup_A() {
 		_bmpFile = setupSensorFile_DS(BMP, &bmpNominal);
 	#else
 		barometerInit(&bmpNominal);
-		notify(TASK_UPDATE, BMP);
+		//notify(TASK_UPDATE, BMP);
 	#endif
 }
 
@@ -207,7 +243,7 @@ void imuSetup_A() {
 		_imuFile = setupSensorFile_DS(IMU, &imuNominal);
 	#else
 		// TODO: Implement imuSetup
-		notify(TASK_UPDATE, IMU);
+		//notify(TASK_UPDATE, IMU);
 	#endif
 }
 
@@ -228,7 +264,7 @@ void alaSetup_A() {
 		_alaFile = setupSensorFile_DS(ALA, &alaNominal);
 	#else
 		// TODO: Implement alaSetup
-		notify(TASK_UPDATE, ALA);
+		//notify(TASK_UPDATE, ALA);
 	#endif
 }
 
@@ -245,8 +281,8 @@ void alaSetup_A() {
  * @param None
  * @retval None
  *
- * @author Jeff Kaji
- * @date 12/23/2020
+ * @author Jack Wiley
+ * @date 02/01/2021
  */
 void gpsRead_A() {
 #ifdef BYPASS_GPS
@@ -263,9 +299,16 @@ void gpsRead_A() {
 	// loads in data
 	_loadGpsData();
 	strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
+
 	_splitNmea();
 
-
+	//recieving no new data
+	if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+	{
+		g_gpsData.hasUpdate = false;
+		// leave function
+		return;
+	}
 
 
 
@@ -279,7 +322,6 @@ void gpsRead_A() {
 	// first time loading in
 	if((!strcmp((char*)g_gpsData.nmeaGGA, "") && !strcmp((char*)g_gpsData.nmeaRMC, "")))
 	{
-
 		_addNmeaData();
 
 		//load next packet
@@ -302,13 +344,22 @@ void gpsRead_A() {
 		strncpy((char*)unsplitGpsNmea, gpsNmea, strlen(gpsNmea));
 		_splitNmea();
 
+		//recieving no new data
+		if((!strcmp((char*)g_gpsData.nmeaGGA, unsplitGpsNmea) || !strcmp((char*)g_gpsData.nmeaRMC, unsplitGpsNmea)))
+		{
+			g_gpsData.hasUpdate = false;
+			// leave function
+			return;
+		}
+
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		if(time == g_gpsData.timeStamp )
+		//printf("%d\n",g_gpsData.utc);
+		if(time == g_gpsData.utc )
 		{
-
+			//printf("here\n");
 			// if time stamps are equal
 			_addNmeaData();
 
@@ -398,7 +449,7 @@ void gpsRead_A() {
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		if(time == g_gpsData.timeStamp ) {
+		if(time == g_gpsData.utc ) {
 
 			// if time stamps are equal
 			_addNmeaData();
@@ -459,44 +510,8 @@ void gpsRead_A() {
 				g_gpsData.hasUpdate = false;
 				g_gpsData.lock = false;
 
-
 		}
-
-
 	}
-
-
-
-
-	/*
-
-	printf("Reading:",);
-
-// Parse each GPS packet type
-	//	Type = GPGGA
-	if (!(strncmp(&gpsNmea[0], "$GPGGA", 6))) {
-		printf("GGA\n");
-		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
-	}
-	//	Type = GPRMC
-	else if (!(strncmp(&gpsNmea[0], "$GPRMC", 6))) {
-		//puts("RMC");
-		printf("RMC\n");
-		strncpy((char*)g_gpsData.nmeaGGA, gpsNmea, strlen(gpsNmea));
-	}
-
-	//	Catch Bad Read
-	else {
-		gpsNominal = false;
-
-
-	}
-
-	g_gpsData.timeStamp = getTimeStamp();
-
-
-*/
-//	return;
 }
 
 
@@ -676,19 +691,23 @@ void sendUpdate_A() {
  */
 void updateLeds_A() {
 #ifdef NDEBUG
-	PSP_GPIO_WritePin(U1S_CHECK_GPIO_Port, U1S_CHECK_Pin, imuNominal, "U1S_CHECK");
-	PSP_GPIO_WritePin(U2S_CHECK_GPIO_Port, U2S_CHECK_Pin, alaNominal, "U2S_CHECK");
-	PSP_GPIO_WritePin(U3S_CHECK_GPIO_Port, U3S_CHECK_Pin, bmpNominal, "U3S_CHECK");
-	PSP_GPIO_WritePin(U4S_CHECK_GPIO_Port, U4S_CHECK_Pin, gpsNominal, "U4S_CHECK");
-
+	setLed(&U1S_CHECK_Led, imuNominal);
+	setLed(&U2S_CHECK_Led, alaNominal);
+	setLed(&U3S_CHECK_Led, bmpNominal);
+	setLed(&U4S_CHECK_Led, gpsNominal);
 
 	if(gpsNominal && bmpNominal && imuNominal && alaNominal) {
-		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_SET, "SENSOR_NOMINAL");
-		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_RESET, "SENSOR_ERROR");
+		setLed(&SENSOR_NOMINAL_Led, GPIO_PIN_SET);
+		setLed(&SENSOR_ERROR_Led, GPIO_PIN_RESET);
 	} else {
-		PSP_GPIO_WritePin(SENSOR_NOMINAL_GPIO_Port, SENSOR_NOMINAL_Pin, GPIO_PIN_RESET, "SENSOR_NOMINAL");
-		PSP_GPIO_WritePin(SENSOR_ERROR_GPIO_Port, SENSOR_ERROR_Pin, GPIO_PIN_SET, "SENSOR_ERROR");
+		setLed(&SENSOR_NOMINAL_Led, GPIO_PIN_RESET);
+		setLed(&SENSOR_ERROR_Led, GPIO_PIN_SET);
 	}
+
+#ifdef ACQUISITION_LEDS_BANKED
+	setSrBank(&ACQUISITION_LED_Bank);
+#endif
+
 	#if !defined(SUPRESS_TASK_UPDATES) && !defined(SUPRESS_ALL)
 		printf("    Task Update: Acquisition LEDs Updated\r\n");
 	#endif
@@ -726,8 +745,8 @@ void _addNmeaData()
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
 
-		g_gpsData.timeStamp = time;
-
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
 
 
 		//adds altitude to struct
@@ -752,7 +771,8 @@ void _addNmeaData()
 		time = 0;
 		_findNmeaAddr(1);
 		time = atoi(&gpsNmea[_nmeaAddrStart]);
-		g_gpsData.timeStamp = time;
+		g_gpsData.utc = time;
+		g_gpsData.timeStamp = getTimeStamp();
 
 		//adds speed to struct
 		speed = 0;
@@ -814,6 +834,8 @@ void _loadGpsData()
 		fscanf(_gpsFile, "%s", gpsNmea);
 	#else
 		//TODO: Implement gpsRead w/ hardware
+		gpsLoadString(gpsNmea);
+
 	#endif
 }
 
@@ -886,12 +908,13 @@ void _clearNmea(char *nmea) {
  */
 void __printGpsData()
 {
-	printf("Time: %d\n",g_gpsData.timeStamp);
-	//prints("GGA: %s\n",g_gpsData.nmeaGGA);
-	//prints("RMC: %s\n",g_gpsData.nmeaRMC);
+
+	printf("Time: %d\n",g_gpsData.utc);
+	printf("GGA: %s\n",g_gpsData.nmeaGGA);
+	printf("RMC: %s\n",g_gpsData.nmeaRMC);
 	printf("Fix: %d\n",g_gpsData.fix);
 	printf("Alt: %f\n",g_gpsData.alt)	;
-	printf("Speed: %f\n",g_gpsData.speed);
+	printf("Speed: %f\n\n",g_gpsData.speed);
 }
 
 /**

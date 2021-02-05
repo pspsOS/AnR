@@ -39,7 +39,7 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.digitalPres = (dataIn[0] << 8) | dataIn[1];
+	bmp.digitalPres = (dataIn[0] << 8) | dataIn[1];
 
 	cmd = D2_1024; //This value will define conversion time, accuracy, and current draw
 	if (sendSPI(&cmd, 1, BARO_CS_GPIO_Port, BARO_CS_Pin, SENSORS_SPI_BUS))
@@ -55,28 +55,28 @@ void barometerRead(int32_t *temperature, int32_t *pressure) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.digitalTemp = (dataIn[0] << 8) | dataIn[1];
+	bmp.digitalTemp = (dataIn[0] << 8) | dataIn[1];
 
 	//Calculate calibrated pressure
 	//T = D2 - TREF = D2 - C5 * 2 ^ 8
-	sensors.deltaT = sensors.digitalTemp - sensors.tref * 256;
+	bmp.deltaT = bmp.digitalTemp - bmp.tref * 256;
 	//TEMP = 20°C + dT* TEMPSENS = 2000 + dT * C6 / 2 ^ 23
-	sensors.temp = 2000 + sensors.deltaT * sensors.tempsens / 8388608;
+	bmp.temp = 2000 + bmp.deltaT * bmp.tempsens / 8388608;
 	//OFF = OFFT1 + TCO* dT = C2 * 2 ^ 17 + (C4 * dT) / 2 ^ 6
-	sensors.off = sensors.offt1 * 131072 + (sensors.tco * sensors.deltaT) / 64;
+	bmp.off = bmp.offt1 * 131072 + (bmp.tco * bmp.deltaT) / 64;
 	//SENS = SENST1 + TCS * dT = C1 * 2 ^ 16 + (C3 * dT) / 2 ^ 7
-	sensors.sens = sensors.senst1 * 65536 + (sensors.tcs * sensors.deltaT) / 128;
+	bmp.sens = bmp.senst1 * 65536 + (bmp.tcs * bmp.deltaT) / 128;
 	//P = D1 * SENS - OFF = (D1 * SENS / 2 ^ 21 - OFF) / 2 ^ 15
-	sensors.pressure = (sensors.digitalPres * sensors.sens / 2097152 - sensors.off) / 32768; //This is the magic number in mbar
+	bmp.pressure = (bmp.digitalPres * bmp.sens / 2097152 - bmp.off) / 32768; //This is the magic number in mbar
 
 #else
-	sensors.temp = 0;
-	sensors.pressure = 0;
+	bmp.temp = 0;
+	bmp.pressure = 0;
 #endif
 
-	if(*sensors.bmpNomPtr) {
-		*temperature = sensors.temp;
-		*pressure = sensors.pressure;
+	if(*nomPtr[BMP]) {
+		*temperature = bmp.temp;
+		*pressure = bmp.pressure;
 	}
 
 }
@@ -100,8 +100,10 @@ void barometerInit(bool *bmpNomPtr) {
 	uint8_t cmd;       // Command sent to device
 
 	//Initialize bmpNominal as true
-	sensors.bmpNomPtr = bmpNomPtr;
-	*(sensors.bmpNomPtr) = true;
+	//sensors.bmpNomPtr = bmpNomPtr;
+	//*(sensors.bmpNomPtr) = true;
+	nomPtr[BMP] = bmpNomPtr;
+	*(nomPtr[BMP]) = true;
 
 	//Reset baro after power on
 	cmd = 0x1E;
@@ -118,7 +120,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.senst1 = (dataIn[0] << 8) | dataIn[1];
+	bmp.senst1 = (dataIn[0] << 8) | dataIn[1];
 
 	//Get value of C2
 	cmd = 0xA2;
@@ -127,7 +129,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.offt1 = (dataIn[0] << 8) | dataIn[1];
+	bmp.offt1 = (dataIn[0] << 8) | dataIn[1];
 
 	//Get value of C3
 	cmd = 0xA3;
@@ -136,7 +138,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.tcs = (dataIn[0] << 8) | dataIn[1];
+	bmp.tcs = (dataIn[0] << 8) | dataIn[1];
 
 	//Get value of C4
 	cmd = 0xA4;
@@ -145,7 +147,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.tco = (dataIn[0] << 8) | dataIn[1];
+	bmp.tco = (dataIn[0] << 8) | dataIn[1];
 
 	//Get value of C5
 	cmd = 0xA5;
@@ -154,7 +156,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.tref = (dataIn[0] << 8) | dataIn[1];
+	bmp.tref = (dataIn[0] << 8) | dataIn[1];
 
 	//Get value of C6
 	cmd = 0xA6;
@@ -163,7 +165,7 @@ void barometerInit(bool *bmpNomPtr) {
 		handleHalError(BMP);
 		return;
 	}
-	sensors.tempsens = (dataIn[0] << 8) | dataIn[1];
+	bmp.tempsens = (dataIn[0] << 8) | dataIn[1];
 #else
 	handleHalError(BMP);
 #endif

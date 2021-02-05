@@ -29,7 +29,24 @@
 #define BARO_CS_GPIO_Port CS2_GPIO_Port
 #define BARO_CS_Pin CS2_Pin
 
+typedef struct MS5607 {
+	//Baro Data
+		uint16_t senst1;		//C1 on datasheet
+		uint16_t offt1; 		//C2 on datasheet
+		uint16_t tcs;			//C3 on datasheet
+		uint16_t tco;			//C4 on datasheet
+		uint16_t tref;			//C5 on datasheet
+		uint16_t tempsens;		//C6 on datasheet
+		uint32_t digitalPres;	//D1 on datasheet (Only 24 bits will be filled)
+		uint32_t digitalTemp;	//D2 on datasheet (Only 24 bits will be filled)
+		int32_t	deltaT;			//dT on datasheet (This is a calculated value)
+		int32_t temp;			//TEMP on datasheet
+		int64_t off;			//OFF on datasheet (This is a calculated value)
+		int64_t sens;			//SENS on datasheet (This is a calculated value)
+		int32_t pressure;		//P on datasheet (This is a calculated value)
+} MS5607_t;
 
+MS5607_t bmp;
 
 //Prototypes
 void barometerRead(int32_t *temperature, int32_t *pressure);

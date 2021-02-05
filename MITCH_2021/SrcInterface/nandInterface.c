@@ -32,7 +32,7 @@ void nandBufferLoad(uint32_t rowAddr){
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 	}while(oip);
-
+//#endif
 }
 
 /**
@@ -61,6 +61,7 @@ void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size){
 		handleHalError(BMP);
 		return;
 	}
+//#endif
 }
 
 /**

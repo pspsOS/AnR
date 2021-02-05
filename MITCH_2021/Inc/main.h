@@ -32,7 +32,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "common.h"
+#include "genericInterface.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -156,7 +157,12 @@ void Error_Handler(void);
 #define ENABLE_MONITORING (1)
 #define ENABLE_PROCESSING (1)
 
-#define _SPI_CONFIGURED
+
+// Acquisition LEDs
+
+
+
+
 
 /* USER CODE END Private defines */
 

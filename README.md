@@ -1,5 +1,5 @@
 # AnR: PSPS Avionics and Recovery GitHub
-This document was last edited by Jeffrey Kaji on *2 Jan 2021*. <br/>
+This document was last edited by Jeffrey Kaji on *4 Feb 2021*. <br/>
 View our license [here](LICENSE)
 
 ## MITCH_2021

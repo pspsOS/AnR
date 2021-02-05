@@ -25,7 +25,7 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState pin
 
 spiLock_t* registerSpiLock() {
 	if(_spiLocksRegistered < NUM_SPI_LOCKS) {
-		_spiLocks[_spiLocksRegistered]->lock = false;
+		_spiLocks[_spiLocksRegistered].lock = false;
 		return &_spiLocks[_spiLocksRegistered++];
 	}
 	else return NULL;
@@ -55,9 +55,9 @@ HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t 
 #ifdef _SPI_CONFIGURED
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, len, HAL_MAX_DELAY);
-
 	for(int i = 0; i < _spiLocksRegistered; i++)
-		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin) goto bypass_unlock;
+		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin)
+			if(_spiLocks[i].lock == true) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
 	bypass_unlock:
 #endif
@@ -74,7 +74,8 @@ HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int data
 	state = HAL_SPI_Transmit(bus, cmd, cmdLen, HAL_MAX_DELAY);
 	HAL_SPI_Receive(bus, data, dataLen, HAL_MAX_DELAY);
 	for(int i = 0; i < _spiLocksRegistered; i++)
-		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin) goto bypass_unlock;
+		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin)
+			if(_spiLocks[i].lock == true) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
 	bypass_unlock:
 #endif
@@ -91,7 +92,7 @@ void handleHalError(Device_ID device)
 
 	switch(device) {
 	case NAND:
-		unlockSpi(&nandSpiLock);
+		unlockSpi(nandSpiLock);
 		break;
 	default:
 		break;

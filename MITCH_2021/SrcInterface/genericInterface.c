@@ -6,6 +6,8 @@
 
 #include "genericInterface.h"
 
+uint8_t _spiLocksRegistered = (uint8_t) 0;
+
 GPIO_PinState PSP_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
 	if(GPIO_Pin == FAKE_GPIO) return 0;
 	else return HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
@@ -21,6 +23,29 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState pin
 #endif
 }
 
+spiLock_t* registerSpiLock() {
+	if(_spiLocksRegistered < NUM_SPI_LOCKS)
+		return &_spiLocks[_spiLocksRegistered++];
+	else return NULL;
+}
+
+void setSpiLock(GPIO_TypeDef* port, uint16_t pin, spiLock_t* locker) {
+	if(locker->lock) {
+		if(pin != FAKE_GPIO) HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);
+		locker->lock = false;
+	}
+	locker->port = port;
+	locker->pin = pin;
+}
+
+void lockSpi(spiLock_t* locker) {
+	HAL_GPIO_WritePin(locker->port, locker->pin, GPIO_PIN_RESET);
+	locker->lock = true;
+}
+void unlockSpi(spiLock_t* locker) {
+	HAL_GPIO_WritePin(locker->port, locker->pin, GPIO_PIN_SET);
+	locker->lock = false;
+}
 
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus)
 {
@@ -28,7 +53,11 @@ HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t 
 #ifdef _SPI_CONFIGURED
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, len, HAL_MAX_DELAY);
+
+	for(int i = 0; i < _spiLocksRegistered; i++)
+		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
+	bypass_unlock:
 #endif
 	return state;
 }
@@ -42,7 +71,10 @@ HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int data
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, cmdLen, HAL_MAX_DELAY);
 	HAL_SPI_Receive(bus, data, dataLen, HAL_MAX_DELAY);
+	for(int i = 0; i < _spiLocksRegistered; i++)
+		if((_spiLocks[i]).port == port && (_spiLocks[i]).pin == pin) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
+	bypass_unlock:
 #endif
 	return state;
 }
@@ -53,7 +85,15 @@ void handleHalError(Device_ID device)
 	//Toggle an LED, send error messages, or something similar
 	//I don't know what you guys need, but this is for you to fill out
 	// TODO: Implement handleHalError
+	extern spiLock_t* nandSpiLock;
 
+	switch(device) {
+	case NAND:
+		unlockSpi(&nandSpiLock);
+		break;
+	default:
+		break;
+	}
 	nomPtr[device] = false;
 }
 

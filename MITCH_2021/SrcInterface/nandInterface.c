@@ -1,6 +1,16 @@
 #include <nandInterface.h>
 #include <common.h>
 
+spiLock_t* nandSpiLock;
+
+void nandInit(bool* nandNomPtr) {
+	nomPtr[NAND] = nandNomPtr;
+	nandSpiLock = registerSpiLock();
+	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, nandSpiLock);
+}
+
+
+
 /**
  * @brief Load data into the buffer from the cell array
  *
@@ -82,18 +92,17 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
 
-	//HAL_GPIO_WritePin(NAND_CS_GPIO_Port, NAND_CS_Pin, GPIO_PIN_SET);
-	//HAL_GPIO_LockPin(NAND_CS_GPIO_Port, NAND_CS_Pin);
+	lockSpi(nandSpiLock);
 
 	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 	if (sendSPI(&data[0], size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
-
+	unlockSpi(nandSpiLock);
 }
 
 /**

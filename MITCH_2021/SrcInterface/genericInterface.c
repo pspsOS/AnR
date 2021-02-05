@@ -24,8 +24,10 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState pin
 }
 
 spiLock_t* registerSpiLock() {
-	if(_spiLocksRegistered < NUM_SPI_LOCKS)
+	if(_spiLocksRegistered < NUM_SPI_LOCKS) {
+		_spiLocks[_spiLocksRegistered]->lock = false;
 		return &_spiLocks[_spiLocksRegistered++];
+	}
 	else return NULL;
 }
 

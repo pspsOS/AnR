@@ -56,6 +56,9 @@ void handleHalError(Device_ID device)
 	case BMP:
 		*(sensors.bmpNomPtr) = false;
 		break;
+	case NAND:
+		printf("Storage Error");
+		break;
 	default:
 		break;
 	}

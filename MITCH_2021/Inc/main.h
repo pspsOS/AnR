@@ -120,12 +120,12 @@ void Error_Handler(void);
 #define DISARM_INPUT_GPIO_Port GPIOG
 #define ADC_ALERT_Pin GPIO_PIN_8
 #define ADC_ALERT_GPIO_Port GPIOC
-#define CS3_Pin GPIO_PIN_0
-#define CS3_GPIO_Port GPIOD
-#define WP_Pin GPIO_PIN_1
-#define WP_GPIO_Port GPIOD
-#define HOLD_Pin GPIO_PIN_2
-#define HOLD_GPIO_Port GPIOD
+#define CS3_Pin GPIO_PIN_6
+#define CS3_GPIO_Port GPIOB
+#define WP_Pin GPIO_PIN_9
+#define WP_GPIO_Port GPIOA
+#define HOLD_Pin GPIO_PIN_7
+#define HOLD_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
 #define NDEBUG
 

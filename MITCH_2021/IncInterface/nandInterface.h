@@ -14,8 +14,11 @@
 #define W_LOAD_RAND		0x84
 #define W_EXECUTE		0x10
 
-#define GET_FEATURE 0x0F
-#define OP_FEATURE_ADDR	0xC0
+#define GET_FEATURE 	0x0F
+#define SET_FEATURE 	0x1F
+#define FEATURE_ADDR_A	0xA0
+#define FEATURE_ADDR_B	0xB0
+#define FEATURE_ADDR_C	0xC0
 
 //Generic Defines
 #define MAX_BLOCK 		2048
@@ -23,10 +26,13 @@
 #define MAX_COLUMN		4224
 
 //GPIO Defines
-
+#define NAND_CS_GPIO_Port CS3_GPIO_Port
+#define NAND_CS_Pin CS3_Pin
 
 
 //Prototypes
+
+void nandInit(bool* nandNomPtr); //setup
 
 void nandBufferLoad(uint32_t rowAddr); //Loads data from a row to the buffer
 void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size); //Reads data from the buffer into the data array
@@ -41,5 +47,6 @@ void writeEnable(); //Enables writing on the nand
 void writeDisable(); //Disables writing on the nand
 
 uint8_t getFeature(uint8_t featureAddr); //Gets a feature from the nand
+void setFeature(uint8_t featureAddr, uint8_t featureVal); //Sets a feature on the nand
 
 #endif

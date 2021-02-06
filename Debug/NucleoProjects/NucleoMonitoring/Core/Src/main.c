@@ -58,6 +58,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 UART_HandleTypeDef huart2;
 
 osThreadId ControlLogicHandle;
@@ -80,10 +82,15 @@ osStaticThreadDef_t MonitoringControlBlock;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_ADC1_Init(void);
 void startControlLogic(void const * argument);
 void startAcquisition(void const * argument);
 void startProcessing(void const * argument);
 void startMonitoring(void const * argument);
+void ADC_Select_CH0 (void);
+void ADC_Select_CH1 (void);
+void ADC_Select_CHTemp (void);
+//int CONTROL_LOGIC_TASK_DELAY;
 
 /* USER CODE BEGIN PFP */
 
@@ -101,7 +108,7 @@ void startMonitoring(void const * argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+//CONTROL_LOGIC_TASK_DELAY = 1000;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -123,6 +130,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
   for(int i = 0; i < 500; i++) printf(" \r\n");
@@ -228,6 +236,116 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+//  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+//  */
+//  sConfig.Channel = ADC_CHANNEL_0;
+//  sConfig.Rank = 1;
+//  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+//  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+//  */
+//  sConfig.Channel = ADC_CHANNEL_1;
+//  sConfig.Rank = 2;
+//  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
+//  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+//  */
+//  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+//  sConfig.Rank = 3;
+//  sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+//  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  /* USER CODE BEGIN ADC1_Init 2 */
+//
+//  /* USER CODE END ADC1_Init 2 */
+
+}
+
+void ADC_Select_CH0 (void)
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_0;
+	  sConfig.Rank = 1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CH1 (void)
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_1;
+	  sConfig.Rank = 1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CHTemp (void)
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+	  sConfig.Rank = 1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -294,7 +412,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-bool printDiv = true;
+bool printDiv = false;
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_startControlLogic */
@@ -308,15 +426,16 @@ void startControlLogic(void const * argument)
 {
   /* USER CODE BEGIN 5 */
 	static TickType_t time_init = 0;
+	static int jj = 0;
   /* Infinite loop */
 	while(ENABLE_CONTROL_LOGIC) {
-
 		if(printDiv) printf("-------------\r\n");
 		toggleLed();
-
-		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
+		printf('%d\r\n', jj++);
+		if(jj>2) jj=0;
+		vTaskDelayUntil(&time_init, 1000);
 	}
-
+	vTaskDelete(NULL);
   /* USER CODE END 5 */
 }
 
@@ -346,10 +465,10 @@ void startAcquisition(void const * argument)
 		default:vTaskDelayUntil(&time_init, ACQUISITION_TASK_DELAY0);
 				break;
 		}
-		if(time_init > 4000) break;
+		//if(time_init > 4000) break;
 	}
 	//printf("%d\n\r",time_init);
-	printDiv = false;
+	if(ENABLE_ACQUISITION) printDiv = false;
 	vTaskDelete(NULL);
 
   /* USER CODE END startAcquisition */
@@ -396,6 +515,8 @@ void startMonitoring(void const * argument)
 	static TickType_t time_init = 0;
 
 	extern bool continuity[4];
+	extern float batteryVoltage;
+	extern float batteryVoltage2;
 
 	printf("Monitoring Start\r\n");
 
@@ -406,13 +527,28 @@ void startMonitoring(void const * argument)
 	while(ENABLE_MONITORING) {
 		//loop_M();
 
-		checkContinuity_M();
-		printf("Continuity: ");
-		for(int i = 0; i < 4; i++) printf("%d ", continuity[i]);
-		printf("\r\n");
+//		checkContinuity_M();
+//		printf("Continuity: ");
+//		for(int i = 0; i < 4; i++) printf("%d ", continuity[i]);
+//		printf("\r\n");
+
+		ADC_Select_CH0();
+		HAL_ADC_Start(&hadc1);
+	    HAL_ADC_PollForConversion(&hadc1, 1000);
+	    //CONTROL_LOGIC_TASK_DELAY = HAL_ADC_GetValue(&hadc1);
+	    HAL_ADC_Stop(&hadc1);
+
+//	    ADC_Select_CH1();
+//	    HAL_ADC_Start(&hadc1);
+//  	    HAL_ADC_PollForConversion(&hadc1, 1000);
+//	    batteryVoltage2 = HAL_ADC_GetValue(&hadc1);
+//	    HAL_ADC_Stop(&hadc1);
+		//checkBatteryVoltage_M();
+	    //printf("BatteryVoltage: %f\r\n", ((batteryVoltage/4095)*3.3));
+	    //printf("BatteryVoltage2: %d\r\n", ((batteryVoltage2/4095)*3.3));
+
 		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
 	}
-
 	vTaskDelete(NULL);
   /* USER CODE END startMonitoring */
 }

@@ -20,6 +20,7 @@
 /* Local variable declarations */
 
 float batteryVoltage; // Voltage of battery (V)
+float batteryVoltage2;
 bool continuity[4]; // Continuity status of parachute deployment charges
 bool buttonState; // State of button (on/off)
 bool hardwareDeploymentDisable; // Terminal block disables deployment in hardware
@@ -107,9 +108,29 @@ void loop_M() {
 void checkBatteryVoltage_M() {
 	#if defined(NDEBUG) && defined(__STM32F4xx_ADC_H)
 	// TODO: Implement battery voltage reading from hardware
-	 HAL_ADC_Start(&hadc1);
-	 HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // TODO: Add appropriate time delay (not HAL_MAX_DELAY)
-	 batteryVoltage = (HAL_ADC_GetValue(&hadc1)) * (ADC_VREF / 4095); // TODO: Add resistor math for total Vbat
+//	 HAL_ADC_Start(&hadc1);
+//	 HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // TODO: Add appropriate time delay (not HAL_MAX_DELAY)
+//	 batteryVoltage = (HAL_ADC_GetValue(&hadc1)) * (ADC_VREF / 4095); // TODO: Add resistor math for total Vbat
+		  ADC_Select_CH0();
+		  HAL_ADC_Start(&hadc1);
+		  HAL_ADC_PollForConversion(&hadc1, 1000);
+		  batteryVoltage = HAL_ADC_GetValue(&hadc1);
+		  HAL_ADC_Stop(&hadc1);
+
+//		  ADC_Select_CH1();
+//		  HAL_ADC_Start(&hadc1);
+//		  HAL_ADC_PollForConversion(&hadc1, 1000);
+//		  batteryVoltage2 = HAL_ADC_GetValue(&hadc1);
+//		  HAL_ADC_Stop(&hadc1);
+//
+//		  ADC_Select_CHTemp();
+//		  HAL_ADC_Start(&hadc1);
+//		  HAL_ADC_PollForConversion(&hadc1, 1000);
+//		  ADC_VAL[2] = HAL_ADC_GetValue(&hadc1);
+//		  HAL_ADC_Stop(&hadc1);
+//
+//		  Temp = ((3.3*ADC_VAL[2]/4095 - V25)/Avg_Slope)+25;
+		  //HAL_Delay (1000);
 	#endif
 }
 

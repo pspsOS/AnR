@@ -52,7 +52,7 @@ void unlockSpi(spiLock_t* locker) {
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus)
 {
 	HAL_StatusTypeDef state = HAL_ERROR;
-#ifdef _SPI_CONFIGURED
+	if (pin == FAKE_GPIO) return state;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, len, HAL_MAX_DELAY);
 	for(int i = 0; i < _spiLocksRegistered; i++)
@@ -60,7 +60,7 @@ HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t 
 			if(_spiLocks[i].lock == true) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
 	bypass_unlock:
-#endif
+
 	return state;
 }
 
@@ -69,7 +69,7 @@ HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int data
 
 	//Note: dataLen should be number of bytes in the register group being read
 	HAL_StatusTypeDef state = HAL_ERROR;
-#ifdef _SPI_CONFIGURED
+	if (pin == FAKE_GPIO) return state;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET); //CS low
 	state = HAL_SPI_Transmit(bus, cmd, cmdLen, HAL_MAX_DELAY);
 	HAL_SPI_Receive(bus, data, dataLen, HAL_MAX_DELAY);
@@ -78,7 +78,7 @@ HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int data
 			if(_spiLocks[i].lock == true) goto bypass_unlock;
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);	//CS high
 	bypass_unlock:
-#endif
+
 	return state;
 }
 
@@ -90,13 +90,8 @@ void handleHalError(Device_ID device)
 	// TODO: Implement handleHalError
 	extern spiLock_t* nandSpiLock;
 
-	switch(device) {
-	case NAND:
-		unlockSpi(nandSpiLock);
-		break;
-	default:
-		break;
-	}
+	if(device == NAND) unlockSpi(nandSpiLock);
+
 	nomPtr[device] = false;
 }
 

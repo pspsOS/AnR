@@ -78,6 +78,8 @@ void Error_Handler(void);
 #define CS3_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define NDEBUG
+#define NAND_CS_GPIO_Port CS3_GPIO_Port
+#define NAND_CS_Pin CS3_Pin
 
 // Acquisition Multiplier Settings
 #define GPS_FREQ (1)        //   1 Hz

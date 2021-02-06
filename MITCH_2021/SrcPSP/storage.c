@@ -18,6 +18,7 @@ bool nandNominal = false;
  * Date: 12/24/2020
  */
 bool storageSetup() {
+	nandInit(&nandNominal);
 	return true;
 }
 

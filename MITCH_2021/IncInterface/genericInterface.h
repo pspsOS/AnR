@@ -90,7 +90,7 @@ typedef struct {
 	bool lock;
 } spiLock_t;
 
-#define NUM_SPI_LOCKS (1)
+#define NUM_SPI_LOCKS (2)
 spiLock_t _spiLocks[NUM_SPI_LOCKS];
 uint8_t _spiLocksRegistered;
 

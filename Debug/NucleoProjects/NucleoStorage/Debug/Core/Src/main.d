@@ -19,6 +19,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
@@ -53,7 +55,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  c:\users\mark\documents\github\anr\mitch_2021\incpsp\processing.h \
  c:\users\mark\documents\github\anr\mitch_2021\incpsp\storage.h \
  c:\users\mark\documents\github\anr\mitch_2021\incpsp\transmission.h \
- c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h
+ c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h
 
 ../Core/Inc/main.h:
 
@@ -96,6 +100,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h:
 
@@ -166,3 +174,7 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\storage.h:
 c:\users\mark\documents\github\anr\mitch_2021\incpsp\transmission.h:
 
 c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:

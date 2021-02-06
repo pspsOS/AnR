@@ -94,14 +94,16 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 
 	lockSpi(nandSpiLock);
 
-	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+	if (sendSPI(&cmd[0], 5, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
 		handleHalError(NAND);
 		return;
 	}
+
 	if (sendSPI(&data[0], size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
 		handleHalError(NAND);
 		return;
 	}
+	HAL_Delay(4000);
 	unlockSpi(nandSpiLock);
 }
 
@@ -164,6 +166,7 @@ void nandRead(uint32_t rowAddr, uint16_t colAddr, uint8_t data[], uint8_t size){
  * @date 01/24/2021
  */
 void nandWrite(uint32_t rowAddr, uint16_t colAddr, uint8_t data[], uint8_t size){
+
 	nandBufferLoad(rowAddr);
 	writeEnable();
 	nandBufferWrite(colAddr, data, size);

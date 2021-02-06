@@ -19,6 +19,8 @@ SrcPSP/common.o: ../SrcPSP/common.c ../SrcPSP/../IncPSP/common.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
@@ -44,7 +46,10 @@ SrcPSP/common.o: ../SrcPSP/common.c ../SrcPSP/../IncPSP/common.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../SrcPSP/../IncPSP/gpio.h ../Core/Inc/retarget.h
+ ../SrcPSP/../IncPSP/gpio.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
+ ../Core/Inc/retarget.h
 
 ../SrcPSP/../IncPSP/common.h:
 
@@ -89,6 +94,10 @@ SrcPSP/common.o: ../SrcPSP/common.c ../SrcPSP/../IncPSP/common.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h:
 
@@ -141,5 +150,9 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 
 ../SrcPSP/../IncPSP/gpio.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
 
 ../Core/Inc/retarget.h:

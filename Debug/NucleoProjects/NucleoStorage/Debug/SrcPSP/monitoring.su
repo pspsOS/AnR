@@ -1,6 +1,6 @@
 monitoring.c:45:6:setup_M	4	static
 monitoring.c:72:6:loop_M	8	static
-monitoring.c:107:6:checkBatteryVoltage_M	4	static
+monitoring.c:107:6:checkBatteryVoltage_M	16	static
 monitoring.c:128:6:checkContinuity_M	8	static
 monitoring.c:149:6:checkButtonState_M	8	static
 monitoring.c:167:6:checkHardwareDeploymentDisable_M	8	static

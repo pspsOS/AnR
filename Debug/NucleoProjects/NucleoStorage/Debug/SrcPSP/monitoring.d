@@ -20,6 +20,8 @@ SrcPSP/monitoring.o: ../SrcPSP/monitoring.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
@@ -45,10 +47,10 @@ SrcPSP/monitoring.o: ../SrcPSP/monitoring.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../SrcPSP/../IncPSP/gpio.h ../Core/Inc/retarget.h \
+ ../SrcPSP/../IncPSP/gpio.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
- c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h \
- C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/common.h
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
+ ../Core/Inc/retarget.h
 
 ../SrcPSP/../IncPSP/monitoring.h:
 
@@ -95,6 +97,10 @@ SrcPSP/monitoring.o: ../SrcPSP/monitoring.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h:
 
@@ -148,10 +154,8 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
 
 ../SrcPSP/../IncPSP/gpio.h:
 
-../Core/Inc/retarget.h:
-
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
 
-c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h:
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
 
-C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/common.h:
+../Core/Inc/retarget.h:

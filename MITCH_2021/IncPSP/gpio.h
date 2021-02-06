@@ -14,14 +14,14 @@
 #endif
 
 
-#ifdef LD2_Pin
+
 void toggleLed();
-#endif
+
 
 // GPIO Setup
 #ifdef NDEBUG
 // GPIO Simulation Constants
-	#define FAKE_GPIO ((uint16_t)-1)
+	#define FAKE_GPIO ((uint16_t)0x8001)
 
 	#ifndef SENSE_A_Pin
 		#define SENSE_A_Pin (FAKE_GPIO)
@@ -106,7 +106,7 @@ void toggleLed();
 
 
 
-#endif
+#endif /* ifdef NDEBUG */
 
 
 

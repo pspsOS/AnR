@@ -37,7 +37,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h
+ c:\users\jeff\documents\github\anr\mitch_2021\incpsp\common.h
 
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 
@@ -117,4 +117,4 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
+c:\users\jeff\documents\github\anr\mitch_2021\incpsp\common.h:

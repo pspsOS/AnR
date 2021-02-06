@@ -26,6 +26,7 @@ void PSP_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState pin
 spiLock_t* registerSpiLock() {
 	if(_spiLocksRegistered < NUM_SPI_LOCKS) {
 		_spiLocks[_spiLocksRegistered].lock = false;
+		_spiLocks[_spiLocksRegistered].pin = 0x69;
 		return &_spiLocks[_spiLocksRegistered++];
 	}
 	else return NULL;
@@ -37,22 +38,24 @@ void setSpiLock(GPIO_TypeDef* port, uint16_t pin, spiLock_t* locker) {
 		locker->lock = false;
 	}
 	locker->port = port;
-	*(&locker->pin) = pin;
+	locker->pin = pin;
 	if(pin != FAKE_GPIO) HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);
+
+	printf("Pin: %X\r\n", locker->pin);
 }
 
 void lockSpi(spiLock_t* locker) {
 	printf("Start Lock\n\r");
-	if(locker->port != FAKE_GPIO){
-		HAL_GPIO_WritePin(&locker->port, locker->pin, GPIO_PIN_RESET);
+	if(locker->pin != FAKE_GPIO){
+		HAL_GPIO_WritePin(locker->port, locker->pin, GPIO_PIN_RESET);
 		printf("First If\n\r");
 	}
 	locker->lock = true;
 	printf("End\n\r");
 }
 void unlockSpi(spiLock_t* locker) {
-	if(locker->port != FAKE_GPIO){
-		HAL_GPIO_WritePin(&locker->port, locker->pin, GPIO_PIN_SET);
+	if(locker->pin != FAKE_GPIO){
+		HAL_GPIO_WritePin(locker->port, locker->pin, GPIO_PIN_SET);
 	}
 	locker->lock = false;
 }

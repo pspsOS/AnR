@@ -39,6 +39,7 @@
 #include "../IncPSP/storage.h"
 #include "../IncPSP/transmission.h"
 #include "../IncPSP/gpio.h"
+#include "../IncInterface/nandInterface.h"
 #include <string.h>
 
 /* USER CODE END Includes */
@@ -581,8 +582,9 @@ void startControlLogic(void const * argument)
 	uint8_t sizeW = 4;
 	uint8_t sizeR = 20;
 	uint8_t feature = 0x00;
+	bool nandNominal = false;
 
-	if(ENABLE_CONTROL_LOGIC){
+	if(ENABLE_CONTROL_LOGIC || true){
 		HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
 
@@ -593,30 +595,19 @@ void startControlLogic(void const * argument)
 		printf("%2X ", feature);
 		feature = getFeature(0xC0);
 		printf("%2X ", feature);*/
-
+		nandInit(&nandNominal);
 		nandBufferLoad(rowAddr);
 		writeEnable();
+		nandWrite(rowAddr, colAddr, writeData, sizeW);
+		nandRead(rowAddr, colAddr, readData, sizeR);
+
+		for(int i = 0; i < sizeR; i++) printf("%X ", readData[i]);
+		printf("\n\r");
 	}
   /* Infinite loop */
 	while(ENABLE_CONTROL_LOGIC) {
-
 		if(printDiv) printf("-------------\r\n");
 		//toggleLed();
-
-		//printf("1");
-		nandWrite(rowAddr, colAddr, writeData, sizeW);
-		//printf("2");
-		nandRead(rowAddr, colAddr, readData, sizeR);
-		//printf("3");
-		//feature = getFeature(0xA0);
-		//printf("%X", feature);
-		//nandBufferWrite(colAddr, writeData, size);
-		//nandBufferRead(colAddr, readData, size);
-		for(int i = 0; i < sizeR; i++){
-			printf("%X ", readData[i]);
-		}
-		printf("\n\r");
-		break;
 		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
 	}
 	vTaskDelete(NULL);
@@ -670,20 +661,29 @@ void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
   /* Infinite loop */
-	spiLock_t* ledSpiLock;
+	if(false) {
+	uint8_t cmd = 0x01;
+
+	spiLock_t* ledSpiLock = registerSpiLock();
 	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, ledSpiLock);
+	HAL_Delay(1000);
+	lockSpi(ledSpiLock);
+	sendSPI(&cmd, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS);
+	HAL_Delay(3000);
+	unlockSpi(ledSpiLock);
+
 
 	static TickType_t time_init = 0;
 
   /* Infinite loop */
 	while(ENABLE_PROCESSING) {
 
-		HAL_GPIO_WritePin(&ledSpiLock->port, *(&ledSpiLock->pin), GPIO_PIN_RESET);
-		printf("%d \n\r", *(&ledSpiLock->pin));
+		HAL_GPIO_WritePin(ledSpiLock->port, ledSpiLock->pin, GPIO_PIN_RESET);
+		printf("%d \n\r", ledSpiLock->pin);
 		printf("%d \n\n\r", NAND_CS_Pin);
 		HAL_Delay(1000);
 		lockSpi(ledSpiLock);
-		if (sendSPI(0x01, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+		/*if (sendSPI(0x01, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
 				handleHalError(NAND);
 				return;
 		}
@@ -695,7 +695,9 @@ void startProcessing(void const * argument)
 		HAL_Delay(4000);
 		unlockSpi(ledSpiLock);
 		HAL_Delay(1000);
+		*/
 		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
+	}
 	}
 	vTaskDelete(NULL);
   /* USER CODE END startProcessing */

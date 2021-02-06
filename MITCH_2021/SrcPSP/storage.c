@@ -6,7 +6,9 @@
  */
 
 #include "../IncPSP/storage.h"
-
+#ifdef NDEBUG
+	#include "nandInterface.h"
+#endif
 // Setup
 
 bool nandNominal = false;

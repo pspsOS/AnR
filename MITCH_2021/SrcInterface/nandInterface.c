@@ -7,6 +7,7 @@ void nandInit(bool* nandNomPtr) {
 	nomPtr[NAND] = nandNomPtr;
 	nandSpiLock = registerSpiLock();
 	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, nandSpiLock);
+	*nandNomPtr = true;
 }
 
 
@@ -103,7 +104,6 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 		handleHalError(NAND);
 		return;
 	}
-	HAL_Delay(4000);
 	unlockSpi(nandSpiLock);
 }
 

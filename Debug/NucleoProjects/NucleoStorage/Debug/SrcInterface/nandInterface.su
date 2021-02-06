@@ -1,7 +1,7 @@
 nandInterface.c:6:6:nandInit	16	static
-nandInterface.c:24:6:nandBufferLoad	32	static
-nandInterface.c:59:6:nandBufferRead	40	static
-nandInterface.c:87:6:nandBufferWrite	32	static
+nandInterface.c:25:6:nandBufferLoad	32	static
+nandInterface.c:60:6:nandBufferRead	40	static
+nandInterface.c:88:6:nandBufferWrite	32	static
 nandInterface.c:118:6:nandBufferExecute	32	static
 nandInterface.c:152:6:nandRead	24	static
 nandInterface.c:168:6:nandWrite	24	static

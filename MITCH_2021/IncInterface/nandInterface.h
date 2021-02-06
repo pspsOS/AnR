@@ -19,6 +19,7 @@
 #define FEATURE_ADDR_A	0xA0
 #define FEATURE_ADDR_B	0xB0
 #define FEATURE_ADDR_C	0xC0
+#define BLOCK_ERASE 	0xD8
 
 //Generic Defines
 #define MAX_BLOCK 		2048
@@ -47,5 +48,6 @@ void writeDisable(); //Disables writing on the nand
 
 uint8_t getFeature(uint8_t featureAddr); //Gets a feature from the nand
 void setFeature(uint8_t featureAddr, uint8_t featureVal); //Sets a feature on the nand
+void eraseBlock(uint32_t rowAddr);
 
 #endif

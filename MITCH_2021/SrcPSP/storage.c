@@ -20,8 +20,12 @@ bool nandNominal = false;
  * Date: 12/24/2020
  */
 bool storageSetup() {
+#ifdef NDEBUG
 	nandInit(&nandNominal);
-	return true;
+#else
+	nandNominal = false;
+#endif
+	return nandNominal;
 }
 
 

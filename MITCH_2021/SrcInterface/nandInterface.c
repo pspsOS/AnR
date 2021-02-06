@@ -244,14 +244,44 @@ uint8_t getFeature(uint8_t featureAddr){
  */
 void setFeature(uint8_t featureAddr, uint8_t featureVal){
 	// Variables
-		uint8_t cmd[3];  // Command sent to device
+	uint8_t cmd[3];  // Command sent to device
 
-		// Send Command
-		cmd[0] = SET_FEATURE;
-		cmd[1] = featureAddr;
-		cmd[2] = featureVal;
-		if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-			handleHalError(BMP);
-			return;
-		}
+	// Send Command
+	cmd[0] = SET_FEATURE;
+	cmd[1] = featureAddr;
+	cmd[2] = featureVal;
+	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+		handleHalError(BMP);
+		return;
+	}
+}
+
+/**
+ * @brief Erase a b;pcl
+ *
+ * @param rowAddr: block to erase
+ *
+ * @author Mark Batistich
+ * @date 2/6/2021
+ */
+void eraseBlock(uint32_t rowAddr){
+	// Variables
+	uint8_t cmd[4];  // Command sent to device
+	uint8_t feature; //feature byte
+	bool oip = true; //operation in progress
+
+	//Load data from cell array into buffer
+	cmd[0] = BLOCK_ERASE;
+	cmd[3] = rowAddr;
+	cmd[2] = rowAddr >> 8;
+	cmd[1] = rowAddr >> 16;
+	if (sendSPI(&cmd[0], 4, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+		handleHalError(BMP);
+		return;
+	}
+
+	do{
+		feature = getFeature(FEATURE_ADDR_C);
+		oip = getBit(feature, 0);
+	}while(oip);
 }

@@ -9,6 +9,7 @@
 
 #ifdef NDEBUG
 	#include <baroInterface.h>
+	#include "genericInterface.h"
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
@@ -35,7 +36,8 @@ bool sendDaqStatus;     // Indicates whether to update the daqStatusData struct
 ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 imuCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
-
+ui16 ala;
+extern ADC_HandleTypeDef hadc1;
 ui8 delayVal = 0;
 
 // Used for parsing NMEA data
@@ -569,7 +571,11 @@ void imuRead_A() {
 
 		// TODO: Implement IMU Simulation
 	#else
-		// TODO: Implement imuRead in hardware
+		ADC_Select_CH1();
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, 1000);
+		ala = HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Stop(&hadc1);
 	#endif
 }
 

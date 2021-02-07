@@ -577,31 +577,70 @@ void startControlLogic(void const * argument)
 	static TickType_t time_init = 0;
 	uint32_t rowAddr = 0x00000000;
 	uint16_t colAddr = 0x0000;
-	uint8_t writeData[4] = {0xAA, 0xBB, 0xCC, 0xDD};
-	uint8_t readData[20] = {0x00, 0x00, 0x00, 0x00};
-	uint8_t sizeW = 4;
-	uint8_t sizeR = 20;
+	uint8_t writeData1[16] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14, 0x21, 0x22, 0x23, 0x24, 0x31, 0x32, 0x33, 0x34};
+	uint8_t writeData2[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	uint8_t readData[16] = {0x00};
+	uint8_t size = 16;
 	uint8_t feature = 0x00;
+	uint32_t goodRows = 0;
+	uint32_t badRows = 0;
+	bool badRow = false;
 	bool nandNominal = false;
 
 	if(ENABLE_CONTROL_LOGIC || true){
 		HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
 
-		/*setFeature(0xA0, 0x00);
-		feature = getFeature(0xA0);
-		printf("%2X ", feature);
-		feature = getFeature(0xB0);
-		printf("%2X ", feature);
-		feature = getFeature(0xC0);
-		printf("%2X ", feature);*/
 		nandInit(&nandNominal);
-		nandBufferLoad(rowAddr);
-		writeEnable();
-		nandWrite(rowAddr, colAddr, writeData, sizeW);
-		nandRead(rowAddr, colAddr, readData, sizeR);
 
+		setFeature(0xA0, 0x00);
+		feature = getFeature(0xA0);
+		printf("Feature %02X ", feature);
+		feature = getFeature(0xB0);
+		printf("%02X\n\r", feature);
+
+		//feature = getFeature(0xC0);
+		//printf("%2X ", feature);
+
+		//for(int i = 0; i < sizeR; i++) printf("%X ", readData[i]);
+		//eraseBlock(rowAddr);
+		/*writeEnable();
+		nandBufferLoad(rowAddr);
+		nandBufferWrite(colAddr, writeData, sizeW);
+		nandBufferRead(colAddr, readData, sizeR);
 		for(int i = 0; i < sizeR; i++) printf("%X ", readData[i]);
+		printf("\n\r");
+		writeEnable();
+		//HAL_Delay(10);
+		nandBufferExecute(rowAddr);*/
+		//nandBufferRead(colAddr, readData, sizeR);
+		printf("Starting...\n\r");
+		for (rowAddr = 0; rowAddr < 131072; rowAddr+=1){
+			nandWrite(rowAddr, colAddr, writeData1, size);
+			//nandRead(rowAddr, colAddr, readData, size);
+			eraseBlock(rowAddr);
+			nandWrite(rowAddr, colAddr, writeData2, size);
+			nandRead(rowAddr, colAddr, readData, size);
+
+			badRow = false;
+			for (int i=0; i<size; i++){
+				if(readData[i] != writeData2[i]){
+					badRow = true;
+				}
+			}
+			if(badRow){
+				printf("\n\rBAD ROW!: %d", rowAddr);
+				badRows++;
+			}else{
+				//printf("\n\rgood row: %d", rowAddr);
+				goodRows++;
+			}
+
+		}
+
+		printf("\n\rGood rows: %d, Bad rows: %d", goodRows, badRows);
+		printf("\n\r");
+		for(int i = 0; i < size; i++) printf("%X ", readData[i]);
 		printf("\n\r");
 	}
   /* Infinite loop */

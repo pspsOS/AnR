@@ -45,13 +45,10 @@ void setSpiLock(GPIO_TypeDef* port, uint16_t pin, spiLock_t* locker) {
 }
 
 void lockSpi(spiLock_t* locker) {
-	printf("Start Lock\n\r");
 	if(locker->pin != FAKE_GPIO){
 		HAL_GPIO_WritePin(locker->port, locker->pin, GPIO_PIN_RESET);
-		printf("First If\n\r");
 	}
 	locker->lock = true;
-	printf("End\n\r");
 }
 void unlockSpi(spiLock_t* locker) {
 	if(locker->pin != FAKE_GPIO){

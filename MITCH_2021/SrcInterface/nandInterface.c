@@ -8,6 +8,9 @@ void nandInit(bool* nandNomPtr) {
 	nandSpiLock = registerSpiLock();
 	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, nandSpiLock);
 	*nandNomPtr = true;
+
+	setFeature(FEATURE_ADDR_A, 0x00);
+	setFeature(FEATURE_ADDR_B, 0x10);
 }
 
 
@@ -95,7 +98,7 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 
 	lockSpi(nandSpiLock);
 
-	if (sendSPI(&cmd[0], 5, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
 		handleHalError(NAND);
 		return;
 	}
@@ -120,7 +123,9 @@ void nandBufferExecute(uint32_t rowAddr){
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
 	bool oip = true; //operation in progress
-	//bool prg_f = false; //program fail
+	bool prg_f = false; //program fail
+	bool eccs1 = false;
+	bool eccs0 = false;
 
 	//Load data from cell array into buffer
 	cmd[0] = W_EXECUTE;
@@ -128,13 +133,17 @@ void nandBufferExecute(uint32_t rowAddr){
 	cmd[2] = rowAddr >> 8;
 	cmd[1] = rowAddr >> 16;
 	if (sendSPI(&cmd[0], 4, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 	do{
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
-		//prg_f = getBit(feature, 3);
+		prg_f = getBit(feature, 3);
+		eccs1 = getBit(feature, 5);
+		eccs0 = getBit(feature, 4);
+
+		//printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
 	}while(oip);
 }
 
@@ -167,11 +176,14 @@ void nandRead(uint32_t rowAddr, uint16_t colAddr, uint8_t data[], uint8_t size){
  */
 void nandWrite(uint32_t rowAddr, uint16_t colAddr, uint8_t data[], uint8_t size){
 
+
 	nandBufferLoad(rowAddr);
 	writeEnable();
 	nandBufferWrite(colAddr, data, size);
+	//eraseBlock(rowAddr);
 	nandBufferExecute(rowAddr);
 	writeDisable();
+	return;
 }
 
 /**
@@ -257,7 +269,7 @@ void setFeature(uint8_t featureAddr, uint8_t featureVal){
 }
 
 /**
- * @brief Erase a b;pcl
+ * @brief Erase a block
  *
  * @param rowAddr: block to erase
  *
@@ -275,6 +287,8 @@ void eraseBlock(uint32_t rowAddr){
 	cmd[3] = rowAddr;
 	cmd[2] = rowAddr >> 8;
 	cmd[1] = rowAddr >> 16;
+
+	writeEnable();
 	if (sendSPI(&cmd[0], 4, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
 		handleHalError(BMP);
 		return;
@@ -284,4 +298,5 @@ void eraseBlock(uint32_t rowAddr){
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 	}while(oip);
+	writeDisable();
 }

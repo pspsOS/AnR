@@ -1,0 +1,56 @@
+Partlist
+
+Exported from PSPS_AVNC_SRD_fullBoard-2020-01-29.sch at 1/29/2020 1:40 PM
+
+EAGLE Version 9.5.1 Copyright (c) 1988-2019 Autodesk, Inc.
+
+Assembly variant: 
+
+Part     Value          Device          Package                      Library        Sheet
+
+AT1-S    A-1JB          A-1JB           A1JB                         SamacSys_Parts 1
+C1-0S    4.7uF          C-USC0805       C0805                        resistor       1
+C1-1S    0.1uF          C-USC0805       C0805                        resistor       1
+C1-2S    0.1uF          C-USC0805       C0805                        resistor       1
+C1-3S    0.1uF          C-USC0805       C0805                        resistor       1
+C2-0S    10uF           C-USC0805       C0805                        resistor       1
+C2-1S    0.1uF          C-USC0805       C0805                        resistor       1
+C2-2S    1uF            C-USC0805       C0805                        resistor       1
+C3-1S    0.1uF          C-USC0805       C0805                        resistor       1
+C3-2S    1uF            C-USC0805       C0805                        resistor       1
+D1-1S    Green          LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D1-2S    Green          LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D1-3S    Green          LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D1-4S    Green          LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D1A-S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D1B-S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2-1S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2-2S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2-3S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2-4S    Blue           LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2A-S    Red            LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D2B-S    Red            LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+D3-4S    Yellow         LEDCHIPLED_0805 CHIPLED_0805                 adafruit       1
+L1-0S    10 uH          L-US            0805                         Computer2      1
+R1-1S    TBD            R-US_R0805      R0805                        resistor       1
+R1-2S    TBD            R-US_R0805      R0805                        resistor       1
+R1-3S    TBD            R-US_R0805      R0805                        resistor       1
+R1-4S    TBD            R-US_R0805      R0805                        resistor       1
+R1A-S    TBD            R-US_R0805      R0805                        resistor       1
+R1B-S    TBD            R-US_R0805      R0805                        resistor       1
+R2-1S    TBD            R-US_R0805      R0805                        resistor       1
+R2-2S    TBD            R-US_R0805      R0805                        resistor       1
+R2-3S    TBD            R-US_R0805      R0805                        resistor       1
+R2-4S    TBD            R-US_R0805      R0805                        resistor       1
+R2A-S    TBD            R-US_R0805      R0805                        resistor       1
+R2B-S    TBD            R-US_R0805      R0805                        resistor       1
+R3-4S    TBD            R-US_R0805      R0805                        resistor       1
+U0-S     TPS62202       TPS62202        SOT95P280X145-5              Computer2      1
+U1-S     ICM-20948      ICM-20948       QFN40P300X300X105-25T159X175 Computer2      1
+U2-S     MMA6555        MMA655X         QFN100P600X600X198-17T424N   Computer2      1
+U3-S     MS5607         MS5607          MS5607                       Computer2      1
+U4-S     FGPMMOPA6H     FGPMMOPA6H      SOIC127P1800X470-20N         Computer2      1
+U11-S    SN74LV1T34     SN74LV1T34      SOT65P210X110-5              Computer2      1
+U12-S    SN74LV1T34     SN74LV1T34      SOT65P210X110-5              Computer2      1
+U13-S    SN74LV1T34     SN74LV1T34      SOT65P210X110-5              Computer2      1
+U14-S    SN74LV1T34     SN74LV1T34      SOT65P210X110-5              Computer2      1

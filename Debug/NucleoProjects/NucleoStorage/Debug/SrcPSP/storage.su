@@ -1,0 +1,9 @@
+storage.c:20:6:storageSetup	4	static
+storage.c:33:6:storageWrite	4	static
+storage.c:44:6:storeDaqStatus	4	static
+storage.c:55:6:storeDaqScaling	4	static
+storage.c:66:6:storeGpsData	4	static
+storage.c:77:6:storeBmpData	4	static
+storage.c:88:6:storeImuData	4	static
+storage.c:99:6:storeProcessedData	4	static
+storage.c:110:6:storeMonitoringData	4	static

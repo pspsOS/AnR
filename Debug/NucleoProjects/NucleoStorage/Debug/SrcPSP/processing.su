@@ -1,0 +1,8 @@
+processing.c:87:6:getBMPData_P	8	static
+processing.c:115:6:getIMUData_P	8	static
+processing.c:154:6:getGPSData_P	8	static
+processing.c:181:6:processData_P	16	static
+processing.c:242:6:transmitData_P	4	static
+processing.c:257:6:pointyEndUp_P	4	static
+processing.c:263:6:CalcAltBMP_P	4	static
+processing.c:272:6:CalcFlightDataBMP_P	24	static

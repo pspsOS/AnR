@@ -59,7 +59,7 @@ ui8 _nmeaAddrEnd;
 	extern led_t SENSOR_NOMINAL_Led;
 	extern led_t SENSOR_ERROR_Led;
 
-#else
+#elif defined(NDEBUG)
 	srBank_t ACQUISITION_LED_Bank;
 	led_t U1S_CHECK_Led;
 	led_t U2S_CHECK_Led;
@@ -834,6 +834,8 @@ void _loadGpsData()
 		fscanf(_gpsFile, "%s", gpsNmea);
 	#else
 		//TODO: Implement gpsRead w/ hardware
+		gpsLoadString(gpsNmea);
+
 	#endif
 }
 

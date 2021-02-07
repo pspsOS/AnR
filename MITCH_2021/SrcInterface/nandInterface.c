@@ -1,6 +1,16 @@
 #include <nandInterface.h>
 #include <common.h>
 
+spiLock_t* nandSpiLock;
+
+void nandInit(bool* nandNomPtr) {
+	nomPtr[NAND] = nandNomPtr;
+	nandSpiLock = registerSpiLock();
+	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, nandSpiLock);
+}
+
+
+
 /**
  * @brief Load data into the buffer from the cell array
  *
@@ -12,11 +22,11 @@
 
 
 void nandBufferLoad(uint32_t rowAddr){
-#if CS3_PIN != FAKE_PIN
+//#if CS3_PIN != FAKE_PIN
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
-	bool oip = false; //operation in progress
+	bool oip = true; //operation in progress
 
 	//Load data from cell array into buffer
 	cmd[0] = R_CELL_ARRAY;
@@ -29,10 +39,10 @@ void nandBufferLoad(uint32_t rowAddr){
 	}
 
 	do{
-		feature = getFeature(OP_FEATURE_ADDR);
+		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 	}while(oip);
-#endif
+//#endif
 }
 
 /**
@@ -47,20 +57,21 @@ void nandBufferLoad(uint32_t rowAddr){
  */
 
 void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size){
-#if CS3_PIN != FAKE_PIN
+//#if CS3_PIN != FAKE_PIN
 	// Variables
-	uint8_t cmd[3];       // Command sent to device
+	uint8_t cmd[4];       // Command sent to device
 
 	//Read data from the buffer into the data array
 	cmd[0] = R_BUFFER;
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
-	if (recieveSPI(&cmd[0], 3, data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
+	cmd[3] = 0x00; //dummy byte
+	if (recieveSPI(&cmd[0], 4, data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
 	{
 		handleHalError(BMP);
 		return;
 	}
-#endif
+//#endif
 }
 
 /**
@@ -77,14 +88,21 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 	// Variables
 	uint8_t cmd[3];       // Command sent to device
 
-	//Read data from the buffer into the data array
 	cmd[0] = W_LOAD_RAND;
 	cmd[2] = colAddr;
 	cmd[1] = colAddr >> 8;
+
+	lockSpi(nandSpiLock);
+
 	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
+	if (sendSPI(&data[0], size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+		handleHalError(NAND);
+		return;
+	}
+	unlockSpi(nandSpiLock);
 }
 
 /**
@@ -99,7 +117,7 @@ void nandBufferExecute(uint32_t rowAddr){
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
 	uint8_t feature; //feature byte
-	bool oip = false; //operation in progress
+	bool oip = true; //operation in progress
 	//bool prg_f = false; //program fail
 
 	//Load data from cell array into buffer
@@ -112,7 +130,7 @@ void nandBufferExecute(uint32_t rowAddr){
 		return;
 	}
 	do{
-		feature = getFeature(OP_FEATURE_ADDR);
+		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 		//prg_f = getBit(feature, 3);
 	}while(oip);
@@ -210,4 +228,27 @@ uint8_t getFeature(uint8_t featureAddr){
 		return 0x00;
 	}
 	return feature;
+}
+
+/**
+ * @brief Sets a feature at a specific address
+ *
+ * @param featureAddr: address of the feature
+ * @param featureVal: Value to set
+ *
+ * @author Mark Batistich
+ * @date 01/24/2021
+ */
+void setFeature(uint8_t featureAddr, uint8_t featureVal){
+	// Variables
+		uint8_t cmd[3];  // Command sent to device
+
+		// Send Command
+		cmd[0] = SET_FEATURE;
+		cmd[1] = featureAddr;
+		cmd[2] = featureVal;
+		if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
+			handleHalError(BMP);
+			return;
+		}
 }

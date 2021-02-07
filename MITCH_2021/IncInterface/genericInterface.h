@@ -23,7 +23,8 @@
 //Generic Defines
 #define	GREAT					1
 #define PSP						GREAT //RRaP is better (just saying)
-
+#define SENSORS_SPI_BUS					&hspi1
+#define STORAGE_SPI_BUS					&hspi1 //&hspi3
 #define ADC_VREF				3.3
 
 #define NUM_DEVICES (5)
@@ -82,14 +83,23 @@ led_t newBankMixed(srBank_t* bank, uint16_t GPIO_Pin);
 void setLed(led_t* led, GPIO_PinState pinState);
 void setSrBank(srBank_t bank);
 
+
+typedef struct {
+	GPIO_TypeDef* port;
+	uint16_t pin;
+	bool lock;
+} spiLock_t;
+
+#define NUM_SPI_LOCKS (1)
+spiLock_t _spiLocks[NUM_SPI_LOCKS];
+uint8_t _spiLocksRegistered;
+
+spiLock_t* registerSpiLock();
+
+void setSpiLock(GPIO_TypeDef* port, uint16_t pin, spiLock_t* locker);
+void lockSpi(spiLock_t* locker);
+void unlockSpi(spiLock_t* locker);
 //Prototypes
-#ifdef _SPI_CONFIGURED
-#define SENSORS_SPI_BUS					&hspi1
-#define STORAGE_SPI_BUS					&hspi3
-#else
-#define SENSORS_SPI_BUS					0
-#define STORAGE_SPI_BUS					0
-#endif
 
 HAL_StatusTypeDef sendSPI(uint8_t * cmd, int len, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);
 HAL_StatusTypeDef recieveSPI(uint8_t * cmd, int cmdLen, uint8_t * data, int dataLen, GPIO_TypeDef * port, uint16_t pin, SPI_HandleTypeDef *bus);

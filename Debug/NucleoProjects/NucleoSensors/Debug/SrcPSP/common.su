@@ -1,0 +1,15 @@
+common.c:34:17:createAltitudeList	32	static
+common.c:45:12:createALAList	32	static
+common.c:56:26:createStaticOrientationList	32	static
+common.c:67:5:setupLinkedLists	8	static
+common.c:75:5:freeAltitudeList	24	static
+common.c:88:5:freeALAList	24	static
+common.c:101:5:freeStaticOrientationList	24	static
+common.c:114:5:freeAllLists	16	static
+common.c:124:5:insertNewAltitude	24	static
+common.c:138:5:insertNewALA	24	static
+common.c:152:5:insertNewStaticOrientation	24	static
+common.c:166:7:calcAvgAlt	24	static
+common.c:198:6:getTimeStamp	8	static
+common.c:216:6:retryTakeDelay	16	static
+common.c:224:6:notify	16	static

@@ -1,0 +1,2 @@
+baroInterface.c:22:6:barometerRead	56	static
+baroInterface.c:96:6:barometerInit	40	static

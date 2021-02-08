@@ -62,14 +62,16 @@ void Error_Handler(void);
 #define SENSE_B_GPIO_Port GPIOC
 #define SENSE_A_Pin GPIO_PIN_14
 #define SENSE_A_GPIO_Port GPIOC
-#define LD1_Pin GPIO_PIN_0
-#define LD1_GPIO_Port GPIOH
+#define LD1_Pin GPIO_PIN_15
+#define LD1_GPIO_Port GPIOC
+#define LD2_Pin GPIO_PIN_0
+#define LD2_GPIO_Port GPIOH
 #define ARMING_EN_Pin GPIO_PIN_1
 #define ARMING_EN_GPIO_Port GPIOH
 #define ARMING_MEAS_Pin GPIO_PIN_4
 #define ARMING_MEAS_GPIO_Port GPIOA
-#define BAT_MEAS_Pin GPIO_PIN_0
-#define BAT_MEAS_GPIO_Port GPIOB
+#define BATT_MEAS_Pin GPIO_PIN_0
+#define BATT_MEAS_GPIO_Port GPIOB
 #define ACCEL_ANALOG_Pin GPIO_PIN_1
 #define ACCEL_ANALOG_GPIO_Port GPIOB
 #define SPI1_LE_Pin GPIO_PIN_2
@@ -134,7 +136,6 @@ void Error_Handler(void);
 // #define SUPRESS_SETUP_WARNING
 // #define SUPRESS_ALL
 
-/* USER CODE END Private defines */
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

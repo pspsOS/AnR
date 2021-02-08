@@ -108,7 +108,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(ARMING_MEAS_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = BAT_MEAS_Pin|ACCEL_ANALOG_Pin;
+    GPIO_InitStruct.Pin = BATT_MEAS_Pin|ACCEL_ANALOG_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -143,7 +143,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     */
     HAL_GPIO_DeInit(ARMING_MEAS_GPIO_Port, ARMING_MEAS_Pin);
 
-    HAL_GPIO_DeInit(GPIOB, BAT_MEAS_Pin|ACCEL_ANALOG_Pin);
+    HAL_GPIO_DeInit(GPIOB, BATT_MEAS_Pin|ACCEL_ANALOG_Pin);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 

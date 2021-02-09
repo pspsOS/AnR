@@ -143,7 +143,7 @@ void nandBufferExecute(uint32_t rowAddr){
 		eccs1 = getBit(feature, 5);
 		eccs0 = getBit(feature, 4);
 
-		//printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
+		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
 	}while(oip);
 }
 
@@ -299,4 +299,10 @@ void eraseBlock(uint32_t rowAddr){
 		oip = getBit(feature, 0);
 	}while(oip);
 	writeDisable();
+}
+
+void eraseAll(){
+	for (int i=0; i<MAX_BLOCK; i++){
+		eraseBlock(i << 6);
+	}
 }

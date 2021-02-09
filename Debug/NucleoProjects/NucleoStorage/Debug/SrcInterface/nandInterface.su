@@ -10,3 +10,4 @@ nandInterface.c:213:6:writeDisable	24	static
 nandInterface.c:233:9:getFeature	40	static
 nandInterface.c:257:6:setFeature	32	static
 nandInterface.c:279:6:eraseBlock	32	static
+nandInterface.c:304:6:eraseAll	16	static

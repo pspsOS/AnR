@@ -219,15 +219,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 72;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -267,7 +266,7 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -578,12 +577,13 @@ void startControlLogic(void const * argument)
 	uint32_t rowAddr = 0x00000000;
 	uint16_t colAddr = 0x0000;
 	uint8_t writeData1[16] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14, 0x21, 0x22, 0x23, 0x24, 0x31, 0x32, 0x33, 0x34};
-	uint8_t writeData2[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	uint8_t writeData2[16] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 	uint8_t readData[16] = {0x00};
 	uint8_t size = 16;
 	uint8_t feature = 0x00;
 	uint32_t goodRows = 0;
 	uint32_t badRows = 0;
+	uint32_t i = 0;
 	bool badRow = false;
 	bool nandNominal = false;
 
@@ -614,8 +614,18 @@ void startControlLogic(void const * argument)
 		//HAL_Delay(10);
 		nandBufferExecute(rowAddr);*/
 		//nandBufferRead(colAddr, readData, sizeR);
-		printf("Starting...\n\r");
-		for (rowAddr = 0; rowAddr < 131072; rowAddr+=1){
+		eraseBlock(rowAddr);
+		nandWrite(rowAddr, colAddr, writeData1, size);
+		nandRead(rowAddr, colAddr, readData, size);
+		for(i = 0; i < size; i++) printf("%02X ", readData[i]);
+		printf("\n\r");
+
+		nandWrite(rowAddr, colAddr, writeData2, size);
+		nandRead(rowAddr, colAddr, readData, size);
+		for(i = 0; i < size; i++) printf("%02X ", readData[i]);
+		printf("\n\r");
+
+		/*for (rowAddr = 0; rowAddr < 131072; rowAddr+=1){
 			nandWrite(rowAddr, colAddr, writeData1, size);
 			//nandRead(rowAddr, colAddr, readData, size);
 			eraseBlock(rowAddr);
@@ -636,12 +646,9 @@ void startControlLogic(void const * argument)
 				goodRows++;
 			}
 
-		}
+		}*/
+		printf("\n\rDone");
 
-		printf("\n\rGood rows: %d, Bad rows: %d", goodRows, badRows);
-		printf("\n\r");
-		for(int i = 0; i < size; i++) printf("%X ", readData[i]);
-		printf("\n\r");
 	}
   /* Infinite loop */
 	while(ENABLE_CONTROL_LOGIC) {

@@ -1,9 +1,9 @@
 storage.c:22:6:storageSetup	8	static
-storage.c:36:6:storageWrite	4	static
-storage.c:47:6:storeDaqStatus	4	static
-storage.c:58:6:storeDaqScaling	4	static
-storage.c:69:6:storeGpsData	4	static
-storage.c:80:6:storeBmpData	4	static
-storage.c:91:6:storeImuData	4	static
-storage.c:102:6:storeProcessedData	4	static
-storage.c:113:6:storeMonitoringData	4	static
+storage.c:40:6:storageWrite	4	static
+storage.c:51:6:storeDaqStatus	4	static
+storage.c:62:6:storeDaqScaling	4	static
+storage.c:73:6:storeGpsData	4	static
+storage.c:84:6:storeBmpData	4	static
+storage.c:95:6:storeImuData	4	static
+storage.c:106:6:storeProcessedData	4	static
+storage.c:117:6:storeMonitoringData	4	static

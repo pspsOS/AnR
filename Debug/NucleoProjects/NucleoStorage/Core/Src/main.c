@@ -625,6 +625,8 @@ void startControlLogic(void const * argument)
 		for(i = 0; i < size; i++) printf("%02X ", readData[i]);
 		printf("\n\r");
 
+		//for(int j = 0; j < 100000; j++) printf("%02X ", j);
+
 		/*for (rowAddr = 0; rowAddr < 131072; rowAddr+=1){
 			nandWrite(rowAddr, colAddr, writeData1, size);
 			//nandRead(rowAddr, colAddr, readData, size);
@@ -764,12 +766,13 @@ void startMonitoring(void const * argument)
 	static TickType_t time_init = 0;
   /* Infinite loop */
 	while(ENABLE_MONITORING) {
+		printf("MONITORING\n\r");
 		//loop_M();
-		if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
+		/*if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
 			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
 			if(!pressed) printf("PRESSED  %d\r\n", ++counter);
 			else printf("RELEASED %d\r\n", counter);
-		}
+		}*/
 
 
 		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);

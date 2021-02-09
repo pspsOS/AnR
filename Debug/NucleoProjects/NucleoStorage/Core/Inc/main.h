@@ -93,7 +93,7 @@ void Error_Handler(void);
 #define ACQUISITION_TASK_RATE1  (GPS_FREQ * BMP_MULTIPLIER)
 #define ACQUISITION_TASK_RATE2  (GPS_FREQ * BMP_MULTIPLIER * IMU_MULTIPLIER)
 #define CONTROL_LOGIC_TASK_RATE (1/100.0)   // TODO: Determine optimal Control Logic Task Rate (currently 1 Hz)
-#define MONITORING_TASK_RATE    (100)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
+#define MONITORING_TASK_RATE    (1)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
 #define PROCESSING_TASK_RATE    (1/8.0) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
 
 // Task Delays are calculated from above rates (DO NOT EDIT)

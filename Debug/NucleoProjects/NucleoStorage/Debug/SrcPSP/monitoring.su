@@ -1,7 +1,7 @@
-monitoring.c:45:6:setup_M	4	static
-monitoring.c:72:6:loop_M	8	static
-monitoring.c:107:6:checkBatteryVoltage_M	16	static
-monitoring.c:128:6:checkContinuity_M	8	static
-monitoring.c:149:6:checkButtonState_M	8	static
-monitoring.c:167:6:checkHardwareDeploymentDisable_M	8	static
-monitoring.c:184:6:sendUpdate_M	16	static
+monitoring.c:46:6:setup_M	4	static
+monitoring.c:73:6:loop_M	8	static
+monitoring.c:108:6:checkBatteryVoltage_M	8	static
+monitoring.c:147:6:checkContinuity_M	8	static
+monitoring.c:168:6:checkButtonState_M	8	static
+monitoring.c:186:6:checkHardwareDeploymentDisable_M	8	static
+monitoring.c:203:6:sendUpdate_M	16	static

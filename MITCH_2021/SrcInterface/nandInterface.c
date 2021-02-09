@@ -121,11 +121,11 @@ void nandBufferWrite(uint16_t colAddr, uint8_t data[], uint8_t size){
 void nandBufferExecute(uint32_t rowAddr){
 	// Variables
 	uint8_t cmd[4];  // Command sent to device
-	uint8_t feature; //feature byte
-	bool oip = true; //operation in progress
-	bool prg_f = false; //program fail
-	bool eccs1 = false;
-	bool eccs0 = false;
+	uint8_t feature = 0x00; //feature byte
+	uint8_t oip = 1; //operation in progress
+	uint8_t prg_f = 0; //program fail
+	uint8_t eccs1 = 0;
+	uint8_t eccs0 = 0;
 
 	//Load data from cell array into buffer
 	cmd[0] = W_EXECUTE;
@@ -136,6 +136,7 @@ void nandBufferExecute(uint32_t rowAddr){
 		handleHalError(NAND);
 		return;
 	}
+	uint8_t a = 0;
 	do{
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
@@ -143,8 +144,10 @@ void nandBufferExecute(uint32_t rowAddr){
 		eccs1 = getBit(feature, 5);
 		eccs0 = getBit(feature, 4);
 
-		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
-	}while(oip);
+		//printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", (int)prg_f, (int)eccs1, (int)eccs0, (int)oip);
+		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", (int)prg_f, (int)eccs1, (int)eccs0, (int)oip);
+		a++;
+	}while(a<2);
 }
 
 /**
@@ -199,7 +202,7 @@ void writeEnable(){
 	// Send Command
 	cmd = W_ENABLE;
 	if (sendSPI(&cmd, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 }
@@ -217,7 +220,7 @@ void writeDisable(){
 	// Send Command
 	cmd = W_DISABLE;
 	if (sendSPI(&cmd, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 }
@@ -233,14 +236,13 @@ void writeDisable(){
 uint8_t getFeature(uint8_t featureAddr){
 	// Variables
 	uint8_t cmd[2];  // Command sent to device
-	uint8_t feature; //feature byte
+	uint8_t feature = 0x00; //feature byte
 
 	// Send Command
 	cmd[0] = GET_FEATURE;
 	cmd[1] = featureAddr;
 	if (recieveSPI(&cmd[0], 2, &feature, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
-		return 0x00;
+		handleHalError(NAND);
 	}
 	return feature;
 }

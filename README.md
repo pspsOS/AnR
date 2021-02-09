@@ -1,15 +1,13 @@
 # AnR: PSPS Avionics and Recovery GitHub
-This document was last edited by Jeffrey Kaji on *2 Jan 2021*. <br/>
+This document was last edited by Jeffrey Kaji on *4 Feb 2021*. <br/>
+View our license [here](LICENSE)
 
 ## MITCH_2021
 **Multi-Instrument Telemetry Computer Hardware** for PSPS 2021 Rocket<br> 
 Important Macros: <br>
-``getBit(A, X)`` : gets the *"Xth"* bit of *"A"*. _(By VV)_<br>
-``setBit(A, X, V)`` : sets the *"Xth"* bit of *"A"* to *"V"*. _(By VV)_ <br><br>
-Debuging Macros: <br>
-``print()`` : Prints to console. Is disabled by ``NDEBUG``. Does not accept string formatters. _(By JK)_ <br>
-``prints()`` : Prints to console. Is disabled by ``NDEBUG``. Requires string formatters. _(By JK)_ <br>
-``printe()`` : Prints to error stream. Is disabled by ``NDEBUG``. Requires string formatters. _(By JK)_ <br>
+``getBit(A, X)`` : gets the *"Xth"* bit of *"A"*.<br>
+``setBit(A, X, V)`` : sets the *"Xth"* bit of *"A"* to *"V"*.<br><br>
+
 
 #### Quick Links
 * [Documentation Folder **Docs/**](../Docs/README.md)

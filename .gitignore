@@ -24,5 +24,8 @@ Debug/NucleoProjects/NucleoSensors/IncPSP
 Debug/NucleoProjects/NucleoSensors/SrcPSP
 Debug/NucleoProjects/NucleoSensors/IncInterface
 Debug/NucleoProjects/NucleoSensors/SrcInterface
-Debug/NucleoProjects/NucleoStorage/Debug/*
-
+MITCH_2021-48/Debug
+MITCH_2021-48/IncPSP
+MITCH_2021-48/SrcPSP
+MITCH_2021-48/IncInterface
+MITCH_2021-48/SrcInterface

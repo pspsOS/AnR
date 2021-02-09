@@ -1,0 +1,111 @@
+Netlist
+
+Exported from PSPS_AVNC_SRD_CS_combined-2021-02-07.sch at 2/7/2021 7:26 PM
+
+EAGLE Version 9.6.2 Copyright (c) 1988-2020 Autodesk, Inc.
+
+Net          Part     Pad      Pin        Sheet
+
+3V3          FB1      2        2          1
+             U0-C     24       VDD        1
+             U0-C     36       VDD        1
+             U0-C     48       VDD        1
+
+ACCEL_ANALOG U0-C     19       PB1        1
+
+ARMING_EN    U0-C     6        PH0-OSC_OUT 1
+
+ARMING_MEAS  U0-C     14       PA4        1
+
+BATT_MEAS    U0-C     18       PB0        1
+
+BOOT0        R0-C     1        1          1
+             U0-C     44       BOOT0      1
+
+BUTTON_IN    U0-C     33       PA12       1
+
+BUZZER_OUT   U0-C     32       PA11       1
+
+FIRE_A       U0-C     40       PB4        1
+
+FIRE_B       U0-C     41       PB5        1
+
+FIRE_C       U0-C     42       PB6        1
+
+FIRE_D       U0-C     43       PB7        1
+
+GND          C0-C     2        2          1
+             C1-C     2        2          1
+             R0-C     2        2          1
+             S0-C     3        P          1
+             S0-C     4        P1         1
+             U0-C     23       VSS        1
+             U0-C     35       VSS        1
+             U0-C     47       VSS        1
+             U0-C     8        VSSA/VREF- 1
+
+HDD_CHECK    U0-C     38       PA15       1
+
+LD1          U0-C     4        PC15       1
+
+LD2          U0-C     5        PH0-OSC_IN 1
+
+NRST         C1-C     1        1          1
+             S0-C     1        S          1
+             S0-C     2        S1         1
+             U0-C     7        NRST       1
+
+SENSE_A      U0-C     3        PC14       1
+
+SENSE_B      U0-C     2        PC13       1
+
+SENSE_C      U0-C     46       PB9        1
+
+SENSE_D      U0-C     45       PB8        1
+
+SPI1_LE      U0-C     20       PB2        1
+
+SPI1_MISO    U0-C     16       PA6        1
+
+SPI1_MOSI    U0-C     17       PA7        1
+
+SPI1_REG     U0-C     21       PB10       1
+
+SPI1_SCK     U0-C     15       PA5        1
+
+SPI2_LE      U0-C     29       PA8        1
+
+SPI2_MISO    U0-C     27       PB14       1
+
+SPI2_MOSI    U0-C     28       PB15       1
+
+SPI2_REG     U0-C     25       PB12       1
+
+SPI2_SCK     U0-C     26       PB13       1
+
+SWCLK        U0-C     37       PA14       1
+
+SWDIO        U0-C     34       PA13       1
+
+SWO          U0-C     39       PB3        1
+
+USART1_RX    U0-C     31       PA10       1
+
+USART1_TX    U0-C     30       PA9        1
+
+USART2_CTS   U0-C     10       PA0        1
+
+USART2_RTS   U0-C     11       PA1        1
+
+USART2_RX    U0-C     13       PA3        1
+
+USART2_TX    U0-C     12       PA2        1
+
+VBAT         U0-C     1        VBAT       1
+
+VCAP_1       C0-C     1        1          1
+             U0-C     22       VCAP_1     1
+
+VDDA         FB1      1        1          1
+             U0-C     9        VDDA/VREF+ 1
+

@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.25" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.125" altunitdist="mm" altunit="mm"/>
+<grid distance="0.00984251969" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.125" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="yes" active="yes"/>
@@ -184,6 +184,7 @@
 </layers>
 <board>
 <plain>
+<circle x="0" y="0" radius="66.675" width="0.127" layer="20"/>
 </plain>
 <libraries>
 <library name="Computer2" urn="urn:adsk.eagle:library:23762960">

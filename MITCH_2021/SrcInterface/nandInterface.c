@@ -144,8 +144,7 @@ void nandBufferExecute(uint32_t rowAddr){
 		eccs1 = getBit(feature, 5);
 		eccs0 = getBit(feature, 4);
 
-		//printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", (int)prg_f, (int)eccs1, (int)eccs0, (int)oip);
-		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", (int)prg_f, (int)eccs1, (int)eccs0, (int)oip);
+		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
 		a++;
 	}while(a<2);
 }

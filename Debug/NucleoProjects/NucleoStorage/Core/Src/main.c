@@ -595,9 +595,9 @@ void startControlLogic(void const * argument)
 
 		setFeature(0xA0, 0x00);
 		feature = getFeature(0xA0);
-		printf("Feature %02X ", feature);
+		printf("Feature 02X ", feature);
 		feature = getFeature(0xB0);
-		printf("%02X\n\r", feature);
+		printf("02X \n\r", feature);
 
 		//feature = getFeature(0xC0);
 		//printf("%2X ", feature);

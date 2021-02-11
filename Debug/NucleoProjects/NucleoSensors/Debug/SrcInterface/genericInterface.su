@@ -3,3 +3,9 @@ genericInterface.c:14:6:PSP_GPIO_WritePin	24	static
 genericInterface.c:25:19:sendSPI	32	static
 genericInterface.c:36:19:recieveSPI	32	static
 genericInterface.c:50:6:handleHalError	16	static
+genericInterface.c:60:10:newSrBank	40	static
+genericInterface.c:65:7:newPinLed	40	static
+genericInterface.c:70:7:newBankLed	40	static
+genericInterface.c:77:7:newBankMixed	40	static
+genericInterface.c:86:6:setLed	24	static
+genericInterface.c:103:6:setSrBank	24	static

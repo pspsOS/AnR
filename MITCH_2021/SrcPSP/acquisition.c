@@ -736,6 +736,7 @@ void _addNmeaData()
 
 	if(!_getNmeaType())
 			{
+
 		//Type GGA
 		//adds GCA to struct
 		strncpy((char*)g_gpsData.nmeaGGA, unsplitGpsNmea, strlen(unsplitGpsNmea));
@@ -826,6 +827,7 @@ int _getNmeaType()
 void _loadGpsData()
 {
 #ifndef NDEBUG
+	//Clear Gps Data todo
 		if(!simulateGps) {
 			if(notifyWhenReadAborted)
 				printf("GPS read aborted.\n");

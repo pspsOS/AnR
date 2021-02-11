@@ -13,4 +13,4 @@
 void gpsInit(bool* gpsNominal);
 void gpsLoadString(char* gpsNmea);
 
-#endif /* GPSINTERFACE_H_ */
+#endif

@@ -82,7 +82,7 @@ void Error_Handler(void);
 
 // Other Task Rates
 #define CONTROL_LOGIC_TASK_RATE (1)   // TODO: Determine optimal Control Logic Task Rate (currently 1 Hz)
-#define MONITORING_TASK_RATE    (1)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
+#define MONITORING_TASK_RATE    (100)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
 #define PROCESSING_TASK_RATE    (125) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
 
 // Task Delays are calculated from above rates (DO NOT EDIT)
@@ -99,13 +99,15 @@ void Error_Handler(void);
 
 #define ENABLE_CONTROL_LOGIC (1)
 #define ENABLE_ACQUISITION (0)
-#define ENABLE_MONITORING (0)
+#define ENABLE_MONITORING (1)
 #define ENABLE_PROCESSING (0)
 
 
 // #define SUPRESS_TASK_UPDATES
 // #define SUPRESS_SETUP_WARNING
 // #define SUPRESS_ALL
+
+#define BYPASS_ACQUISITION_LEDS
 
 /* USER CODE END Private defines */
 

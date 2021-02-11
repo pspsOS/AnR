@@ -44,12 +44,12 @@ SrcPSP/processing.o: ../SrcPSP/processing.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../SrcPSP/../IncPSP/../IncPSP/gpio.h ../Core/Inc/retarget.h \
- /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/imuInterface.h \
+ ../SrcPSP/../IncPSP/../IncPSP/gpio.h \
  /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
- /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/../IncPSP/gpio.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
- /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/common.h
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
+ ../Core/Inc/retarget.h \
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/imuInterface.h \
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h
 
 ../SrcPSP/../IncPSP/processing.h:
 
@@ -147,14 +147,12 @@ SrcPSP/processing.o: ../SrcPSP/processing.c \
 
 ../SrcPSP/../IncPSP/../IncPSP/gpio.h:
 
+/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
+
 ../Core/Inc/retarget.h:
 
 /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/imuInterface.h:
 
 /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
-
-/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/../IncPSP/gpio.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
-
-/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/common.h:

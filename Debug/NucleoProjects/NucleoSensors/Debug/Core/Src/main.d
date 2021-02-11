@@ -52,7 +52,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/processing.h \
  /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/storage.h \
  /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/transmission.h \
- /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/gpio.h
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/gpio.h \
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
+ /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h
 
 ../Core/Inc/main.h:
 
@@ -163,3 +165,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/transmission.h:
 
 /Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/../IncPSP/gpio.h:
+
+/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+/Users/jackwiley/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:

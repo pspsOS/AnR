@@ -23,6 +23,15 @@ typedef struct VLQ {
 	};
 } VLQ_t;
 
+/* Constants */
+
+#define NOMINAL_DAQ_STATUS (0x80)
+#define NOMINAL_GPS_DATA (0x90)
+#define NOMINAL_BMP_DATA (0xA0)
+#define NOMINAL_IMU_DATA (0xB0)
+#define NOMINAL_MONITOR_DATA (0xC0)
+#define NOMINAL_PROCESSED_DATA (0xD0)
+
 /* Function Prototypes */
 
 bool storageSetup();

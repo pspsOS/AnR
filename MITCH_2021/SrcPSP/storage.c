@@ -54,11 +54,12 @@ void storeDaqStatus() {
 	}
 	g_daqStatusData.lock = true;
 
-	uint8_t dataStream[10] = {0};
-	uint8_t size = 0;
+	uint8_t dataStream[11] = {0};
+	dataStream[0] = NOMINAL_DAQ_STATUS;
+	uint8_t size = 1;
 
 	VLQ_t genericVLQ = convertToUVLQ(g_daqStatusData.timeStamp);
-	for (uint8_t i = 0; i < genericVLQ.quantityLength; i++) {
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
 				dataStream[i] = genericVLQ.oneByteVLQ[i];
@@ -77,9 +78,11 @@ void storeDaqStatus() {
 	size += genericVLQ.quantityLength;
 
 	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i++) {
-		dataStream[genericVLQ.quantityLength + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
+		dataStream[genericVLQ.quantityLength + 1 + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
 		size++;
 	}
+
+	g_daqStatusData.lock = false;
 
 	uint8_t funcReturn = writeToStorage(dataStream, size);
 	if (funcReturn == FAILED_FILE_WRITE) {

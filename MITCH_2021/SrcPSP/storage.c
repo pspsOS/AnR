@@ -49,8 +49,47 @@ void storageWrite() {
  * @date 1/30/21
  */
 void storeDaqStatus() {
+	if (g_daqStatusData.lock) {
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_daqStatusData.lock = true;
 
+	uint8_t dataStream[10] = {0};
+	uint8_t size = 0;
+
+	VLQ_t genericVLQ = convertToUVLQ(g_daqStatusData.timeStamp);
+	for (uint8_t i = 0; i < genericVLQ.quantityLength; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i++) {
+		dataStream[genericVLQ.quantityLength + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
+		size++;
+	}
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
+
 
 /**
  * @brief stores Daq Scaling

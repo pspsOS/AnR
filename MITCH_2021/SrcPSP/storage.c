@@ -45,7 +45,7 @@ void storageWrite() {
  * @brief stores Daq Status
  * Stores values from the daqStatus Struct
  *
- * @author Ryan Horvath
+ * @author Ryan Horvath, Vishnu Vijay
  * @date 1/30/21
  */
 void storeDaqStatus() {
@@ -62,22 +62,22 @@ void storeDaqStatus() {
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
-				dataStream[i] = genericVLQ.oneByteVLQ[i];
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
 				break;
 			case 2:
-				dataStream[i] = genericVLQ.twoByteVLQ[i];
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
 				break;
 			case 3:
-				dataStream[i] = genericVLQ.threeByteVLQ[i];
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
 				break;
 			case 4:
-				dataStream[i] = genericVLQ.fourByteVLQ[i];
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
 				break;
 		}
 	}
 	size += genericVLQ.quantityLength;
 
-	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i++) {
+	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i += sizeof(char)) {
 		dataStream[genericVLQ.quantityLength + 1 + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
 		size++;
 	}
@@ -148,22 +148,162 @@ void storeGpsData() {
  * @brief stores BMP data
  * Stores values from the bmpData Struct
  *
- * @author Ryan Horvath
+ * @author Ryan Horvath, Vishnu Vijay
  * @date 1/30/21
  */
 void storeBmpData() {
+	if (g_bmpData.lock) {
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_bmpData.lock = true;
 
+	uint8_t dataStream[16] = {0};
+	dataStream[0] = NOMINAL_BMP_DATA;
+	uint8_t size = 1;
+
+	//Compressing Time Stamp
+	VLQ_t genericVLQ = convertToUVLQ(g_bmpData.timeStamp);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//Compressing Pressure
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_bmpData.pressure);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//Compressing Temperature
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_bmpData.temperature);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	g_bmpData.lock = false;
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
 
 /**
  * @brief stores Imu Data
  * Stores values from the imuData Struct
  *
- * @author Ryan Horvath
+ * @author Ryan Horvath, Vishnu Vijay
  * @date 1/30/21
  */
 void storeImuData() {
+	if (g_imuData.lock) {
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_imuData.lock = true;
 
+	uint8_t dataStream[1 + 5 + 10 * (3)] = {0};
+	dataStream[0] = NOMINAL_IMU_DATA;
+	uint8_t size = 1;
+
+	//Compressing Time Stamp
+	VLQ_t genericVLQ = convertToUVLQ(g_imuData.timeStamp);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//Compress imu data
+	for (uint8_t i = sizeof(g_imuData.timeStamp); i < sizeof(g_imuData); i += sizeof(int16_t)) {
+		int16_t tempInt = g_imuData[i];
+		memset(genericVLQ, 0, sizeof(genericVLQ));
+		genericVLQ = convertToSVLQ(tempInt);
+		for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+			switch (genericVLQ.quantityLength) {
+				case 1:
+					dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+					break;
+				case 2:
+					dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+					break;
+				case 3:
+					dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+					break;
+				case 4:
+					dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+					break;
+			}
+		}
+		size += genericVLQ.quantityLength;
+	}
+
+	g_imuData.lock = false;
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
 
 /**
@@ -302,11 +442,76 @@ void storeProcessedData() {
  * @brief stores Monitoring Data
  * Stores values from the monitoringData Struct
  *
- * @author Ryan Horvath
+ * @author Ryan Horvath, Vishnu Vijay
  * @date 1/30/21
  */
 void storeMonitoringData() {
+	if (g_monitoringData.lock) {
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_monitoringData.lock = true;
 
+	uint8_t dataStream[sizeof(g_monitoringData) + 2] = {0};
+	dataStream[0] = NOMINAL_MONITORING_DATA;
+	uint8_t size = 1;
+
+	//Compressing Time Stamp
+	VLQ_t genericVLQ = convertToUVLQ(g_bmpData.timeStamp);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//Compressing battery voltage
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.batteryVoltage);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//Assign bools to data stream
+	uint8_t oldSize = size;
+	for (uint8_t i = oldSize; i < sizeof(g_monitoringData); i += sizeof(char)) {
+		dataStream[i - oldSize] = g_monitoringData[i];
+		size++;
+	}
+
+	g_monitoringData.lock = false;
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
 
 /**

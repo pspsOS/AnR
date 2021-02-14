@@ -12,7 +12,7 @@
  * @author Ryan Horvath
  * @date 2/11/21
  */
-int8_t writeToFile(uint8_t *bytePointer, uint8_t streamSize){
+int8_t writeToStorage(uint8_t *bytePointer, uint8_t streamSize){
 	FILE *fp = NULL;
 	fp = fopen("output.txt","a");
 	if (fp == NULL) {

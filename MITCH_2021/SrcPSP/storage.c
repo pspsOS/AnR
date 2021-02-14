@@ -93,18 +93,6 @@ void storeDaqStatus() {
 	}
 }
 
-
-/**
- * @brief stores Daq Scaling
- * Stores values from the daqScaling Struct
- *
- * @author Ryan Horvath
- * @date 1/30/21
- */
-void storeDaqScaling() {
-
-}
-
 /**
  * @brief stores GPS data
  * Stores values from the gpsData Struct
@@ -113,7 +101,47 @@ void storeDaqScaling() {
  * @date 1/30/21
  */
 void storeGpsData() {
+	if (g_gpsData.lock) {
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_gpsData.lock = true;
 
+	uint8_t dataStream[6] = {0};
+	dataStream[0] = NOMINAL_GPS_DATA;
+	uint8_t size = 1;
+
+	//compressing Time Stamp
+	VLQ_t genericVLQ = convertToUVLQ(g_gpsData.timeStamp);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	writeToStorage(g_gpsData.nmeaGGA, MAX_NMEA);
+	writeToStorage(g_gpsData.nmeaRMC, MAX_NMEA);
+
+	g_gpsData.lock = false;
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
 
 /**
@@ -146,7 +174,128 @@ void storeImuData() {
  * @date 1/30/21
  */
 void storeProcessedData() {
+	if (g_processedData.lock) {
+		retryTakeDelay(DEFAULT_TAKE_DELAY);
+	}
+	g_processedData.lock = true;
 
+	uint8_t dataStream[10] = {0};
+	dataStream[0] = NOMINAL_PROCESSED_DATA;
+	uint8_t size = 1;
+
+	//compressing Time Stamp
+	VLQ_t genericVLQ = convertToUVLQ(g_processedData.timeStamp);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//compressing altitude
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	VLQ_t genericVLQ = convertToSVLQ(g_processedData.altitude);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//compressing velocity in x direction
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_xout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//compressing velocity in y direction
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_yout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	//compressing velocity in z direction
+	memset(genericVLQ, 0, sizeof(genericVLQ));
+	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_zout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
+	g_processedData.lock = false;
+
+	uint8_t funcReturn = writeToStorage(dataStream, size);
+	if (funcReturn == FAILED_FILE_WRITE) {
+		printf("Failed File Write\n");
+	}
+	else if (funcReturn == SUCCESSFUL_FILE_WRITE) {
+		printf("Successful File Write\n");
+	}
 }
 
 /**

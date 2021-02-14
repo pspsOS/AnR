@@ -12,13 +12,15 @@
  * @author Ryan Horvath
  * @date 2/11/21
  */
-void writeToFile(uint8_t pointer[], uint8_t size){
-	FILE *fp;
-	fp = fopen("output.txt","w+");
-	int i;
-	for(i = 0; i < size; i++){
-		fwrite(pointer[i], sizeof(pointer), 1, 0);
+int8_t writeToFile(uint8_t *bytePointer, uint8_t streamSize){
+	FILE *fp = NULL;
+	fp = fopen("output.txt","a");
+	if (fp == NULL) {
+		return FAILED_FILE_WRITE;
 	}
+	fwrite(bytePointer, sizeof(uint8_t), streamSize, fp);
 	fclose(fp);
+	fp = NULL;
+	return SUCCESSFUL_FILE_WRITE;
 }
 

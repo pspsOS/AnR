@@ -67,8 +67,8 @@ typedef enum {
 
 // Function returns
 #define SUCCESSFUL_RETURN (0)
-
-
+#define FAILED_FILE_WRITE (-1)
+#define SUCCESSFUL_FILE_WRITE (0)
 
 /* User typedef */
 

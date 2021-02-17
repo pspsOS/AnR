@@ -80,6 +80,7 @@ void Error_Handler(void);
 #define NDEBUG
 #define BYPASS_GPS
 #define BYPASS_ACQUISITION_LEDS
+#define BYPASS_ALA
 
 // Acquisition Multiplier Settings
 #define GPS_FREQ (1)        //   1 Hz
@@ -108,7 +109,9 @@ void Error_Handler(void);
 #define ENABLE_MONITORING (0)
 #define ENABLE_PROCESSING (0)
 
-
+// User Pin defines
+#define NAND_CS_Pin CS3_Pin
+#define NAND_CS_GPIO_Port CS3_GPIO_Port
 // #define SUPRESS_TASK_UPDATES
 // #define SUPRESS_SETUP_WARNING
  #define SUPRESS_ALL

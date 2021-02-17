@@ -154,7 +154,7 @@ typedef struct processedData {
 
 typedef struct monitoringData {
 	ui32 timeStamp;
-	float batteryVoltage;
+	i16 batteryVoltage;
 	bool continuity[4];
 	bool buttonState;
 	bool hardwareDeploymentDisable;

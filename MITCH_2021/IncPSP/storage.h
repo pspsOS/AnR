@@ -9,6 +9,7 @@
 #define INC_STORAGE_H_
 
 #include "common.h"
+#include "debugStorage.h"
 
 /* Struct Typedef */
 

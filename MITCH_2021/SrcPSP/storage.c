@@ -77,10 +77,11 @@ void storeDaqStatus() {
 	}
 	size += genericVLQ.quantityLength;
 
-	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i += sizeof(char)) {
-		dataStream[genericVLQ.quantityLength + 1 + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
-		size++;
-	}
+	dataStream[size++] = g_daqStatusData.daqScalingEnabled;
+	dataStream[size++] = g_daqStatusData.gpsNominal;
+	dataStream[size++] = g_daqStatusData.bmpNominal;
+	dataStream[size++] = g_daqStatusData.imuNominal;
+	dataStream[size++] = g_daqStatusData.alaNominal;
 
 	g_daqStatusData.lock = false;
 
@@ -130,8 +131,8 @@ void storeGpsData() {
 	}
 	size += genericVLQ.quantityLength;
 
-	writeToStorage(g_gpsData.nmeaGGA, MAX_NMEA);
-	writeToStorage(g_gpsData.nmeaRMC, MAX_NMEA);
+	writeToStorage((uint8_t *) g_gpsData.nmeaGGA, MAX_NMEA);
+	writeToStorage((uint8_t *) g_gpsData.nmeaRMC, MAX_NMEA);
 
 	g_gpsData.lock = false;
 
@@ -182,7 +183,7 @@ void storeBmpData() {
 	size += genericVLQ.quantityLength;
 
 	//Compressing Pressure
-	memset(genericVLQ, 0, sizeof(genericVLQ));
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
 	genericVLQ = convertToSVLQ(g_bmpData.pressure);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
@@ -203,7 +204,7 @@ void storeBmpData() {
 	size += genericVLQ.quantityLength;
 
 	//Compressing Temperature
-	memset(genericVLQ, 0, sizeof(genericVLQ));
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
 	genericVLQ = convertToSVLQ(g_bmpData.temperature);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
@@ -272,9 +273,12 @@ void storeImuData() {
 	size += genericVLQ.quantityLength;
 
 	//Compress imu data
+	int16_t tempArr[sizeof(g_imuData) / 2] = {0};
+	memcpy(&tempArr, (const void *) g_imuData, sizeof(g_imuData));
 	for (uint8_t i = sizeof(g_imuData.timeStamp); i < sizeof(g_imuData); i += sizeof(int16_t)) {
-		int16_t tempInt = g_imuData[i];
-		memset(genericVLQ, 0, sizeof(genericVLQ));
+		int16_t tempInt = 0; //((int16_t *) g_imuData)[i];
+		//memcpy(&tempInt, g_imuData[i], sizeof(int16_t));
+		memset(&genericVLQ, 0, sizeof(genericVLQ));
 		genericVLQ = convertToSVLQ(tempInt);
 		for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 			switch (genericVLQ.quantityLength) {
@@ -344,8 +348,8 @@ void storeProcessedData() {
 	size += genericVLQ.quantityLength;
 
 	//compressing altitude
-	memset(genericVLQ, 0, sizeof(genericVLQ));
-	VLQ_t genericVLQ = convertToSVLQ(g_processedData.altitude);
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_processedData.altitude);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
@@ -365,8 +369,8 @@ void storeProcessedData() {
 	size += genericVLQ.quantityLength;
 
 	//compressing velocity in x direction
-	memset(genericVLQ, 0, sizeof(genericVLQ));
-	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_xout);
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_processedData.vel_xout);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
@@ -386,8 +390,8 @@ void storeProcessedData() {
 	size += genericVLQ.quantityLength;
 
 	//compressing velocity in y direction
-	memset(genericVLQ, 0, sizeof(genericVLQ));
-	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_yout);
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_processedData.vel_yout);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
@@ -407,8 +411,8 @@ void storeProcessedData() {
 	size += genericVLQ.quantityLength;
 
 	//compressing velocity in z direction
-	memset(genericVLQ, 0, sizeof(genericVLQ));
-	VLQ_t genericVLQ = convertToSVLQ(g_processedData.vel_zout);
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_processedData.vel_zout);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
@@ -452,7 +456,7 @@ void storeMonitoringData() {
 	g_monitoringData.lock = true;
 
 	uint8_t dataStream[sizeof(g_monitoringData) + 2] = {0};
-	dataStream[0] = NOMINAL_MONITORING_DATA;
+	dataStream[0] = NOMINAL_MONITOR_DATA;
 	uint8_t size = 1;
 
 	//Compressing Time Stamp
@@ -476,8 +480,8 @@ void storeMonitoringData() {
 	size += genericVLQ.quantityLength;
 
 	//Compressing battery voltage
-	memset(genericVLQ, 0, sizeof(genericVLQ));
-	genericVLQ = convertToSVLQ(g_imuData.batteryVoltage);
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_monitoringData.batteryVoltage);
 	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
 		switch (genericVLQ.quantityLength) {
 			case 1:
@@ -497,11 +501,11 @@ void storeMonitoringData() {
 	size += genericVLQ.quantityLength;
 
 	//Assign bools to data stream
-	uint8_t oldSize = size;
-	for (uint8_t i = oldSize; i < sizeof(g_monitoringData); i += sizeof(char)) {
-		dataStream[i - oldSize] = g_monitoringData[i];
-		size++;
+	for (int8_t i = 0; i < 4; i++) {
+		dataStream[size++] = g_monitoringData.continuity[i];
 	}
+	dataStream[size++] = g_monitoringData.buttonState;
+	dataStream[size++] = g_monitoringData.hardwareDeploymentDisable;
 
 	g_monitoringData.lock = false;
 

@@ -273,31 +273,207 @@ void storeImuData() {
 	size += genericVLQ.quantityLength;
 
 	//Compress imu data
-	int16_t tempArr[sizeof(g_imuData) / 2] = {0};
-	memcpy(&tempArr, (const void *) g_imuData, sizeof(g_imuData));
-	for (uint8_t i = sizeof(g_imuData.timeStamp); i < sizeof(g_imuData); i += sizeof(int16_t)) {
-		int16_t tempInt = 0; //((int16_t *) g_imuData)[i];
-		//memcpy(&tempInt, g_imuData[i], sizeof(int16_t));
-		memset(&genericVLQ, 0, sizeof(genericVLQ));
-		genericVLQ = convertToSVLQ(tempInt);
-		for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
-			switch (genericVLQ.quantityLength) {
-				case 1:
-					dataStream[i] = genericVLQ.oneByteVLQ[i - size];
-					break;
-				case 2:
-					dataStream[i] = genericVLQ.twoByteVLQ[i - size];
-					break;
-				case 3:
-					dataStream[i] = genericVLQ.threeByteVLQ[i - size];
-					break;
-				case 4:
-					dataStream[i] = genericVLQ.fourByteVLQ[i - size];
-					break;
-			}
+	//accelx
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.accel_xout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
 		}
-		size += genericVLQ.quantityLength;
 	}
+	size += genericVLQ.quantityLength;
+	//accely
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.accel_yout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//accelz
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.accel_zout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//gyrox
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.gyro_xout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//gyroy
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.gyro_yout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//gyroz
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.gyro_zout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//magx
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.mag_xout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//magy
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.mag_yout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//magz
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.mag_zout);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+	//alaz
+	memset(&genericVLQ, 0, sizeof(genericVLQ));
+	genericVLQ = convertToSVLQ(g_imuData.alaZ);
+	for (uint8_t i = size; i < genericVLQ.quantityLength + size; i++) {
+		switch (genericVLQ.quantityLength) {
+			case 1:
+				dataStream[i] = genericVLQ.oneByteVLQ[i - size];
+				break;
+			case 2:
+				dataStream[i] = genericVLQ.twoByteVLQ[i - size];
+				break;
+			case 3:
+				dataStream[i] = genericVLQ.threeByteVLQ[i - size];
+				break;
+			case 4:
+				dataStream[i] = genericVLQ.fourByteVLQ[i - size];
+				break;
+		}
+	}
+	size += genericVLQ.quantityLength;
+
 
 	g_imuData.lock = false;
 

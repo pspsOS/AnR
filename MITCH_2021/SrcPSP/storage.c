@@ -791,3 +791,24 @@ VLQ_t convertToSVLQ(int32_t originalNum) {
 
 	return newNum;
 }
+
+/**
+ * @brief Writes to file
+ * Writes the pointer to a file
+ *
+ * @author Ryan Horvath
+ * @date 2/11/21
+ */
+int8_t writeToStorage(uint8_t *bytePointer, uint8_t streamSize){
+#ifndef NDEBUG
+	FILE *fp = NULL;
+	fp = fopen("output.txt","a");
+	if (fp == NULL) {
+		return FAILED_FILE_WRITE;
+	}
+	fwrite(bytePointer, sizeof(uint8_t), streamSize, fp);
+	fclose(fp);
+	fp = NULL;
+#endif
+	return SUCCESSFUL_FILE_WRITE;
+}

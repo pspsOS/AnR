@@ -9,7 +9,6 @@
 #define INC_STORAGE_H_
 
 #include "common.h"
-#include "debugStorage.h"
 
 /* Struct Typedef */
 
@@ -45,6 +44,7 @@ void storeBmpData();
 void storeImuData();
 void storeProcessedData();
 void storeMonitoringData();
+int8_t writeToStorage(uint8_t *, uint8_t );
 
 //Data Compression Functions
 

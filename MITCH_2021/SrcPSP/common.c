@@ -20,6 +20,8 @@ volatile imuData_t g_imuData = {0};
 //
 // monitoring
 volatile monitoringData_t g_monitoringData = {0};
+//processing
+volatile processedData_t g_processedData = {0};
 // transmission
 volatile transmissionData_t g_transmissionData = {0};
 // modes

@@ -143,12 +143,18 @@ typedef struct imuData {
 
 typedef struct processedData {
 	ui32 timeStamp;
+	i16 altitude;
+	i16 vel_xout;
+	i16 vel_yout;
+	i16 vel_zout;
+	bool hasUpdate;
+	bool lock;
 
 } processedData_t;
 
 typedef struct monitoringData {
 	ui32 timeStamp;
-	float batteryVoltage;
+	i16 batteryVoltage;
 	bool continuity[4];
 	bool buttonState;
 	bool hardwareDeploymentDisable;
@@ -202,6 +208,7 @@ extern volatile bmpData_t g_bmpData;
 extern volatile imuData_t g_imuData;
 extern volatile monitoringData_t g_monitoringData;
 extern volatile transmissionData_t g_transmissionData;
+extern volatile processedData_t g_processedData;
 
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;

@@ -33,7 +33,7 @@ ui8 bmpCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 imuCounter;         // Counter used in DAQ Scaling for Finite State Machine
 ui8 fsmState;           // Defines state of Finite State Machine
 ui16 ala;
-extern ADC_HandleTypeDef hadc1;
+//extern ADC_HandleTypeDef hadc1;
 ui8 delayVal = 0;
 
 // Used for parsing NMEA data

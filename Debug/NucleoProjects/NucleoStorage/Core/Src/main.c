@@ -39,7 +39,6 @@
 #include "../IncPSP/storage.h"
 #include "../IncPSP/transmission.h"
 #include "../IncPSP/gpio.h"
-#include "../IncInterface/nandInterface.h"
 #include <string.h>
 
 /* USER CODE END Includes */
@@ -62,10 +61,7 @@
 ADC_HandleTypeDef hadc1;
 
 SPI_HandleTypeDef hspi1;
-SPI_HandleTypeDef hspi2;
-SPI_HandleTypeDef hspi3;
 
-UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 osThreadId ControlLogicHandle;
@@ -87,13 +83,9 @@ osStaticThreadDef_t MonitoringControlBlock;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_SPI2_Init(void);
-static void MX_SPI3_Init(void);
-static void MX_USART1_UART_Init(void);
-static void MX_USB_OTG_FS_USB_Init(void);
+static void MX_SPI1_Init(void);
 void startControlLogic(void const * argument);
 void startAcquisition(void const * argument);
 void startProcessing(void const * argument);
@@ -136,13 +128,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
-  MX_SPI2_Init();
-  MX_SPI3_Init();
-  MX_USART1_UART_Init();
-  MX_USB_OTG_FS_USB_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
   for(int i = 0; i < 500; i++) printf(" \r\n");
@@ -219,14 +207,15 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 72;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 3;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -266,15 +255,15 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 3;
   hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -285,7 +274,25 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = 2;
+  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Rank = 3;
+  sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -335,115 +342,6 @@ static void MX_SPI1_Init(void)
 }
 
 /**
-  * @brief SPI2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI2_Init(void)
-{
-
-  /* USER CODE BEGIN SPI2_Init 0 */
-
-  /* USER CODE END SPI2_Init 0 */
-
-  /* USER CODE BEGIN SPI2_Init 1 */
-
-  /* USER CODE END SPI2_Init 1 */
-  /* SPI2 parameter configuration*/
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_MASTER;
-  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI2_Init 2 */
-
-  /* USER CODE END SPI2_Init 2 */
-
-}
-
-/**
-  * @brief SPI3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI3_Init(void)
-{
-
-  /* USER CODE BEGIN SPI3_Init 0 */
-
-  /* USER CODE END SPI3_Init 0 */
-
-  /* USER CODE BEGIN SPI3_Init 1 */
-
-  /* USER CODE END SPI3_Init 1 */
-  /* SPI3 parameter configuration*/
-  hspi3.Instance = SPI3;
-  hspi3.Init.Mode = SPI_MODE_MASTER;
-  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi3.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI3_Init 2 */
-
-  /* USER CODE END SPI3_Init 2 */
-
-}
-
-/**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART1_Init 0 */
-
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -477,27 +375,6 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
-  * @brief USB_OTG_FS Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USB_OTG_FS_USB_Init(void)
-{
-
-  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
-
-  /* USER CODE END USB_OTG_FS_Init 0 */
-
-  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
-
-  /* USER CODE END USB_OTG_FS_Init 1 */
-  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
-
-  /* USER CODE END USB_OTG_FS_Init 2 */
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -519,7 +396,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, CS3_Pin|LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(CS3_GPIO_Port, CS3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -541,25 +418,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(HOLD_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA10 PA11 PA12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : CS3_Pin LED_Pin */
-  GPIO_InitStruct.Pin = CS3_Pin|LED_Pin;
+  /*Configure GPIO pin : CS3_Pin */
+  GPIO_InitStruct.Pin = CS3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(CS3_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-//bool printDiv = true;
 bool printDiv = false;
 /* USER CODE END 4 */
 
@@ -587,75 +455,30 @@ void startControlLogic(void const * argument)
 	bool badRow = false;
 	bool nandNominal = false;
 
-	if(ENABLE_CONTROL_LOGIC || true){
-		HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
+	printf("Variables declared \n\r");
 
-		nandInit(&nandNominal);
+	HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
 
-		setFeature(0xA0, 0x00);
-		feature = getFeature(0xA0);
-		printf("Feature 02X ", feature);
-		feature = getFeature(0xB0);
-		printf("02X \n\r", feature);
+	nandInit(&nandNominal);
 
-		//feature = getFeature(0xC0);
-		//printf("%2X ", feature);
+	printf("Feature set \n\r");
+	feature = getFeature(0xA0);
+	printf("Feature %02X ", feature);
+	feature = getFeature(0xB0);
+	printf("%02X \n\r", feature);
 
-		//for(int i = 0; i < sizeR; i++) printf("%X ", readData[i]);
-		//eraseBlock(rowAddr);
-		/*writeEnable();
-		nandBufferLoad(rowAddr);
-		nandBufferWrite(colAddr, writeData, sizeW);
-		nandBufferRead(colAddr, readData, sizeR);
-		for(int i = 0; i < sizeR; i++) printf("%X ", readData[i]);
-		printf("\n\r");
-		writeEnable();
-		//HAL_Delay(10);
-		nandBufferExecute(rowAddr);*/
-		//nandBufferRead(colAddr, readData, sizeR);
-		eraseBlock(rowAddr);
-		nandWrite(rowAddr, colAddr, writeData1, size);
-		nandRead(rowAddr, colAddr, readData, size);
-		for(i = 0; i < size; i++) printf("%02X ", readData[i]);
-		printf("\n\r");
+	eraseBlock(rowAddr);
+	nandWrite(rowAddr, colAddr, writeData1, size);
+	nandRead(rowAddr, colAddr, readData, size);
+	for(i = 0; i < size; i++) printf("%02X ", readData[i]);
+	printf("\n\r");
 
-		nandWrite(rowAddr, colAddr, writeData2, size);
-		nandRead(rowAddr, colAddr, readData, size);
-		for(i = 0; i < size; i++) printf("%02X ", readData[i]);
-		printf("\n\r");
-
-		//for(int j = 0; j < 100000; j++) printf("%02X ", j);
-
-		/*for (rowAddr = 0; rowAddr < 131072; rowAddr+=1){
-			nandWrite(rowAddr, colAddr, writeData1, size);
-			//nandRead(rowAddr, colAddr, readData, size);
-			eraseBlock(rowAddr);
-			nandWrite(rowAddr, colAddr, writeData2, size);
-			nandRead(rowAddr, colAddr, readData, size);
-
-			badRow = false;
-			for (int i=0; i<size; i++){
-				if(readData[i] != writeData2[i]){
-					badRow = true;
-				}
-			}
-			if(badRow){
-				printf("\n\rBAD ROW!: %d", rowAddr);
-				badRows++;
-			}else{
-				//printf("\n\rgood row: %d", rowAddr);
-				goodRows++;
-			}
-
-		}*/
-		printf("\n\rDone");
-
-	}
+	printf("Done %d \n\r", 1);
   /* Infinite loop */
 	while(ENABLE_CONTROL_LOGIC) {
-		if(printDiv) printf("-------------\r\n");
-		//toggleLed();
+
+
 		vTaskDelayUntil(&time_init, CONTROL_LOGIC_TASK_DELAY);
 	}
 	vTaskDelete(NULL);
@@ -673,10 +496,9 @@ void startAcquisition(void const * argument)
 {
   /* USER CODE BEGIN startAcquisition */
 	static TickType_t time_init = 0;
-	if(ENABLE_ACQUISITION){
-		setup_A();
-		printf("\n\n");
-	}
+
+	if(ENABLE_ACQUISITION) setup_A();
+	printf("\n\n");
   /* Infinite loop */
 	while(ENABLE_ACQUISITION) {
 		switch(loop_A()) {
@@ -709,43 +531,22 @@ void startProcessing(void const * argument)
 {
   /* USER CODE BEGIN startProcessing */
   /* Infinite loop */
-	if(false) {
-	uint8_t cmd = 0x01;
-
-	spiLock_t* ledSpiLock = registerSpiLock();
-	setSpiLock(NAND_CS_GPIO_Port, NAND_CS_Pin, ledSpiLock);
-	HAL_Delay(1000);
-	lockSpi(ledSpiLock);
-	sendSPI(&cmd, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS);
-	HAL_Delay(3000);
-	unlockSpi(ledSpiLock);
-
+	static GPIO_PinState pressed = GPIO_PIN_SET;
+	static int counter = 0;
+	extern ui16 ala;
 
 	static TickType_t time_init = 0;
-
   /* Infinite loop */
 	while(ENABLE_PROCESSING) {
-
-		HAL_GPIO_WritePin(ledSpiLock->port, ledSpiLock->pin, GPIO_PIN_RESET);
-		printf("%d \n\r", ledSpiLock->pin);
-		printf("%d \n\n\r", NAND_CS_Pin);
-		HAL_Delay(1000);
-		lockSpi(ledSpiLock);
-		/*if (sendSPI(0x01, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-				handleHalError(NAND);
-				return;
+		if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
+			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
+			if(!pressed) printf("PRESSED  %d\r\n", ++counter);
+			else printf("RELEASED %d\r\n", counter);
 		}
-		HAL_Delay(1000);
-		if (sendSPI(0x01, 1, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-			handleHalError(NAND);
-			return;
-		}
-		HAL_Delay(4000);
-		unlockSpi(ledSpiLock);
-		HAL_Delay(1000);
-		*/
 		vTaskDelayUntil(&time_init, PROCESSING_TASK_DELAY);
-	}
+
+		imuRead_A();
+		printf("ALA: %d\r\n", (int)ala);
 	}
 	vTaskDelete(NULL);
   /* USER CODE END startProcessing */
@@ -761,20 +562,29 @@ void startProcessing(void const * argument)
 void startMonitoring(void const * argument)
 {
   /* USER CODE BEGIN startMonitoring */
-	static GPIO_PinState pressed = GPIO_PIN_SET;
-	static int counter = 0;
 	static TickType_t time_init = 0;
+
+	extern bool continuity[4];
+	extern float batteryVoltage;
+	extern float temperature;
+
+	printf("Monitoring Start\r\n");
+
+	setup_M();
+
+
   /* Infinite loop */
 	while(ENABLE_MONITORING) {
-		printf("MONITORING\n\r");
 		//loop_M();
-		/*if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) != pressed) {
-			pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
-			if(!pressed) printf("PRESSED  %d\r\n", ++counter);
-			else printf("RELEASED %d\r\n", counter);
-		}*/
 
-
+//		checkContinuity_M();
+//		printf("Continuity: ");
+//		for(int i = 0; i < 4; i++) printf("%d ", continuity[i]);
+//		printf("\r\n");
+		checkBatteryVoltage_M();
+//		printf("%f\r\n", batteryVoltage);
+		printf("Voltage 1: %d\r\n", (int)batteryVoltage);
+		printf("Temperature: %d\r\n", (int)temperature);
 		vTaskDelayUntil(&time_init, MONITORING_TASK_DELAY);
 	}
 

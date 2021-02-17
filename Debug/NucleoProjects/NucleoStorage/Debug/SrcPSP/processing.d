@@ -1,5 +1,7 @@
-SrcPSP/processing.o: ../SrcPSP/processing.c \
- ../SrcPSP/../IncPSP/processing.h ../SrcPSP/../IncPSP/../IncPSP/common.h \
+SrcPSP/processing.o: \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/SrcPSP/processing.c \
+ c:\users\mark\documents\github\anr\mitch_2021\incpsp\processing.h \
+ c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -47,16 +49,16 @@ SrcPSP/processing.o: ../SrcPSP/processing.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../SrcPSP/../IncPSP/../IncPSP/gpio.h \
+ c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
  ../Core/Inc/retarget.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/imuInterface.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h
 
-../SrcPSP/../IncPSP/processing.h:
+c:\users\mark\documents\github\anr\mitch_2021\incpsp\processing.h:
 
-../SrcPSP/../IncPSP/../IncPSP/common.h:
+c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
 
 ../Core/Inc/main.h:
 
@@ -154,7 +156,7 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
 
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 
-../SrcPSP/../IncPSP/../IncPSP/gpio.h:
+c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h:
 
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
 

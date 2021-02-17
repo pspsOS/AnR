@@ -7,9 +7,9 @@ genericInterface.c:53:6:unlockSpi	16	static
 genericInterface.c:60:19:sendSPI	32	static
 genericInterface.c:75:19:recieveSPI	32	static
 genericInterface.c:93:6:handleHalError	16	static
-genericInterface.c:106:10:newSrBank	40	static
-genericInterface.c:111:7:newPinLed	40	static
-genericInterface.c:116:7:newBankLed	40	static
-genericInterface.c:123:7:newBankMixed	40	static
-genericInterface.c:132:6:setLed	24	static
-genericInterface.c:149:6:setSrBank	24	static
+genericInterface.c:123:10:newSrBank	40	static
+genericInterface.c:128:7:newPinLed	40	static
+genericInterface.c:133:7:newBankLed	40	static
+genericInterface.c:140:7:newBankMixed	40	static
+genericInterface.c:149:6:setLed	24	static
+genericInterface.c:166:6:setSrBank	24	static

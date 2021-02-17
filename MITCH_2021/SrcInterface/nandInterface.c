@@ -38,7 +38,7 @@ void nandBufferLoad(uint32_t rowAddr){
 	cmd[2] = rowAddr >> 8;
 	cmd[1] = rowAddr >> 16;
 	if (sendSPI(&cmd[0], 4, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 
@@ -72,7 +72,7 @@ void nandBufferRead(uint16_t colAddr, uint8_t data[], uint8_t size){
 	cmd[3] = 0x00; //dummy byte
 	if (recieveSPI(&cmd[0], 4, data, size, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS))
 	{
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 //#endif
@@ -136,8 +136,21 @@ void nandBufferExecute(uint32_t rowAddr){
 		handleHalError(NAND);
 		return;
 	}
-	uint8_t a = 0;
-	do{
+
+	for (int i=0; i<5; i++){
+		feature = getFeature(FEATURE_ADDR_C);
+		oip = getBit(feature, 0);
+		prg_f = getBit(feature, 3);
+		eccs1 = getBit(feature, 5);
+		eccs0 = getBit(feature, 4);
+
+		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d\n\r", prg_f, eccs1, eccs0, oip);
+
+		if (!oip) i = 5;
+		//printf("Exiting For Loop");
+	}
+
+	/*do{
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 		prg_f = getBit(feature, 3);
@@ -145,8 +158,8 @@ void nandBufferExecute(uint32_t rowAddr){
 		eccs0 = getBit(feature, 4);
 
 		printf("prg_f: %d, eccs1: %d, eccs0: %d, oip: %d \n\r", prg_f, eccs1, eccs0, oip);
-		a++;
-	}while(a<2);
+
+	}while(oip);*/
 }
 
 /**
@@ -264,7 +277,7 @@ void setFeature(uint8_t featureAddr, uint8_t featureVal){
 	cmd[1] = featureAddr;
 	cmd[2] = featureVal;
 	if (sendSPI(&cmd[0], 3, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 }
@@ -291,7 +304,7 @@ void eraseBlock(uint32_t rowAddr){
 
 	writeEnable();
 	if (sendSPI(&cmd[0], 4, NAND_CS_GPIO_Port, NAND_CS_Pin, STORAGE_SPI_BUS)){
-		handleHalError(BMP);
+		handleHalError(NAND);
 		return;
 	}
 

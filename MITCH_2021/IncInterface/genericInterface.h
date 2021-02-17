@@ -24,7 +24,7 @@
 #define	GREAT					1
 #define PSP						GREAT //RRaP is better (just saying)
 #define SENSORS_SPI_BUS					&hspi1
-#define STORAGE_SPI_BUS					&hspi1 //&hspi3
+#define STORAGE_SPI_BUS					&hspi1
 #define ADC_VREF				3.3
 
 #define NUM_DEVICES (5)

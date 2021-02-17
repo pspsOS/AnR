@@ -1,4 +1,5 @@
-SrcPSP/gpio.o: ../SrcPSP/gpio.c \
+SrcPSP/gpio.o: \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/SrcPSP/gpio.c \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \

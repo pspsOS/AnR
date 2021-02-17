@@ -1,4 +1,5 @@
-SrcInterface/genericInterface.o: ../SrcInterface/genericInterface.c \
+SrcInterface/genericInterface.o: \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/SrcInterface/genericInterface.c \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \

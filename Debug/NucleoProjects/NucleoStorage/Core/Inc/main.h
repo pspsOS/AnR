@@ -76,25 +76,23 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 #define CS3_Pin GPIO_PIN_6
 #define CS3_GPIO_Port GPIOB
-#define LED_Pin GPIO_PIN_9
-#define LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define NDEBUG
+#define BYPASS_GPS
 #define BYPASS_ACQUISITION_LEDS
-#define NAND_CS_GPIO_Port CS3_GPIO_Port
-#define NAND_CS_Pin CS3_Pin
+
 // Acquisition Multiplier Settings
 #define GPS_FREQ (1)        //   1 Hz
-#define BMP_MULTIPLIER (2) //  10 Hz
+#define BMP_MULTIPLIER (10) //  10 Hz
 #define IMU_MULTIPLIER (10) // 100 Hz
 
 // Task Rates
 #define ACQUISITION_TASK_RATE0  (GPS_FREQ)
 #define ACQUISITION_TASK_RATE1  (GPS_FREQ * BMP_MULTIPLIER)
 #define ACQUISITION_TASK_RATE2  (GPS_FREQ * BMP_MULTIPLIER * IMU_MULTIPLIER)
-#define CONTROL_LOGIC_TASK_RATE (1/100.0)   // TODO: Determine optimal Control Logic Task Rate (currently 1 Hz)
+#define CONTROL_LOGIC_TASK_RATE (1)   // TODO: Determine optimal Control Logic Task Rate (currently 1 Hz)
 #define MONITORING_TASK_RATE    (1)   // TODO: Determine optimal Monitoring Task Rate (currently 1 Hz)
-#define PROCESSING_TASK_RATE    (1/8.0) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
+#define PROCESSING_TASK_RATE    (5) // TODO: Determine optimal Processing Task Rate (currently 125 Hz)
 
 // Task Delays are calculated from above rates (DO NOT EDIT)
 #define ACQUISITION_TASK_DELAY0  (1000 / ACQUISITION_TASK_RATE0 / portTICK_RATE_MS)
@@ -110,12 +108,10 @@ void Error_Handler(void);
 #define ENABLE_MONITORING (0)
 #define ENABLE_PROCESSING (0)
 
-#define BYPASS_GPS
-#define _SPI_CONFIGURED
 
 // #define SUPRESS_TASK_UPDATES
 // #define SUPRESS_SETUP_WARNING
-// #define SUPRESS_ALL
+ #define SUPRESS_ALL
 
 /* USER CODE END Private defines */
 

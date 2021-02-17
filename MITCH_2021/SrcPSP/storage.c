@@ -78,7 +78,7 @@ void storeDaqStatus() {
 	size += genericVLQ.quantityLength;
 
 	for (uint8_t i = sizeof(g_daqStatusData.timeStamp); i < sizeof(g_daqStatusData); i++) {
-		dataStream[genericVLQ.quantityLength + 1 + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
+		//dataStream[genericVLQ.quantityLength + 1 + i - sizeof(g_daqStatusData.timeStamp)] = g_daqStatusData[i];
 		size++;
 	}
 

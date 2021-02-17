@@ -1,4 +1,5 @@
-SrcInterface/baroInterface.o: ../SrcInterface/baroInterface.c \
+SrcInterface/baroInterface.o: \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/SrcInterface/baroInterface.c \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/baroInterface.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \

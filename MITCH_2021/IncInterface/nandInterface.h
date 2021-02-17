@@ -27,7 +27,8 @@
 #define MAX_COLUMN		4224
 
 //GPIO Defines
-
+#define NAND_CS_Pin CS3_Pin
+#define NAND_CS_GPIO_Port CS3_GPIO_Port
 
 
 //Prototypes

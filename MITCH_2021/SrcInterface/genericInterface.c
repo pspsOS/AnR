@@ -97,7 +97,24 @@ void handleHalError(Device_ID device)
 	//I don't know what you guys need, but this is for you to fill out
 	// TODO: Implement handleHalError
 	extern spiLock_t* nandSpiLock;
-
+	printf("HAL Error: ");
+	switch(device){
+	case GPS:
+			printf("GPS\n\r");
+			break;
+	case BMP:
+			printf("BMP\n\r");
+			break;
+	case IMU:
+			printf("IMU\n\r");
+			break;
+	case ALA:
+			printf("ALA\n\r");
+			break;
+	case NAND:
+		printf("NAND\n\r");
+		break;
+	}
 	if(device == NAND) unlockSpi(nandSpiLock);
 
 	nomPtr[device] = false;

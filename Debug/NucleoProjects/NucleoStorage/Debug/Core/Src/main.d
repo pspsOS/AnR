@@ -57,10 +57,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  c:\users\mark\documents\github\anr\mitch_2021\incpsp\transmission.h \
  c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
- C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
- c:\users\mark\documents\github\anr\mitch_2021\incinterface\nandinterface.h \
- c:\users\mark\documents\github\anr\mitch_2021\incinterface\genericInterface.h \
- c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h
 
 ../Core/Inc/main.h:
 
@@ -181,9 +178,3 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h:
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
 
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
-
-c:\users\mark\documents\github\anr\mitch_2021\incinterface\nandinterface.h:
-
-c:\users\mark\documents\github\anr\mitch_2021\incinterface\genericInterface.h:
-
-c:\users\mark\documents\github\anr\mitch_2021\incpsp\gpio.h:

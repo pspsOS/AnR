@@ -8,8 +8,9 @@
 #include "../IncPSP/acquisition.h"
 
 #ifdef NDEBUG
-	#include <baroInterface.h>
+	#include "baroInterface.h"
 	#include "genericInterface.h"
+	#include "gpsInterface.h"
 #else
 	#include "../IncDebug/debugSettings.h"
 	#include <unistd.h>
@@ -85,7 +86,7 @@ ui8 _nmeaAddrEnd;
 void setup_A() {
 
 	// Initialize local variables
-	daqScalingEnabled = true;
+	daqScalingEnabled = false;
 	daqScaler = DEFAULT_DAQ_SCALER;
 	gpsNominal = true;
 	bmpNominal = true;
@@ -573,11 +574,13 @@ void imuRead_A() {
 
 		// TODO: Implement IMU Simulation
 	#else
-		ADC_Select_CH1();
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, 1000);
-		ala = HAL_ADC_GetValue(&hadc1);
-		HAL_ADC_Stop(&hadc1);
+		#ifndef BYPASS_ALA
+			ADC_Select_CH1();
+			HAL_ADC_Start(&hadc1);
+			HAL_ADC_PollForConversion(&hadc1, 1000);
+			ala = HAL_ADC_GetValue(&hadc1);
+			HAL_ADC_Stop(&hadc1);
+		#endif
 	#endif
 }
 

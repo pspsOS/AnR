@@ -54,7 +54,8 @@ SrcPSP/acquisition.o: \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
  ../Core/Inc/retarget.h \
  C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/baroInterface.h \
- C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/gpsInterface.h
 
 c:\users\mark\documents\github\anr\mitch_2021\incpsp\acquisition.h:
 
@@ -167,3 +168,5 @@ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/baroInterface.h:
 
 C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/gpsInterface.h:

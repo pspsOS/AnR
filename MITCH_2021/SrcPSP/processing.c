@@ -37,18 +37,21 @@ float accZ;
 float delta_alt;
 float Calc_Alt;
 float g = 9.81; // Acceleration of gravity in m/s^2
-float R = 287; // R constant of Earth's atmosphere (air)
+float R = 8.3144598; // R constant (J/(mol K)) of Earth's atmosphere (air)
+float M = 0.0289644; // molar mass of Earth's ait (kg/mol)
+float L_b;
+float press_rto;
+float power_val;
 float temp_alt_bmp; // Temp in K at sea level
 float pres_alt_bmp; // Pressure in Pa at sea level
 float new_temp;
 float new_pres;
-float dens_alt = 1.225; // Density in kg/m^3 at sea level
-float v_s_alt; // Speed of Sound in m/s at the altitude
 
-float temp_g = 288.16; // Ground temperature
-float temp_trop_p = 216.66; // Temperature in the tropopause
-float trop_p_alt = 11000; // in m
-float a_trop;
+float V_i[3] = {0, 0, 1};
+float X_axis[] = {1, 0, 0};
+float Y_axis[] = {0, 1, 0};
+float Z_axis[] = {0, 0, 1};
+float Calb_arr[];
 
 float time_var; // Local time variable
 float new_time; // Local time variable
@@ -211,6 +214,17 @@ void processData_P() {
 		Calc_Alt = 0;
 		Z_speed = 0; // e-frame
 		Z_accl = 0;
+
+		Calb_arr_mag[0] = magX_imu-V_i[0];
+		Calb_arr_mag[1] = magY_imu-V_i[1];
+		Calb_arr_mag[2] = magZ_imu-V_i[2];
+
+		V = V_i;
+
+		gyX_0 = gyrX_imu;
+		gyY_0 = gyrY_imu;
+		gyZ_0 = gyrZ_imu;
+
 		time_var = g_bmpData.timeStamp / pow(10,3);
 	}
 	else {
@@ -219,8 +233,35 @@ void processData_P() {
 
 		new_time = g_bmpData.timeStamp;
 
+		gyX = gyrX_imu - gyX_0;
+		gyY = gyrY_imu - gyY_0;
+		gyZ = gyrZ_imu - gyZ_0;
+
+		V_mag[0] = -(magX_imu-Calb_arr_mag[0]);
+		V_mag[1] = -(magY_imu-Calb_arr_mag[1]);
+		V_mag[2] = -(magZ_imu-Calb_arr_mag[2]);
+
+		mag_Xw = Cross_prod_mag(V_mag, X_axis);
+		mag_Yw = Cross_prod_mag(V_mag, Y_axis);
+		mag_Zw = Cross_prod_mag(V_mag, Z_axis);
+
 		CalcAltBMP_P();
+
+		Ang_xz = atan2(V[0], V[2]);
+		Ang_yz = atan2(V[1], V[2]);
+
 		CalcFlightDataBMP_P();
+
+		Ang_xz = Ang_xz_new;
+		Ang_yz = Ang_yz_new;
+
+		gyX_0 = gyX;
+		gyY_0 = gyY;
+		gyZ_0 = gyZ;
+
+		V[0] = V_new[0];
+		V[1] = V_new[1];
+		V[2] = V_new[2];
 
 		time_var = new_time;
 	}
@@ -238,6 +279,27 @@ void processData_P() {
  * Author: Vishnu Vijay, Bahaa Elshimy
  * Date: 12/29/20
  */
+
+float Cross_prod_mag(v, w) {
+	s_1 = pow(v[2] * w[3] - v[3] * w[2], 2);
+	s_2 = pow(v[3] * w[1] - v[1] * w[3], 2);
+	s_3 = pow(v[1] * w[2] - v[2] * w[1], 2);
+
+	return sqrt(s_1 + s_2 + s_3);
+}
+
+
+float Cross_prod_fun(v, w) {
+	s[0] = v[2] * w[3] - v[3] * w[2];
+	s[1] = v[3] * w[1] - v[1] * w[3];
+	s[2] = v[1] * w[2] - v[2] * w[1];
+
+	return s;
+}
+
+float dot_prod_fun(v, w) {
+	return v[0]*w[0] + v[1]*w[1] + v[2]*w[2]
+}
 
 void transmitData_P() {
 
@@ -261,30 +323,27 @@ bool pointyEndUp_P() {
 }
 
 void CalcAltBMP_P() {
-	a_trop = (temp_trop_p - temp_g)/(trop_p_alt);
-	delta_alt = (new_temp - temp_alt_bmp) / a_trop; // e-frame
+	delta_time = new_time - time_var;
+	L_b = - (new_temp - temp_alt_bmp) / delta_time;
+
+	press_rto = new_pres/pres_alt_bmp;
+
+	// in e-frame
+	if (L_b == 0) {
+		power_val = - R*L_b / (g*M);
+
+		delta_alt = (pow(press_rto, power_val) - 1) * temp_alt_bmp / L_b;
+	}
+	else {
+		delta_alt = - log(press_rto) * R * temp_alt_bmp / (g * M);
+	}
+
 	Calc_Alt += delta_alt; //e-frame
 
 	temp_alt_bmp = new_temp;
 	pres_alt_bmp = new_pres;
-}
 
-void CalcFlightDataBMP_P() {
-	delta_time = new_time - time_var;
-
-	avg_Z_speed = delta_alt/delta_time; // e-frame
-
-	new_Z_speed = (2 * avg_Z_speed) - Z_speed;
-
-	delta_Z_speed = new_Z_speed - Z_speed;
-
-	avg_Z_accl = delta_Z_speed / delta_time;
-
-	new_Z_accl = (2 * avg_Z_accl) - Z_accl;
-
-	if (new_Z_accl != Z_accl) {
-		//change in flight status
-	}
+	// After the addition of the kalman filter, a velocity will be given
 
 	tm_apgee = new_Z_speed / g;
 
@@ -294,20 +353,60 @@ void CalcFlightDataBMP_P() {
 	else {
 		// free fall
 	}
+}
 
-	acclZ_bmp = (new_Z_speed - Z_speed) / delta_time; // e-frame
+void CalcFlightDataBMP_P() {
+	delta_time = new_time - time_var;
 
-	Horz_vel = sqrt(pow((accX_imu * delta_time), 2) + pow((accY_imu * delta_time), 2)); // g-frame
-	Vert_vel = accZ * delta_time; // g-frame
+	Ang_xz_new = Ang_xz + ((gyY + gyY_0)/2) * delta_time;
 
-	Speed_Norm = sqrt(pow(Horz_vel, 2) + pow(Vert_vel, 2)); // g-frame
-	Vert_Orientation = atan(Horz_vel/Vert_vel);
+	Ang_yz_new = Ang_yz + ((gyX + gyX_0)/2) * delta_time;
 
-	//if (abs(acclZ_bmp - accZ) < threshold_check) {
-//
-	//}
+	Vx_gy = sin(Ang_xz_new) / sqrt(1 + pow(cos(Ang_xz_new), 2) * pow(tan(Ang_yz_new), 2));
 
+	Vy_gy = sin(Ang_yz_new) / sqrt(1 + pow(cos(Ang_yz_new), 2) * pow(tan(Ang_xz_new), 2));
 
-	Z_speed = new_Z_speed; //e-frame
-	Z_accl = new_Z_accl; //e-frame
+	Vz_gy = sqrt(1 - pow(Vx_gy,2) - pow(Vy_gy,2)) * V_new[2]/abs(V_new[2]);
+
+	if (mag_Xw == 0) {
+		V_new[0] = Vx_gy; // Orientation x-comp, e-frame
+		Calb_arr_mag[0] = magX_imu-V_new[0];
+	}
+	else {
+		wX_gy = Const/mag_Xw;
+		V_new[0] = (V_mag[0] + Vx_gy * wX_gy) / (1+wX_gy); // Orientation x-comp
+	}
+
+	if (mag_Yw == 0) {
+		V_new[1] = Vy_gy; // Orientation y-comp
+		Calb_arr_mag[1] = magX_imu-V_new[1];
+	}
+	else {
+		wY_gy = Const/mag_Yw;
+		V_new[1] = (V_mag[1] + Vy_gy * wY_gy) / (1+wY_gy); // Orientation y-comp
+	}
+
+	if (mag_Zw == 0) {
+		V_new[2] = Vz_gy; // Orientation z-comp
+		Calb_arr_mag[2] = magX_imu-V_new[2];
+	}
+	else {
+		wZ_gy = Const/mag_Zw;
+		V_new[2] = (V_mag[2] + Vz_gy * wZ_gy) / (1+wZ_gy); // Orientation z-comp
+	}
+
+	V1 = V/mag(V);
+	V1_new = V_new/mag(V_new);
+
+	v_prod = Cross_prod_fun(V1, V1_new);
+
+	v_matrix = [0, -v_prod[2], v_prod[1]; v_prod[2], 0, -v_prod[0]; -v_prod[1], v_prod[0], 0]; // skew-symmetric cross-product
+
+	// works for all but 180 deg rotations
+
+	Rot_matrix = [1, 0, 0; 0, 1, 0; 0, 0, 1] + v_matrix + pow(v_matrix, 2) * (1-dot_prod_fun(V1, V1_new))/mag(v_prod)^2;
+
+	X_axis = Rot_matrix * X_axis; // e-frame
+	Y_axis = Rot_matrix * Y_axis;
+	Z_axis = Rot_matrix * Z_axis;
 }

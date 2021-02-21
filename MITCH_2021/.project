@@ -30,11 +30,4 @@
 		<nature>com.st.stm32cube.ide.mcu.MCUSingleCpuProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCURootProjectNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>IncInterface</name>
-			<type>2</type>
-			<location>C:/Users/Jeff/Documents/GitHub/AnR/MITCH_2021/IncInterface</location>
-		</link>
-	</linkedResources>
 </projectDescription>

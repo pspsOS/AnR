@@ -16,6 +16,15 @@
 #define IMU 2
 #define ALA 3
 
+// Local String Definitions
+#define _GPS "GPS"
+#define _BMP "BMP"
+#define _IMU "IMU"
+#define _ALA "ALA"
+
+#define _TRUE "TRUE"
+#define _FALSE "FALSE"
+
 // Sensor sensitivities 
 #define ACCEL_SENSITIVITY (16) // g
 #define GYRO_SENSITIVITY (2000) // dps
@@ -38,6 +47,7 @@ extern char bmpFileName[];
 extern bool simulateImu;
 extern char imuFileName[];
 
+extern bool simulateAla;
 
 // Monitoring Settings
 extern bool simulateMonitoring;

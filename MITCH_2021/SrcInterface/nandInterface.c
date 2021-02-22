@@ -137,7 +137,7 @@ void nandBufferExecute(uint32_t rowAddr){
 		return;
 	}
 
-	for (int i=0; i<5; i++){
+	/*for (int i=0; i<5; i++){
 		feature = getFeature(FEATURE_ADDR_C);
 		oip = getBit(feature, 0);
 		prg_f = getBit(feature, 3);
@@ -148,6 +148,11 @@ void nandBufferExecute(uint32_t rowAddr){
 
 		if (!oip) i = 5;
 		//printf("Exiting For Loop");
+	}*/
+	for(int i=0;i<10;i++){
+		feature = getFeature(FEATURE_ADDR_C);
+		oip = getBit(feature, 0);
+		if(!oip) i=10;
 	}
 
 	/*do{

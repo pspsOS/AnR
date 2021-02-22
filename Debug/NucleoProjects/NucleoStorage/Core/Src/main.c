@@ -445,7 +445,7 @@ void startControlLogic(void const * argument)
 	uint32_t rowAddr = 0x00000000;
 	uint16_t colAddr = 0x0000;
 	uint8_t writeData1[16] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14, 0x21, 0x22, 0x23, 0x24, 0x31, 0x32, 0x33, 0x34};
-	uint8_t writeData2[16] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+	uint8_t writeData2[16] = {0x34, 0x33, 0x32, 0x31, 0x24, 0x23, 0x22, 0x21, 0x14, 0x13, 0x12, 0x11, 0x04, 0x03, 0x02, 0x01};
 	uint8_t readData[16] = {0x00};
 	uint8_t size = 16;
 	uint8_t feature = 0x00;
@@ -468,8 +468,11 @@ void startControlLogic(void const * argument)
 	feature = getFeature(0xB0);
 	printf("%02X \n\r", feature);
 
-	eraseBlock(rowAddr);
 	nandWrite(rowAddr, colAddr, writeData1, size);
+	nandRead(rowAddr, colAddr, readData, size);
+	for(i = 0; i < size; i++) printf("%02X ", readData[i]);
+	printf("\n\r");
+	nandWrite(rowAddr, colAddr, writeData2, size);
 	nandRead(rowAddr, colAddr, readData, size);
 	for(i = 0; i < size; i++) printf("%02X ", readData[i]);
 	printf("\n\r");
@@ -568,7 +571,7 @@ void startMonitoring(void const * argument)
 	extern float batteryVoltage;
 	extern float temperature;
 
-	printf("Monitoring Start\r\n");
+	//printf("Monitoring Start\r\n");
 
 	setup_M();
 

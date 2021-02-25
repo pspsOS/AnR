@@ -12,4 +12,3 @@ common.c:152:5:insertNewStaticOrientation	24	static
 common.c:166:7:calcAvgAlt	24	static
 common.c:198:6:getTimeStamp	8	static
 common.c:216:6:retryTakeDelay	16	static
-common.c:224:6:notify	16	static

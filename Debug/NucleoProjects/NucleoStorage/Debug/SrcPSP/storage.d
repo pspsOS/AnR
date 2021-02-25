@@ -45,7 +45,10 @@ SrcPSP/storage.o: ../SrcPSP/storage.c ../SrcPSP/../IncPSP/storage.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../SrcPSP/../IncPSP/gpio.h ../Core/Inc/retarget.h
+ ../SrcPSP/../IncPSP/gpio.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h \
+ C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h \
+ ../Core/Inc/retarget.h
 
 ../SrcPSP/../IncPSP/storage.h:
 
@@ -144,5 +147,9 @@ c:\users\mark\documents\github\anr\mitch_2021\incpsp\common.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 
 ../SrcPSP/../IncPSP/gpio.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncInterface/genericInterface.h:
+
+C:/Users/Mark/Documents/GitHub/AnR/MITCH_2021/IncPSP/gpio.h:
 
 ../Core/Inc/retarget.h:

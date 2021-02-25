@@ -35,6 +35,8 @@
 "Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o"
 "SrcInterface/baroInterface.o"
 "SrcInterface/genericInterface.o"
+"SrcInterface/gpsInterface.o"
+"SrcInterface/imuInterface.o"
 "SrcInterface/nandInterface.o"
 "SrcPSP/acquisition.o"
 "SrcPSP/common.o"

@@ -99,8 +99,13 @@ void toggleLed();
 	#endif
 
 #ifndef NAND_CS_Pin
-#define NAND_CS_Pin (FAKE_GPIO)
-#define NAND_CS_GPIO_Port (0)
+	#define NAND_CS_Pin (FAKE_GPIO)
+	#define NAND_CS_GPIO_Port (0)
+#endif
+
+#ifndef IMU_CS_Pin
+	#define IMU_CS_Pin (FAKE_GPIO)
+	#define IMU_CS_GPIO_Port (0)
 #endif
 
 

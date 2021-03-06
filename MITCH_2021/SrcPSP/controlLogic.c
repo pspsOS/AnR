@@ -10,10 +10,8 @@
 #define REQUIRED_TIME_FROM_STARTUP (1200000)
 #define ACCEPTABLE_PERCENT_ERROR (5)
 #define LAUNCH_FORCE_DETECT_FACTOR (3)
+#define ROCKET_HEIGHT (5.4)
 #define LAUNCH_ALTITUDE_DIFFERENCE_DETECT (ROCKET_HEIGHT * 3)
-
-
-volatile uint32_t g_launchTime = 0;
 
 
 
@@ -229,7 +227,7 @@ bool checkPrelaunchTrans_C() {
 	}
 
 	bool orientationSatisfied = false;
-	if (g_newStaticOrientationNode->numNotOptimal == 0) {
+	if (g_staticOrientationArray[newestStaticOrientationIndex].numNotOptimal == 0) {
 		orientationSatisfied = true;
 	}
 
@@ -382,23 +380,23 @@ bool determineStillness_C() {
 	float maxGyrZ = FLT_MIN;
 	float avgGyrZ = 0;
 
-	imuNode_t *tempPtr = g_newIMUNode;
+
 	imuNode_t newestData = {0};
 	for (int i = 0; i < IMU_ARRAY_SIZE; i++) {
 		int currentIndex = (i + newestImuIndex) % IMU_ARRAY_SIZE;
-		while (g_imuArray[currentIndex]->lock) {
+		while (g_imuArray[currentIndex].lock) {
 			retryTakeDelay(DEFAULT_TAKE_DELAY);
 		}
 
-		g_imuArray[currentIndex]->lock = true;
-		newestData.accX = g_imuArray[currentIndex]->accX;
-		newestData.accY = g_imuArray[currentIndex]->accY;
-		newestData.accZ = g_imuArray[currentIndex]->accZ;
-		newestData.alaZ = g_imuArray[currentIndex]->alaZ;
-		newestData.gyrX = g_imuArray[currentIndex]->gyrX;
-		newestData.gyrY = g_imuArray[currentIndex]->gyrY;
-		newestData.gyrZ = g_imuArray[currentIndex]->gyrZ;
-		g_imuArray[currentIndex]->lock = false;
+		g_imuArray[currentIndex].lock = true;
+		newestData.accX = g_imuArray[currentIndex].accX;
+		newestData.accY = g_imuArray[currentIndex].accY;
+		newestData.accZ = g_imuArray[currentIndex].accZ;
+		newestData.alaZ = g_imuArray[currentIndex].alaZ;
+		newestData.gyrX = g_imuArray[currentIndex].gyrX;
+		newestData.gyrY = g_imuArray[currentIndex].gyrY;
+		newestData.gyrZ = g_imuArray[currentIndex].gyrZ;
+		g_imuArray[currentIndex].lock = false;
 
 		avgAccX += newestData.accX / IMU_ARRAY_SIZE;
 		avgAccY += newestData.accY / IMU_ARRAY_SIZE;
@@ -476,11 +474,10 @@ bool determineSustainedZForce_C() {
 }
 
 bool determineAscent_C() {
-	if (g_altitudeArray[newestAltitudeIndex].runningAltitude >= LAUNCH_ALTITUDE_DIFFERENCE_DETECT +
-			g_altitudeArray[(newestAltitudeIndex + 1) % ALTITUDE_ARRAY_SIZE].runningAltitude) {
+	if (g_altitudeArray[newestAltitudeIndex].runningAltitude >= (LAUNCH_ALTITUDE_DIFFERENCE_DETECT +
+			g_altitudeArray[(newestAltitudeIndex + 1) % ALTITUDE_ARRAY_SIZE].runningAltitude)) {
 		return true;
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }

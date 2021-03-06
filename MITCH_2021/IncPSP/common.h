@@ -15,6 +15,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <float.h>
 
 #include "main.h" // NDEBUG is now defined in main.h
 
@@ -53,7 +54,7 @@
 #define TAN_THETA_SQUARED (32) // Theta is about 80 degrees
 
 // Circular Buffer Sizes
-#define ALTITUDE_ARRRAY_SIZE (20)
+#define ALTITUDE_ARRAY_SIZE (20)
 #define ALA_ARRAY_SIZE (40)
 #define STATIC_ORIENTATION_ARRAY_SIZE (40)
 #define IMU_ARRAY_SIZE (40)
@@ -247,10 +248,10 @@ extern alaNode_t g_alaArray[ALA_ARRAY_SIZE];
 extern staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE];
 extern imuNode_t g_imuArray[IMU_ARRAY_SIZE];
 
-extern uint16_t newestAltitudeIndex = 0;
-extern uint16_t newestAlaIndex = 0;
-extern uint16_t newestStaticOrientationIndex = 0;
-extern uint16_t newestImuIndex = 0;
+extern uint16_t newestAltitudeIndex;
+extern uint16_t newestAlaIndex;
+extern uint16_t newestStaticOrientationIndex;
+extern uint16_t newestImuIndex;
 
 /* Common Function Prototypes */
 

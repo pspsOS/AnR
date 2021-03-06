@@ -6,6 +6,7 @@
  */
 
 #include "../IncPSP/common.h"
+#include "../IncPSP/processing.h"
 #include <unistd.h>
 /* Global variable declarations */
 
@@ -43,13 +44,13 @@ int insertNewAltitude(float newAltitude) {
 		newestAltitudeIndex = 0;
 	}
 
-	while (g_altitudeArray[newestAltitudeIndex]->lock) {
+	while (g_altitudeArray[newestAltitudeIndex].lock) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
-	g_altitudeArray[newestAltitudeIndex]->lock = true;
-	g_altitudeArray[newestAltitudeIndex]->currentAltitude = newAltitude;
-	g_altitudeArray[newestAltitudeIndex]->runningAltitude += newAltitude * 2.0 / ((float) ALTITUDE_ARRAY_SIZE);
-	g_altitudeArray[newestAltitudeIndex]->lock = false;
+	g_altitudeArray[newestAltitudeIndex].lock = true;
+	g_altitudeArray[newestAltitudeIndex].currentAltitude = newAltitude;
+	g_altitudeArray[newestAltitudeIndex].runningAltitude += newAltitude * 2.0 / ((float) ALTITUDE_ARRAY_SIZE);
+	g_altitudeArray[newestAltitudeIndex].lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
@@ -60,13 +61,13 @@ int insertNewALA(float newALA) {
 		newestAlaIndex = 0;
 	}
 
-	while (g_alaArray[newestAlaIndex]->lock) {
+	while (g_alaArray[newestAlaIndex].lock) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
-	g_alaArray[newestAlaIndex]->lock = true;
-	g_alaArray[newestAlaIndex]->currentForce = newALA;
-	g_alaArray[newestAlaIndex]->runningForce += newALA * 2.0 / ((float) ALA_ARRAY_SIZE);
-	g_alaArray[newestAlaIndex]->lock = false;
+	g_alaArray[newestAlaIndex].lock = true;
+	g_alaArray[newestAlaIndex].currentForce = newALA;
+	g_alaArray[newestAlaIndex].runningForce += newALA * 2.0 / ((float) ALA_ARRAY_SIZE);
+	g_alaArray[newestAlaIndex].lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
@@ -80,15 +81,15 @@ int insertNewStaticOrientation() {
 	int notPEUCounter = 0;
 	for (int i = 0; i < STATIC_ORIENTATION_ARRAY_SIZE; i++) {
 		int currentIndex = (i + newestStaticOrientationIndex) % STATIC_ORIENTATION_ARRAY_SIZE;
-		while (g_staticOrientationArray[currentIndex]->lock) {
+		while (g_staticOrientationArray[currentIndex].lock) {
 			retryTakeDelay(DEFAULT_TAKE_DELAY);
 		}
-		g_staticOrientationArray[currentIndex]->lock = true;
+		g_staticOrientationArray[currentIndex].lock = true;
 
-		if (!(g_staticOrientationArray[currentIndex]->staticOrientation)) {
+		if (!(g_staticOrientationArray[currentIndex].staticOrientation)) {
 			notPEUCounter++;
 		}
-		g_staticOrientationArray[currentIndex]->lock = false;
+		g_staticOrientationArray[currentIndex].lock = false;
 	}
 
 	bool newStatus = pointyEndUp_P();
@@ -96,13 +97,13 @@ int insertNewStaticOrientation() {
 		notPEUCounter++;
 	}
 
-	while (g_staticOrientationArray[newestStaticOrientationIndex]->lock) {
+	while (g_staticOrientationArray[newestStaticOrientationIndex].lock) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
-	g_staticOrientationArray[newestStaticOrientationIndex]->lock = true;
-	g_staticOrientationArray[newestStaticOrientationIndex]->staticOrientation = newStatus;
-	g_staticOrientationArray[newestStaticOrientationIndex]->numNotOptimal = notPEUCounter;
-	g_staticOrientationArray[newestStaticOrientationIndex]->lock = false;
+	g_staticOrientationArray[newestStaticOrientationIndex].lock = true;
+	g_staticOrientationArray[newestStaticOrientationIndex].staticOrientation = newStatus;
+	g_staticOrientationArray[newestStaticOrientationIndex].numNotOptimal = notPEUCounter;
+	g_staticOrientationArray[newestStaticOrientationIndex].lock = false;
 
 	return SUCCESSFUL_RETURN;
 }
@@ -121,21 +122,21 @@ int insertNewIMUNode() {
 	newestData = g_imuData;
 	g_imuData.lock = false;
 
-	while (g_imuArray[newestImuIndex]->lock) {
+	while (g_imuArray[newestImuIndex].lock) {
 		retryTakeDelay(DEFAULT_TAKE_DELAY);
 	}
-	g_imuArray[newestImuIndex]->lock = true;
-	g_imuArray[newestImuIndex]->accX = newestData.accX;
-	g_imuArray[newestImuIndex]->accY = newestData.accY;
-	g_imuArray[newestImuIndex]->accZ = newestData.accZ;
-	g_imuArray[newestImuIndex]->gyrX = newestData.gyrX;
-	g_imuArray[newestImuIndex]->gyrY = newestData.gyrY;
-	g_imuArray[newestImuIndex]->gyrZ = newestData.gyrZ;
-	g_imuArray[newestImuIndex]->magX = newestData.magX;
-	g_imuArray[newestImuIndex]->magY = newestData.magY;
-	g_imuArray[newestImuIndex]->magZ = newestData.magZ;
-	g_imuArray[newestImuIndex]->alaZ = newestData.alaZ;
-	g_imuArray[newestImuIndex]->lock = false;
+	g_imuArray[newestImuIndex].lock = true;
+	g_imuArray[newestImuIndex].accX = newestData.accel_xout;
+	g_imuArray[newestImuIndex].accY = newestData.accel_yout;
+	g_imuArray[newestImuIndex].accZ = newestData.accel_zout;
+	g_imuArray[newestImuIndex].gyrX = newestData.gyro_xout;
+	g_imuArray[newestImuIndex].gyrY = newestData.gyro_yout;
+	g_imuArray[newestImuIndex].gyrZ = newestData.gyro_zout;
+	g_imuArray[newestImuIndex].magX = newestData.mag_xout;
+	g_imuArray[newestImuIndex].magY = newestData.mag_yout;
+	g_imuArray[newestImuIndex].magZ = newestData.mag_zout;
+	g_imuArray[newestImuIndex].alaZ = newestData.alaZ;
+	g_imuArray[newestImuIndex].lock = false;
 
 	return SUCCESSFUL_RETURN;
 }

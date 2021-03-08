@@ -42,9 +42,10 @@
 
 #define DEFAULT_TAKE_DELAY (50)
 
-#define ALTITUDE_LIST_SIZE (20)
-#define ALA_LIST_SIZE (40)
-#define STATIC_ORIENTATION_LIST_SIZE (20)
+#define ALTITUDE_ARRAY_SIZE (20)
+#define ALA_ARRAY_SIZE (40)
+#define STATIC_ORIENTATION_ARRAY_SIZE (20)
+#define IMU_ARRAY_SIZE (40)
 
 // Nominal mode flow
 #define PRELAUNCH (1)
@@ -83,6 +84,7 @@ typedef int32_t i32;
 typedef struct altitudeNode altitudeNode_t;
 typedef struct alaNode alaNode_t;
 typedef struct staticOrientationNode staticOrientationNode_t;
+typedef struct imuNode imuNode_t;
 
 
 typedef struct daqStatusData {
@@ -135,7 +137,7 @@ typedef struct imuData {
 	i16 mag_xout;
 	i16 mag_yout;
 	i16 mag_zout;
-	float alaZ;
+	i16 alaZ;
 	bool hasUpdate;
 	bool lock;
 
@@ -176,22 +178,50 @@ typedef struct transmissionData {
 /* Node structures */
 
 typedef struct altitudeNode {
-	float altitude;
+	float currentAltitude;
+	float runningAltitude;
 	bool lock;
-	altitudeNode_t *nextNode;
 } altitudeNode_t;
 
 typedef struct alaNode {
-	float gForce;
+	int16_t currentForce;
+	float runningForce;
 	bool lock;
-	alaNode_t *nextNode;
 } alaNode_t;
 
 typedef struct staticOrientationNode {
-	float staticOrientation;
+	bool staticOrientation;
+	int numNotOptimal;
 	bool lock;
-	staticOrientationNode_t *nextNode;
 } staticOrientationNode_t;
+
+typedef struct imuNode {
+	int16_t accX;
+	int16_t accY;
+	int16_t accZ;
+	int16_t gyrX;
+	int16_t gyrY;
+	int16_t gyrZ;
+	int16_t magX;
+	int16_t magY;
+	int16_t magZ;
+	int16_t alaZ;
+	bool lock;
+} imuNode_t;
+
+
+/* VLQ Struct */
+
+typedef struct VLQ {
+	uint8_t quantityLength;
+	union {
+		uint8_t oneByteVLQ[1];
+		uint8_t twoByteVLQ[2];
+		uint8_t threeByteVLQ[3];
+		uint8_t fourByteVLQ[4];
+		uint8_t fiveByteVLQ[5];
+	};
+} VLQ_t;
 
 /* Extern variable definitions */
 
@@ -206,10 +236,18 @@ extern volatile transmissionData_t g_transmissionData;
 extern volatile ui8 g_currentNominalMode;
 extern volatile ui8 g_currentContingency;
 extern volatile ui32 g_launchTime;
+extern volatile bool g_chuteDisarm;
+extern volatile bool g_chuteDeployment;
 
-extern altitudeNode_t *g_newAltitudeNode;
-extern alaNode_t *g_newALANode;
-extern staticOrientationNode_t *g_newStaticOrientationNode;
+extern altitudeNode_t g_altitudeArray[ALTITUDE_ARRAY_SIZE];
+extern alaNode_t g_alaArray[ALA_ARRAY_SIZE];
+extern staticOrientationNode_t g_staticOrientationArray[STATIC_ORIENTATION_ARRAY_SIZE];
+extern imuNode_t g_imuArray[IMU_ARRAY_SIZE];
+
+extern uint16_t newestAltitudeIndex;
+extern uint16_t newestAlaIndex;
+extern uint16_t newestStaticOrientationIndex;
+extern uint16_t newestImuIndex;
 
 /* Common Function Prototypes */
 
@@ -220,21 +258,12 @@ void retryTakeDelay(int );
 
 #endif
 
-altitudeNode_t *createAltitudeList(ui8 );
-alaNode_t *createALAList(ui8 );
-staticOrientationNode_t *createStaticOrientationList(ui8 );
-int setupLinkedLists();
-
-int freeAltitudeList(altitudeNode_t *);
-int freeALAList(alaNode_t *);
-int freeStaticOrientationList(staticOrientationNode_t *);
-int freeAllLists();
-
 int insertNewAltitude(float );
 int insertNewALA(float );
-int insertNewStaticOrientation(float );
+int insertNewStaticOrientation();
+int insertNewIMUNode();
 
-float calcAvgAlt();
+VLQ_t convertToVLQ(uint32_t );
 
 //void notify(Message_ID message, Device_ID device);
 

@@ -7,6 +7,12 @@
 
 #include "../IncPSP/controlLogic.h"
 
+#define REQUIRED_TIME_FROM_STARTUP (1200000)
+#define ACCEPTABLE_PERCENT_ERROR (5)
+#define LAUNCH_FORCE_DETECT_FACTOR (3)
+#define ROCKET_HEIGHT (5.4)
+#define LAUNCH_ALTITUDE_DIFFERENCE_DETECT (ROCKET_HEIGHT * 3)
+
 
 
 void loop_C() {
@@ -15,11 +21,13 @@ void loop_C() {
 	bool modeChange = determineMode_C();
 
 	if (modeChange) {
+		g_currentNominalMode++;
 		// TODO: Send Transition data
 	}
 
 	//TODO: Send info to storage and transition
 }
+
 
 /**
  * @brief Encapsulates logic functions
@@ -213,8 +221,36 @@ bool determineMode_C() {
  */
 
 bool checkPrelaunchTrans_C() {
+	bool timeSatisfied = false;
+	if (getTimeStamp() > REQUIRED_TIME_FROM_STARTUP) {
+		timeSatisfied = true;
+	}
 
-	return 0;
+	bool orientationSatisfied = false;
+	if (g_staticOrientationArray[newestStaticOrientationIndex].numNotOptimal == 0) {
+		orientationSatisfied = true;
+	}
+
+	bool stillnessSatisfied = false;
+	insertNewIMUNode();
+	stillnessSatisfied = determineStillness_C();
+
+	if (timeSatisfied && orientationSatisfied && stillnessSatisfied) {
+		//TODO: Send to Transmission & Storage
+
+		//TODO: Store stopRewrite Address Marker
+
+		//TODO: Set hotBoot to true
+
+		g_chuteDeployable = true;
+		g_daqStatusData.daqScaling = true;
+		g_daqStatusData.hasUpdate = true;
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -231,8 +267,23 @@ bool checkPrelaunchTrans_C() {
  */
 
 bool checkLaunchTrans_C() {
+	bool sustainedZForce = false;
+	sustainedZForce = determineSustainedZForce_C();
 
-	return 0;
+	bool detectedAscent = false;
+	detectedAscent = determineAscent_C();
+
+	if (sustainedZForce && detectedAscent) {
+		//TODO: Send to Transmission & Storage
+
+
+		g_launchTime = getTimeStamp();
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -301,4 +352,132 @@ bool checkDescentMainTrans_C() {
 
 bool checkProgramEnd_C() {
 	return 0;
+}
+
+
+bool determineStillness_C() {
+	//TODO: Change min and max to int16_t data types
+	float minAccX = FLT_MAX;
+	float maxAccX = FLT_MIN;
+	float avgAccX = 0;
+	float minAccY = FLT_MAX;
+	float maxAccY = FLT_MIN;
+	float avgAccY = 0;
+	float minAccZ = FLT_MAX;
+	float maxAccZ = FLT_MIN;
+	float avgAccZ = 0;
+	float minAlaZ = FLT_MAX;
+	float maxAlaZ = FLT_MIN;
+	float avgAlaZ = 0;
+
+	float minGyrX = FLT_MAX;
+	float maxGyrX = FLT_MIN;
+	float avgGyrX = 0;
+	float minGyrY = FLT_MAX;
+	float maxGyrY = FLT_MIN;
+	float avgGyrY = 0;
+	float minGyrZ = FLT_MAX;
+	float maxGyrZ = FLT_MIN;
+	float avgGyrZ = 0;
+
+
+	imuNode_t newestData = {0};
+	for (int i = 0; i < IMU_ARRAY_SIZE; i++) {
+		int currentIndex = (i + newestImuIndex) % IMU_ARRAY_SIZE;
+		while (g_imuArray[currentIndex].lock) {
+			retryTakeDelay(DEFAULT_TAKE_DELAY);
+		}
+
+		g_imuArray[currentIndex].lock = true;
+		newestData.accX = g_imuArray[currentIndex].accX;
+		newestData.accY = g_imuArray[currentIndex].accY;
+		newestData.accZ = g_imuArray[currentIndex].accZ;
+		newestData.alaZ = g_imuArray[currentIndex].alaZ;
+		newestData.gyrX = g_imuArray[currentIndex].gyrX;
+		newestData.gyrY = g_imuArray[currentIndex].gyrY;
+		newestData.gyrZ = g_imuArray[currentIndex].gyrZ;
+		g_imuArray[currentIndex].lock = false;
+
+		avgAccX += newestData.accX / IMU_ARRAY_SIZE;
+		avgAccY += newestData.accY / IMU_ARRAY_SIZE;
+		avgAccZ += newestData.accZ / IMU_ARRAY_SIZE;
+		avgAlaZ += newestData.alaZ / IMU_ARRAY_SIZE;
+		avgGyrX += newestData.gyrX / IMU_ARRAY_SIZE;
+		avgGyrY += newestData.gyrY / IMU_ARRAY_SIZE;
+		avgGyrZ += newestData.gyrZ / IMU_ARRAY_SIZE;
+
+		if (newestData.accX < minAccX) {
+			minAccX = newestData.accX;
+		}
+		if (newestData.accX > maxAccX) {
+			maxAccX = newestData.accX;
+		}
+		if (newestData.accY < minAccY) {
+			minAccY = newestData.accY;
+		}
+		if (newestData.accY > maxAccY) {
+			maxAccY = newestData.accY;
+		}
+		if (newestData.accZ < minAccZ) {
+			minAccZ = newestData.accZ;
+		}
+		if (newestData.accZ > maxAccZ) {
+			maxAccZ = newestData.accZ;
+		}
+		if (newestData.alaZ < minAlaZ) {
+			minAlaZ = newestData.alaZ;
+		}
+		if (newestData.alaZ > maxAlaZ) {
+			maxAlaZ = newestData.alaZ;
+		}
+
+		if (newestData.gyrX < minGyrX) {
+			minGyrX = newestData.gyrX;
+		}
+		if (newestData.gyrX > maxGyrX) {
+			maxGyrX = newestData.gyrX;
+		}
+		if (newestData.gyrY < minGyrY) {
+			minGyrY = newestData.gyrY;
+		}
+		if (newestData.gyrY > maxGyrY) {
+			maxGyrY = newestData.gyrY;
+		}
+		if (newestData.gyrZ < minGyrZ) {
+			minGyrZ = newestData.gyrZ;
+		}
+		if (newestData.gyrZ > maxGyrZ) {
+			maxGyrZ = newestData.gyrZ;
+		}
+	}
+
+	bool accSatisfied = ((100.0 * (maxAccX - minAccX) / (avgAccX)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAccY - minAccY) / (avgAccY)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAccZ - minAccZ) / (avgAccZ)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxAlaZ - minAlaZ) / (avgAlaZ)) <= ACCEPTABLE_PERCENT_ERROR);
+	bool gyrSatisfied = ((100.0 * (maxGyrX - minGyrX) / (avgGyrX)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxGyrY - minGyrY) / (avgGyrY)) <= ACCEPTABLE_PERCENT_ERROR) &&
+						((100.0 * (maxGyrZ - minGyrZ) / (avgGyrZ)) <= ACCEPTABLE_PERCENT_ERROR);
+
+	return (accSatisfied && gyrSatisfied);
+}
+
+
+bool determineSustainedZForce_C() {
+	if (g_alaArray[newestAlaIndex].runningForce >= abs(LAUNCH_FORCE_DETECT_FACTOR *
+			g_alaArray[(newestAlaIndex + 1) % ALA_ARRAY_SIZE].runningForce)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool determineAscent_C() {
+	if (g_altitudeArray[newestAltitudeIndex].runningAltitude >= (LAUNCH_ALTITUDE_DIFFERENCE_DETECT +
+			g_altitudeArray[(newestAltitudeIndex + 1) % ALTITUDE_ARRAY_SIZE].runningAltitude)) {
+		return true;
+	}
+
+	return false;
 }

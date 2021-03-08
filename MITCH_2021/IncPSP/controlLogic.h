@@ -30,5 +30,8 @@ bool checkDescentDrogueTrans_C();
 bool checkDescentMainTrans_C();
 bool checkProgramEnd_C();
 
+bool determineStillness_C();
+bool determineSustainedZForce_C();
+bool determineAscent_C();
 
 #endif /* INC_CONTROLLOGIC_H_ */

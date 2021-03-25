@@ -46,40 +46,96 @@ float temp_alt_bmp; // Temp in K at sea level
 float pres_alt_bmp; // Pressure in Pa at sea level
 float new_temp;
 float new_pres;
+float v_s_alt;
 
 float V_i[3] = {0, 0, 1};
-float X_axis[] = {1, 0, 0};
-float Y_axis[] = {0, 1, 0};
-float Z_axis[] = {0, 0, 1};
-float Calb_arr[];
+float X_axis[3] = {1, 0, 0};
+float Y_axis[3] = {0, 1, 0};
+float Z_axis[3] = {0, 0, 1};
+float v_matrix[3][3]; // skew-symmetric cross-product
+float Rot_matrix[3][3];
+
+float gyX;
+float gyY;
+float gyZ;
+
+float Vx_gy;
+float Vy_gy;
+float Vz_gy;
+float V_new[3];
+
+float Calb_arr_mag[3];
+float mag_Xw;
+float wX_gy;
+float mag_Yw;
+float wY_gy;
+float mag_Zw;
+float wZ_gy;
+
+float w_Const = 1;
+
+float V_unit[3];
+float V_unit_new[3];
+
+float V_mag[3];
+float V[3];
+
+float Ang_xz;
+float Ang_yz;
+
+float Ang_xz_new;
+float Ang_yz_new;
+
+float gyX_0;
+float gyY_0;
+float gyZ_0;
+
+float v_matrix_sqrd[3][3];
+float mult_skew_mat[3][3];
+float skew_const;
+float first_add_Rot_matrix[3][3];
+
+float result_mat_mult_Rot_Matrix[3];
+
+float vel_magnitude;
 
 float time_var; // Local time variable
 float new_time; // Local time variable
 
-float avg_Z_speed;
-float avg_Z_accl;
-
-float delta_Z_speed;
-float Z_accl;
-float new_Z_accl;
-
-float Vert_vel;
-float tm_apgee;
-
-float apgee;
-
-float Z_speed; // y-axis Speed, e-frame
-float new_Z_speed; // Local y-axis Speed variable, e-frame
+float vel_g[3];
 
 float delta_time;
 
-float Horz_vel; // Horizontal velocity relative to accelerometer, g-frame
+float v_prod[3];
 
-float Speed_Norm; // g-frame
-float Vert_Orientation;
+float vel_e[3];
+float calc_x_pos;
+float calc_y_pos;
+float tm_apgee;
+float apgee;
 
-float acclZ_bmp;
+int r1=3;
+int c1=3;
+int r2=3;
+int c2=1;
+float result_mat_mult[3][3];
 
+float I_n[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+float t[3][3];
+float result_mat_pow[3][3]; // Initialized to result_mat_pow = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
+
+float determinant = 0;
+float result_mat_inv[3][3];
+
+float result_mat_add_sub[3][3];
+
+int i;
+int j;
+
+float s_1;
+float s_2;
+float s_3;
+float s[3];
 
 /* TODO: Implement getBMPData
  *
@@ -174,6 +230,134 @@ bool getGPSData_P() {
 	return true;
 }
 
+// function to multiply two matrices
+//matrix_mult_fun(first, second, result, r1, c1, r2, c2);
+void matrix_mult_fun(float first[][3],
+		float second[][3],
+		float *result_mat_mult[],
+        int r1, int c1, int r2, int c2) {
+
+   // Initializing elements of matrix mult to 0.
+   for (int i = 0; i < r1; ++i) {
+      for (int j = 0; j < c2; ++j) {
+    	  result_mat_mult[i][j] = 0;
+      }
+   }
+
+   // Multiplying first and second matrices and storing it in result
+   for (int i = 0; i < r1; ++i) {
+      for (int j = 0; j < c2; ++j) {
+         for (int k = 0; k < c1; ++k) {
+        	 result_mat_mult[i][j] += first[i][k] * second[k][j];
+         }
+      }
+   }
+}
+
+// function to display the matrix
+//void display(float result[][3], int row, int column) {
+//
+//   printf("\nOutput Matrix:\n");
+//   for (int i = 0; i < row; ++i) {
+//      for (int j = 0; j < column; ++j) {
+//         printf("%d  ", result[i][j]);
+//         if (j == column - 1)
+//            printf("\n");
+//      }
+//   }
+//}
+
+
+
+//matrix_pow_fun(first, result, n, p); result[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, result must be initialized to this
+void matrix_pow_fun(float m[][3], //Matrix n x n to be raised to power p
+					float *result_mat_pow[],
+					int n, int p) {
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			if (i == j) {
+				result_mat_mult[i][j] = 1;
+			}
+			else {
+				result_mat_mult[i][j] = 0;
+			}
+		}
+	}
+
+	int t[n][n]; // Empty 3x3 matrix
+    for (int i = 0; i < p; i++) {
+    	for (int b = 0; b < n; b++) {
+    		for (int d = 0; d < n; d++) {
+    			int sum = 0;
+                for (int k = 0; k < n; k++) {
+                	sum += result_mat_pow[b][k] * m[k][d];
+                }
+                t[b][d] = sum;
+    		}
+    	}
+    	for (int b = 0; b < n; b++) {
+    		for (int d = 0; d < n; d++) {
+    			result_mat_pow[b][d] = t[b][d];
+    		}
+    	}
+    }
+}
+
+void matrix_inverse_fun(float mat[][3], float *result_mat_inv[]) {
+	//finding determinant
+	determinant = 0;
+	for(i = 0; i < 3; i++)
+		determinant = determinant + (mat[0][i] * (mat[1][(i+1)%3] * mat[2][(i+2)%3] - mat[1][(i+2)%3] * mat[2][(i+1)%3]));
+
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			result_mat_inv[i][j] = ((mat[(j+1)%3][(i+1)%3] * mat[(j+2)%3][(i+2)%3]) - (mat[(j+1)%3][(i+2)%3] * mat[(j+2)%3][(i+1)%3]))/ determinant;
+		}
+	}
+//	printf("\nInverse of matrix is: \n");
+//	for(i = 0; i < 3; i++){
+//		for(j = 0; j < 3; j++){
+//			printf("%f\t", result[i][j]);
+//		}
+//		printf("\n");
+//	}
+}
+
+void matrix_add_sub_fun(float first[][3],
+                      float second[][3],
+					  float *result_mat_add_sub[],
+					  int mode) { // mode = 1: add, mode = -1: subtract second from first
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			if (mode == 1) {
+				result_mat_add_sub[i][j] = first[i][j] + second[i][j];
+			}
+			else {
+				result_mat_add_sub[i][j] = first[i][j] - second[i][j];
+			}
+		}
+	}
+}
+
+float Cross_prod_mag(float v[3], float w[3]) {
+	s_1 = pow(v[2] * w[3] - v[3] * w[2], 2);
+	s_2 = pow(v[3] * w[1] - v[1] * w[3], 2);
+	s_3 = pow(v[1] * w[2] - v[2] * w[1], 2);
+
+	return sqrt(s_1 + s_2 + s_3);
+}
+
+
+void Cross_prod_fun(float v[3], float w[3], float *s) {
+	s[0] = v[2] * w[3] - v[3] * w[2];
+	s[1] = v[3] * w[1] - v[1] * w[3];
+	s[2] = v[1] * w[2] - v[2] * w[1];
+}
+
+float dot_prod_fun(float v[3], float w[3]) {
+	return v[0]*w[0] + v[1]*w[1] + v[2]*w[2];
+}
+
 
 /* TODO: Implement processData
  *
@@ -212,14 +396,18 @@ void processData_P() {
 		//}
 
 		Calc_Alt = 0;
-		Z_speed = 0; // e-frame
-		Z_accl = 0;
+
+		vel_e[0] = 0;
+		vel_e[1] = 0;
+		vel_e[2] = 0;
 
 		Calb_arr_mag[0] = magX_imu-V_i[0];
 		Calb_arr_mag[1] = magY_imu-V_i[1];
 		Calb_arr_mag[2] = magZ_imu-V_i[2];
 
-		V = V_i;
+		V[0] = V_i[0];
+		V[1] = V_i[1];
+		V[2] = V_i[2];
 
 		gyX_0 = gyrX_imu;
 		gyY_0 = gyrY_imu;
@@ -268,9 +456,6 @@ void processData_P() {
 
 	v_s_alt = sqrt(1.4*R*temp_alt_bmp); // Speed of Sound in m/s at the altitude
 
-
-
-
 }
 
 
@@ -279,27 +464,6 @@ void processData_P() {
  * Author: Vishnu Vijay, Bahaa Elshimy
  * Date: 12/29/20
  */
-
-float Cross_prod_mag(v, w) {
-	s_1 = pow(v[2] * w[3] - v[3] * w[2], 2);
-	s_2 = pow(v[3] * w[1] - v[1] * w[3], 2);
-	s_3 = pow(v[1] * w[2] - v[2] * w[1], 2);
-
-	return sqrt(s_1 + s_2 + s_3);
-}
-
-
-float Cross_prod_fun(v, w) {
-	s[0] = v[2] * w[3] - v[3] * w[2];
-	s[1] = v[3] * w[1] - v[1] * w[3];
-	s[2] = v[1] * w[2] - v[2] * w[1];
-
-	return s;
-}
-
-float dot_prod_fun(v, w) {
-	return v[0]*w[0] + v[1]*w[1] + v[2]*w[2]
-}
 
 void transmitData_P() {
 
@@ -343,16 +507,13 @@ void CalcAltBMP_P() {
 	temp_alt_bmp = new_temp;
 	pres_alt_bmp = new_pres;
 
+	// Temp Mock vel:
+	// vel_g is the velocity calculated from the barometric data and corresponds only to the vertical component of the velocity in e
+	vel_g[0] = 0;
+	vel_g[1] = 0;
+	vel_g[2] = delta_alt/delta_time;
+
 	// After the addition of the kalman filter, a velocity will be given
-
-	tm_apgee = new_Z_speed / g;
-
-	if (tm_apgee > 0) {
-		apgee = (new_Z_speed * tm_apgee) - (0.5 * g * pow(tm_apgee, 2));
-	}
-	else {
-		// free fall
-	}
 }
 
 void CalcFlightDataBMP_P() {
@@ -366,14 +527,14 @@ void CalcFlightDataBMP_P() {
 
 	Vy_gy = sin(Ang_yz_new) / sqrt(1 + pow(cos(Ang_yz_new), 2) * pow(tan(Ang_xz_new), 2));
 
-	Vz_gy = sqrt(1 - pow(Vx_gy,2) - pow(Vy_gy,2)) * V_new[2]/abs(V_new[2]);
+	Vz_gy = sqrt(1 - pow(Vx_gy,2) - pow(Vy_gy,2)) * V_new[2]/abs(V_new[2]); // V_new[2]/abs(V_new[2]) = 1 or -1
 
 	if (mag_Xw == 0) {
 		V_new[0] = Vx_gy; // Orientation x-comp, e-frame
 		Calb_arr_mag[0] = magX_imu-V_new[0];
 	}
 	else {
-		wX_gy = Const/mag_Xw;
+		wX_gy = w_Const/mag_Xw;
 		V_new[0] = (V_mag[0] + Vx_gy * wX_gy) / (1+wX_gy); // Orientation x-comp
 	}
 
@@ -382,7 +543,7 @@ void CalcFlightDataBMP_P() {
 		Calb_arr_mag[1] = magX_imu-V_new[1];
 	}
 	else {
-		wY_gy = Const/mag_Yw;
+		wY_gy = w_Const/mag_Yw;
 		V_new[1] = (V_mag[1] + Vy_gy * wY_gy) / (1+wY_gy); // Orientation y-comp
 	}
 
@@ -391,22 +552,101 @@ void CalcFlightDataBMP_P() {
 		Calb_arr_mag[2] = magX_imu-V_new[2];
 	}
 	else {
-		wZ_gy = Const/mag_Zw;
+		wZ_gy = w_Const/mag_Zw;
 		V_new[2] = (V_mag[2] + Vz_gy * wZ_gy) / (1+wZ_gy); // Orientation z-comp
 	}
 
-	V1 = V/mag(V);
-	V1_new = V_new/mag(V_new);
+	for(i = 0; i < 3; i++){
+		V_unit[i] = V[i]/sqrt(pow(V[0], 2) + pow(V[1], 2) + pow(V[2], 2));
+		V_unit_new[i] = V_new[i]/sqrt(pow(V_new[0], 2) + pow(V_new[1], 2) + pow(V_new[2], 2));
+	}
 
-	v_prod = Cross_prod_fun(V1, V1_new);
+	for(i = 0; i < 3; i++){
+		s[i] = v_prod[i];
+	}
+	Cross_prod_fun(V_unit, V_unit_new, &s[0]);
 
-	v_matrix = [0, -v_prod[2], v_prod[1]; v_prod[2], 0, -v_prod[0]; -v_prod[1], v_prod[0], 0]; // skew-symmetric cross-product
+	// skew-symmetric cross-product
+
+	v_matrix[0][0] = 0;
+	v_matrix[0][1]= -v_prod[2];
+	v_matrix[0][2] = v_prod[1];
+	v_matrix[1][0] = v_prod[2];
+	v_matrix[1][1] = 0;
+	v_matrix[1][2] = -v_prod[0];
+	v_matrix[2][0] = -v_prod[1];
+	v_matrix[2][1] = v_prod[0];
+	v_matrix[2][2] = 0;
 
 	// works for all but 180 deg rotations
 
-	Rot_matrix = [1, 0, 0; 0, 1, 0; 0, 0, 1] + v_matrix + pow(v_matrix, 2) * (1-dot_prod_fun(V1, V1_new))/mag(v_prod)^2;
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			result_mat_pow[i][j] = v_matrix_sqrd[i][j];
+		}
+	}
+	matrix_pow_fun(v_matrix, &result_mat_pow, 3, 2);
 
-	X_axis = Rot_matrix * X_axis; // e-frame
-	Y_axis = Rot_matrix * Y_axis;
-	Z_axis = Rot_matrix * Z_axis;
+	skew_const = (1-dot_prod_fun(V_unit, V_unit_new))/pow(sqrt(pow(v_prod[0], 2) + pow(v_prod[1], 2) + pow(v_prod[2], 2)), 2);
+
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			result_mat_add_sub[i][j] = first_add_Rot_matrix[i][j];
+		}
+	}
+	matrix_add_sub_fun(I_n, v_matrix, &result_mat_add_sub, 1);
+
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			result_mat_add_sub[i][j] = Rot_matrix[i][j];
+		}
+	}
+
+	for(i = 0; i < 3; i++){
+		for(j = 0; j < 3; j++){
+			mult_skew_mat[i][j] = v_matrix_sqrd[i][j] * skew_const;
+		}
+	}
+	matrix_add_sub_fun(first_add_Rot_matrix, mult_skew_mat, &result_mat_add_sub, 1);
+
+	Rot_matrix[0][0] = 1 + v_matrix[0][0] + v_matrix_sqrd[0][0] * skew_const;
+	Rot_matrix[0][1] = v_matrix[0][1] + v_matrix_sqrd[0][1] * skew_const;
+	Rot_matrix[0][2] = v_matrix[0][2] + v_matrix_sqrd[0][2] * skew_const;
+	Rot_matrix[1][0] = v_matrix[1][0] + v_matrix_sqrd[1][0] * skew_const;
+	Rot_matrix[1][1] = 1 + v_matrix[1][1] + v_matrix_sqrd[1][1] * skew_const;
+	Rot_matrix[1][2] = v_matrix[1][2] + v_matrix_sqrd[1][2] * skew_const;
+	Rot_matrix[2][0] = v_matrix[2][0] + v_matrix_sqrd[2][0] * skew_const;
+	Rot_matrix[2][1] = v_matrix[2][1] + v_matrix_sqrd[2][1] * skew_const;
+	Rot_matrix[2][2] = 1 + v_matrix[2][2] + v_matrix_sqrd[2][2] * skew_const;
+
+	for(i = 0; i < 3; i++){
+		result_mat_mult_Rot_Matrix[i] = X_axis[i]; // e-frame
+	}
+	matrix_mult_fun(Rot_matrix, X_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+
+	for(i = 0; i < 3; i++){
+		result_mat_mult_Rot_Matrix[i] = Y_axis[i]; // e-frame
+	}
+	matrix_mult_fun(Rot_matrix, Y_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+
+	for(i = 0; i < 3; i++){
+		result_mat_mult_Rot_Matrix[i] = Z_axis[i]; // e-frame
+	}
+	matrix_mult_fun(Rot_matrix, Z_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+
+	vel_magnitude = vel_g[2] / V_unit_new[2];
+
+	vel_e[0] = vel_magnitude * V_unit_new[0];
+	vel_e[1] = vel_magnitude * V_unit_new[1];
+	vel_e[2] = vel_g[2];
+
+	calc_x_pos += vel_e[0] * delta_time;
+	calc_y_pos += vel_e[1] * delta_time;
+
+	tm_apgee = (vel_e[2] / g);
+
+	if (tm_apgee > 0) {
+		apgee = Calc_Alt + pow(vel_e[2], 2) / (2*g);
+	}
+
 }

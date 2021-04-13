@@ -162,6 +162,7 @@ ui8 loop_A() {
  * @date 12/31/2020
  */
 void gpsSetup_A() {
+
 	#ifndef NDEBUG
 		_gpsFile = setupSensorFile_DS(GPS, &gpsNominal);
 	#else

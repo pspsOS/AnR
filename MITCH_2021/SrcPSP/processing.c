@@ -9,10 +9,10 @@
 #include <math.h>
 
 #ifndef NDEBUG
-#include <debugSettings.h>
-#include <unistd.h>
+	#include <debugSettings.h>
+	#include <unistd.h>
 #else
-#include "imuInterface.h"
+	#include "imuInterface.h"
 #endif
 
 bool bmpDStatus = false;
@@ -35,13 +35,16 @@ float magZ_imu;
 float accZ;
 
 float delta_alt;
-float Calc_Alt;
-float g = 9.81; // Acceleration of gravity in m/s^2
+float new_Alt = 0;
+float Calc_Alt = 0;
+float g = 9.80665; // Acceleration of gravity in m/s^2
 float R = 8.3144598; // R constant (J/(mol K)) of Earth's atmosphere (air)
 float M = 0.0289644; // molar mass of Earth's ait (kg/mol)
-float L_b;
-float press_rto;
-float power_val;
+float L_b = -0.0065; // K/m
+float T_b = 288.15; // K
+float P_b = 101325; // Pa
+float T_b2 = 216.65; // K
+float P_b2 = 22632.1; // Pa
 float temp_alt_bmp; // Temp in K at sea level
 float pres_alt_bmp; // Pressure in Pa at sea level
 float new_temp;
@@ -99,12 +102,12 @@ float result_mat_mult_Rot_Matrix[3];
 
 float vel_magnitude;
 
-float time_var; // Local time variable
-float new_time; // Local time variable
+float time_var = 0; // Local time variable
+float new_time = 0; // Local time variable
 
 float vel_g[3];
 
-float delta_time;
+float delta_time = 0;
 
 float v_prod[3];
 
@@ -232,25 +235,41 @@ bool getGPSData_P() {
 
 // function to multiply two matrices
 //matrix_mult_fun(first, second, result, r1, c1, r2, c2);
-void matrix_mult_fun(float first[][3],
+void matrix_mult_fun_3x3(float first[][3],
 		float second[][3],
-		float *result_mat_mult[],
-        int r1, int c1, int r2, int c2) {
+		float result_mat_mult[][3]) {
 
    // Initializing elements of matrix mult to 0.
-   for (int i = 0; i < r1; ++i) {
-      for (int j = 0; j < c2; ++j) {
+   for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
     	  result_mat_mult[i][j] = 0;
       }
    }
 
    // Multiplying first and second matrices and storing it in result
-   for (int i = 0; i < r1; ++i) {
-      for (int j = 0; j < c2; ++j) {
-         for (int k = 0; k < c1; ++k) {
+   for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+         for (int k = 0; k < 3; ++k) {
         	 result_mat_mult[i][j] += first[i][k] * second[k][j];
          }
       }
+   }
+}
+
+void matrix_mult_fun_3x3_3x1(float first[][3],
+		float second[3],
+		float result_mat_mult[3]) {
+
+   // Initializing elements of matrix mult to 0.
+   for (int i = 0; i < 3; ++i) {
+	   result_mat_mult[i] = 0;
+   }
+
+   // Multiplying first and second matrices and storing it in result
+   for (int i = 0; i < 3; ++i) {
+	   for (int j = 0; j < 3; ++j) {
+		   result_mat_mult[i] += first[i][j] * second[j];
+	   }
    }
 }
 
@@ -271,15 +290,15 @@ void matrix_mult_fun(float first[][3],
 
 //matrix_pow_fun(first, result, n, p); result[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, result must be initialized to this
 void matrix_pow_fun(float m[][3], //Matrix n x n to be raised to power p
-					float *result_mat_pow[],
+					float result_mat_pow[][3],
 					int n, int p) {
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
 			if (i == j) {
-				result_mat_mult[i][j] = 1;
+				result_mat_pow[i][j] = 1;
 			}
 			else {
-				result_mat_mult[i][j] = 0;
+				result_mat_pow[i][j] = 0;
 			}
 		}
 	}
@@ -303,7 +322,7 @@ void matrix_pow_fun(float m[][3], //Matrix n x n to be raised to power p
     }
 }
 
-void matrix_inverse_fun(float mat[][3], float *result_mat_inv[]) {
+void matrix_inverse_fun(float mat[][3], float result_mat_inv[][3]) {
 	//finding determinant
 	determinant = 0;
 	for(i = 0; i < 3; i++)
@@ -325,7 +344,7 @@ void matrix_inverse_fun(float mat[][3], float *result_mat_inv[]) {
 
 void matrix_add_sub_fun(float first[][3],
                       float second[][3],
-					  float *result_mat_add_sub[],
+					  float result_mat_add_sub[][3],
 					  int mode) { // mode = 1: add, mode = -1: subtract second from first
 	for(i = 0; i < 3; i++){
 		for(j = 0; j < 3; j++){
@@ -340,18 +359,18 @@ void matrix_add_sub_fun(float first[][3],
 }
 
 float Cross_prod_mag(float v[3], float w[3]) {
-	s_1 = pow(v[2] * w[3] - v[3] * w[2], 2);
-	s_2 = pow(v[3] * w[1] - v[1] * w[3], 2);
-	s_3 = pow(v[1] * w[2] - v[2] * w[1], 2);
+	s_1 = pow(v[1] * w[2] - v[2] * w[1], 2);
+	s_2 = pow(v[2] * w[0] - v[0] * w[2], 2);
+	s_3 = pow(v[0] * w[1] - v[1] * w[0], 2);
 
 	return sqrt(s_1 + s_2 + s_3);
 }
 
 
-void Cross_prod_fun(float v[3], float w[3], float *s) {
-	s[0] = v[2] * w[3] - v[3] * w[2];
-	s[1] = v[3] * w[1] - v[1] * w[3];
-	s[2] = v[1] * w[2] - v[2] * w[1];
+void Cross_prod_fun(float v[3], float w[3], float s[3]) {
+	s[0] = v[1] * w[2] - v[2] * w[1];
+	s[1] = v[2] * w[0] - v[0] * w[2];
+	s[2] = v[0] * w[1] - v[1] * w[0];
 }
 
 float dot_prod_fun(float v[3], float w[3]) {
@@ -366,6 +385,10 @@ float dot_prod_fun(float v[3], float w[3]) {
  */
 
 void processData_P() {
+
+	print("Works");
+
+
 	if (g_bmpData.hasUpdate && !g_bmpData.lock) {
 		getBMPData_P();
 	}
@@ -433,7 +456,7 @@ void processData_P() {
 		mag_Yw = Cross_prod_mag(V_mag, Y_axis);
 		mag_Zw = Cross_prod_mag(V_mag, Z_axis);
 
-		CalcAltBMP_P();
+		CalcAltBMP_P(new_pres, new_time);
 
 		Ang_xz = atan2(V[0], V[2]);
 		Ang_yz = atan2(V[1], V[2]);
@@ -450,14 +473,11 @@ void processData_P() {
 		V[0] = V_new[0];
 		V[1] = V_new[1];
 		V[2] = V_new[2];
-
-		time_var = new_time;
 	}
 
 	v_s_alt = sqrt(1.4*R*temp_alt_bmp); // Speed of Sound in m/s at the altitude
 
 }
-
 
 /* TODO: Implement transmitData
  *
@@ -486,32 +506,40 @@ bool pointyEndUp_P() {
 	return ((accZ*accZ / (accX_imu * accX_imu + accY_imu * accY_imu)) > TAN_THETA_SQUARED) && (accZ < 0); // g-rame
 }
 
-void CalcAltBMP_P() {
+void CalcAltBMP_P(float new_pres, float new_time) {
 	delta_time = new_time - time_var;
-	L_b = - (new_temp - temp_alt_bmp) / delta_time;
-
-	press_rto = new_pres/pres_alt_bmp;
 
 	// in e-frame
-	if (L_b == 0) {
-		power_val = - R*L_b / (g*M);
-
-		delta_alt = (pow(press_rto, power_val) - 1) * temp_alt_bmp / L_b;
+	if (Calc_Alt < 11000) {
+		new_Alt = ((pow((new_pres/P_b), -(R*L_b/(g*M))) * T_b) - T_b)/L_b;
 	}
 	else {
-		delta_alt = - log(press_rto) * R * temp_alt_bmp / (g * M);
+		new_Alt = (-log(new_pres/P_b2) * R * T_b2/(g*M)) + 11000;
 	}
 
-	Calc_Alt += delta_alt; //e-frame
+	delta_alt = new_Alt - Calc_Alt;
 
 	temp_alt_bmp = new_temp;
 	pres_alt_bmp = new_pres;
+
+	//printf("%f \n", new_temp_alt_bmp);
 
 	// Temp Mock vel:
 	// vel_g is the velocity calculated from the barometric data and corresponds only to the vertical component of the velocity in e
 	vel_g[0] = 0;
 	vel_g[1] = 0;
 	vel_g[2] = delta_alt/delta_time;
+
+	tm_apgee = (vel_g[2] / g);
+
+	if (tm_apgee > 0) {
+		apgee = Calc_Alt + pow(vel_g[2], 2) / (2*g);
+	}
+
+	//printf(", %f, %f, %f\n", new_Alt, vel_g[2], tm_apgee);
+
+	Calc_Alt = new_Alt;
+	time_var = new_time;
 
 	// After the addition of the kalman filter, a velocity will be given
 }
@@ -585,7 +613,7 @@ void CalcFlightDataBMP_P() {
 			result_mat_pow[i][j] = v_matrix_sqrd[i][j];
 		}
 	}
-	matrix_pow_fun(v_matrix, &result_mat_pow, 3, 2);
+	matrix_pow_fun(v_matrix, result_mat_pow, 3, 2);
 
 	skew_const = (1-dot_prod_fun(V_unit, V_unit_new))/pow(sqrt(pow(v_prod[0], 2) + pow(v_prod[1], 2) + pow(v_prod[2], 2)), 2);
 
@@ -594,7 +622,7 @@ void CalcFlightDataBMP_P() {
 			result_mat_add_sub[i][j] = first_add_Rot_matrix[i][j];
 		}
 	}
-	matrix_add_sub_fun(I_n, v_matrix, &result_mat_add_sub, 1);
+	matrix_add_sub_fun(I_n, v_matrix, result_mat_add_sub, 1);
 
 	for(i = 0; i < 3; i++){
 		for(j = 0; j < 3; j++){
@@ -607,7 +635,7 @@ void CalcFlightDataBMP_P() {
 			mult_skew_mat[i][j] = v_matrix_sqrd[i][j] * skew_const;
 		}
 	}
-	matrix_add_sub_fun(first_add_Rot_matrix, mult_skew_mat, &result_mat_add_sub, 1);
+	matrix_add_sub_fun(first_add_Rot_matrix, mult_skew_mat, result_mat_add_sub, 1);
 
 	Rot_matrix[0][0] = 1 + v_matrix[0][0] + v_matrix_sqrd[0][0] * skew_const;
 	Rot_matrix[0][1] = v_matrix[0][1] + v_matrix_sqrd[0][1] * skew_const;
@@ -622,17 +650,17 @@ void CalcFlightDataBMP_P() {
 	for(i = 0; i < 3; i++){
 		result_mat_mult_Rot_Matrix[i] = X_axis[i]; // e-frame
 	}
-	matrix_mult_fun(Rot_matrix, X_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+	matrix_mult_fun_3x3_3x1(Rot_matrix, X_axis, result_mat_mult_Rot_Matrix);
 
 	for(i = 0; i < 3; i++){
 		result_mat_mult_Rot_Matrix[i] = Y_axis[i]; // e-frame
 	}
-	matrix_mult_fun(Rot_matrix, Y_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+	matrix_mult_fun_3x3_3x1(Rot_matrix, Y_axis, result_mat_mult_Rot_Matrix);
 
 	for(i = 0; i < 3; i++){
 		result_mat_mult_Rot_Matrix[i] = Z_axis[i]; // e-frame
 	}
-	matrix_mult_fun(Rot_matrix, Z_axis, &result_mat_mult_Rot_Matrix, 3, 3, 3, 1);
+	matrix_mult_fun_3x3_3x1(Rot_matrix, Z_axis, result_mat_mult_Rot_Matrix);
 
 	vel_magnitude = vel_g[2] / V_unit_new[2];
 
@@ -642,11 +670,4 @@ void CalcFlightDataBMP_P() {
 
 	calc_x_pos += vel_e[0] * delta_time;
 	calc_y_pos += vel_e[1] * delta_time;
-
-	tm_apgee = (vel_e[2] / g);
-
-	if (tm_apgee > 0) {
-		apgee = Calc_Alt + pow(vel_e[2], 2) / (2*g);
-	}
-
 }
